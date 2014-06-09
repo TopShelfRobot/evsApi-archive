@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="evs.Model.UserProfile" Collapsed="true">
+    <Position X="4" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>AccountModels.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.RegisterExternalLoginModel" Collapsed="true">
+    <Position X="5.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>AccountModels.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.LocalPasswordModel" Collapsed="true">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAAAAEAAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>AccountModels.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.LoginModel" Collapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAQAAAAAgAAA=</HashCode>
+      <FileName>AccountModels.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.RegisterModel" Collapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAQAAAAAAIAA=</HashCode>
+      <FileName>AccountModels.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.ExternalLogin" Collapsed="true">
+    <Position X="7.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAEAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AccountModels.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.Address" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAAAAAAAAAwAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Address.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.CartItems" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAGAAAAAAAAAAAAgAAAAAACAAAAAIAAAAEAAAAAAAA=</HashCode>
+      <FileName>Cart.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.Contact" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Contact.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.ContactType" Collapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ContactType.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.Coupon" Collapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAKCAAAAAAABAAAAAAAAASCAAAAAAAgAQAAAAAAAAA=</HashCode>
+      <FileName>Coupon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.EmergencyContact" Collapsed="true">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAACAAAAAAAAAIAQAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>EmergencyContact.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.Eventure" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAIAAAAAAAAAAAAQIYDAAAAkAAgAAAAQCQCAgA=</HashCode>
+      <FileName>Eventure.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.EventureGroup" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQCAAgAAAAgAAAAAAAEAAA=</HashCode>
+      <FileName>EventureGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.EventureList" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAACEAAAABBAAAAAAQAAAQQCAAAAAAAkAAABYAwAAAA=</HashCode>
+      <FileName>EventureList.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.EventureType" Collapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAkAAAAAAAAAAA=</HashCode>
+      <FileName>EventureType.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.FeeSchedule" Collapsed="true">
+    <Position X="9.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAEAACAAAgAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>FeeSchedule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.Invoice" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Invoice.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.InvoiceList" Collapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>InvoiceList.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.Participant" Collapsed="true">
+    <Position X="7.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAEAIgSAAAACIAAAAKAAAAA4AAAACAAAAJAAAAAg=</HashCode>
+      <FileName>Participant.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.Player" Collapsed="true">
+    <Position X="9.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQiAAAAIAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAQA=</HashCode>
+      <FileName>Player.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.QAnswer" Collapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>QAnswer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.QQuestion" Collapsed="true">
+    <Position X="2.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAgAAAAAQAAACAAEAAA=</HashCode>
+      <FileName>QQuestion.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.QResult" Collapsed="true">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAgAAAAAIAAAACAAAAAAAAAAAAEAAAAAgAEAAA=</HashCode>
+      <FileName>QResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.Registration" Collapsed="true">
+    <Position X="9.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABCAAAAAAAAAAAAAAAAAASAAAgAAAABAKAAAAAEAAA=</HashCode>
+      <FileName>Registration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.Roster" Collapsed="true">
+    <Position X="0.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAgAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>Roster.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="evs.Model.State" Collapsed="true">
+    <Position X="2.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAABAAAAAAAAAAAAAAAQAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>State.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

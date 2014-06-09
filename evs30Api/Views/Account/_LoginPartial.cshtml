@@ -1,0 +1,26 @@
+﻿@model evs.Model.LoginModel
+@using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.LabelFor(m => m.UserName)
+    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.UserName)
+    <br>
+    @Html.LabelFor(m => m.Password)
+    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.Password)
+                  
+    <br>
+    <input type="submit" value="Sign In" class="btn btn-primary btn-block" />
+    <br>
+    <div class="row">
+        <div class="col-6 col-sm-6 col-lg-6 text-center">
+            <a>Forgot Password?</a>
+        </div>
+        <div class="col-6 col-sm-6 col-lg-6 text-center">
+            @Html.ActionLink("Create Account", "Register")
+        </div>
+    </div>
+    <!-- /row -->
+}

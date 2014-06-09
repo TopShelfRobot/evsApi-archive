@@ -1,0 +1,38 @@
+﻿@using System.Web.Optimization
+@model evs.Model.RegisterExternalLoginModel
+@{
+    ViewBag.Title = "Register";
+}
+
+<hgroup class="title">
+   <h2>Associate your @ViewBag.ProviderDisplayName account.</h2>
+</hgroup>
+
+@using (Html.BeginForm("ExternalLoginConfirmation", "Account", new { ReturnUrl = ViewBag.ReturnUrl }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+       <p>
+            You've successfully authenticated with <strong>@ViewBag.ProviderDisplayName</strong>.
+            Please enter your email address below and click the Confirm button to finish
+            logging in.
+        </p>
+        @Html.LabelFor(m => m.UserName)
+        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @type = "email" })
+        @Html.ValidationMessageFor(m => m.UserName)
+        <br>
+        @Html.HiddenFor(m => m.ExternalLoginData)
+        <input type="submit" class="btn btn-primary btn-block" value="Confirm" />
+    </fieldset>
+}
+
+@*@section Scripts {
+    @Scripts.Render("~/scripts/jqueryval")
+}*@
+<style scoped>
+    #socialLoginForm {
+        display: none;
+    }
+</style>

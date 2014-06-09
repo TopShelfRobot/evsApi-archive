@@ -1,0 +1,6 @@
+D:\source\evs\evs.Model\bin\Release\evs.Model.dll.config
+D:\source\evs\evs.Model\bin\Release\evs.Model.dll
+D:\source\evs\evs.Model\bin\Release\evs.Model.pdb
+D:\source\evs\evs.Model\obj\Release\evs.Model.dll
+D:\source\evs\evs.Model\obj\Release\evs.Model.pdb
+D:\source\evs\evs.Model\obj\Release\evs.Model.csprojResolveAssemblyReference.cache

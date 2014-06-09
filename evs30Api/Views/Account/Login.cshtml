@@ -1,0 +1,33 @@
+﻿@using System.Web.Optimization
+@model evs.Model.LoginModel
+
+@{
+    ViewBag.Title = "Log in";
+}
+
+<hgroup class="title">
+    @*<h1>@ViewBag.Title.</h1>*@
+</hgroup>
+@*<h2>Use a local account to log in.</h2>*@
+@using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.LabelFor(m => m.UserName)
+    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.UserName)
+    <br>
+    @Html.LabelFor(m => m.Password)
+    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+    @Html.ValidationMessageFor(m => m.Password)
+                  
+    <br>
+    <input type="submit" value="Sign In" class="btn btn-success btn-block" />
+    
+    <h6 class="text-center">@Html.ActionLink("Forgot your password?", "PasswordReset", new { ReturnUrl = ViewBag.ReturnUrl }) </h6>
+    @*<p class="text-center"> @Html.ActionLink("Create Headfirst Account","Register", new { ReturnUrl = ViewBag.ReturnUrl }, new { @class = "btn btn-default" })</p>*@
+    <div class="text-center"><strong> @Html.ActionLink("Create Account","Register", new { ReturnUrl = ViewBag.ReturnUrl })</strong></div>     
+}
+@section Scripts {
+    @Scripts.Render("~/scripts")
+}
