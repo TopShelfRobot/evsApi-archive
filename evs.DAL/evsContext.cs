@@ -57,8 +57,15 @@ namespace evs.DAL
         public DbSet<Roster> Rosters { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamMember> TeamMembers { get; set; }
+        public DbSet<TeamMemberPayment> TeamMemberPayments { get; set; }
         public DbSet<Facility> Facilitys { get; set; }  //spell
         public DbSet<GameSchedule> GameSchedules { get; set; }
+
+        public DbSet<Volunteer> Volunteer { get; set; }
+        public DbSet<VolunteerSchedule> VolunteerSchedule { get; set; }  //mjb
+        public DbSet<VolunteerJob> VolunteerJob { get; set; }
+        public DbSet<VolunteerShift> VolunteerShift { get; set; }
+
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

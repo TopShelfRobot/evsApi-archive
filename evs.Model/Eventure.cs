@@ -32,6 +32,7 @@ namespace evs.Model
         public Boolean Managed { get; set; }
         public Int32? ClientId { get; set; }
         public Boolean IsGroupRequired { get; set; }
+        public Boolean IsTeam { get; set; }
    
         // Navigation property
         public ICollection<EventureList> EventureLists { get; set; }

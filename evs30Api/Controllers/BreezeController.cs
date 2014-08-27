@@ -1,8 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity.Core.Objects;
 using System.Linq;
+//using System.Net;
+//using System.Net.Http;
+//using System.Threading;
+//using System.Threading.Tasks;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Breeze.ContextProvider;
 using Breeze.ContextProvider.EF6;
@@ -10,15 +17,16 @@ using Breeze.WebApi2;
 using Newtonsoft.Json.Linq;
 using evs.DAL;
 using evs.Model;
-//using System.Data.Objects;
+//using System.Web.Http.Cors;
 
 namespace evs30Api.Controllers
 {
+    //[EnableCors(origins: "http://imperclient.azurewebsites.net", headers: "*", methods: "*")]
     [BreezeController]
     public class BreezeController : ApiController
     {
         readonly EFContextProvider<evsContext> _contextProvider = new EFContextProvider<evsContext>();
-        
+
         public class DtoCoupon
         {
             public decimal Amount { get; set; }
@@ -103,7 +111,7 @@ namespace evs30Api.Controllers
             public decimal Last1Amount { get; set; }
             public decimal TotalAmount { get; set; }
 
-            public DtoTrends(Int32 last30Count, Int32 last7Count, Int32 last1Count,Int32 totalCount, decimal? last30Amount, decimal? last7Amount, decimal? last1Amount, decimal? totalAmount)
+            public DtoTrends(Int32 last30Count, Int32 last7Count, Int32 last1Count, Int32 totalCount, decimal? last30Amount, decimal? last7Amount, decimal? last1Amount, decimal? totalAmount)
             {
                 Last30Count = last30Count;
                 Last7Count = last7Count;
@@ -118,11 +126,11 @@ namespace evs30Api.Controllers
         }
 
         [HttpGet]
-        public DtoTrends GetTrendsByEventId(int id)    
+        public DtoTrends GetTrendsByEventId(int id)
         {
             var queryLists = _contextProvider.Context
                                         .EventureLists
-                                        .Where(el =>el.EventureId == id)
+                                        .Where(el => el.EventureId == id)
                                         .Select(l => l.Id);
 
             var last7Date = DateTime.Now.AddDays(-7).Date;
@@ -144,6 +152,39 @@ namespace evs30Api.Controllers
 
 
             return new DtoTrends(reg30Count, reg7Count, reg1Count, totalCount, reg30Amount, reg7Amount, reg1Amount, totalAmount);
+        }
+
+        [HttpGet]
+        public object GetTeamMemberPaymentInfoByTeamMemberGuid(Guid id)
+        {
+            return _contextProvider.Context.TeamMembers
+                     .Where(t => t.TeamMemberGuid == id && t.Active)
+                     .Select(m => new
+                     {
+                         ListName = m.Team.Registration.EventureList.DisplayName,
+                         RegAmount = m.Team.Registration.ListAmount,   //totalAmount??
+                         m.Id,
+                         m.Team.Name
+                     })
+                     .ToList();
+        }
+
+        [HttpGet]
+        public object GetNotPaidTeamMemberCountByTeamGuid(Guid id)
+        {
+            var allTeamCount = _contextProvider.Context.TeamMembers.Count(t => t.Team.TeamGuid == id && t.Active);
+
+            var paidTeamCount = _contextProvider.Context.TeamMembers.Count(t => t.Team.TeamGuid == id && t.Active && t.TeamMemberPayments.Count > 0);
+
+            return allTeamCount - paidTeamCount;
+        }
+
+        [HttpGet]
+        public object GetTeamMemberPaymentSumByTeamGuid(Guid id)
+        {
+            return _contextProvider.Context.TeamMembers
+                              .Where(t => t.Team.TeamGuid == id && t.Active)
+                            .Sum(t => (decimal?)t.TeamMemberPayments.Sum(p => (decimal?)p.Amount) ?? 0);  
         }
 
         [HttpGet]
@@ -231,17 +272,20 @@ namespace evs30Api.Controllers
         [HttpGet]
         public object GetTransferInfo(int id)
         {
-          var transfer = from t in _contextProvider.Context.EventureTransfers
+            var transfer = from t in _contextProvider.Context.EventureTransfers
                            join fl in _contextProvider.Context.EventureLists
                            on t.EventureListIdFrom equals fl.Id
                            join tl in _contextProvider.Context.EventureLists
                            on t.EventureListIdTo equals tl.Id
                            where t.Id == id
-                           select new { originalList = fl.Name, 
-                                           originalListCost = fl.CurrentFee, 
-                                           newList = tl.Name, 
-                                           newListCost = tl.CurrentFee, 
-                                           regId = t.RegistrationId };    //this should really look at reg for original cost
+                           select new
+                           {
+                               originalList = fl.Name,
+                               originalListCost = fl.CurrentFee,
+                               newList = tl.Name,
+                               newListCost = tl.CurrentFee,
+                               regId = t.RegistrationId
+                           };    //this should really look at reg for original cost
             return transfer.ToList();
         }
 
@@ -261,7 +305,7 @@ namespace evs30Api.Controllers
             //dtoAccess.OwnerId = 1;
             //dtoAccess.AccessType = "admin";
 
-           
+
 
             var dtoAccess = new DtoAccess(1, "admin", 4896);
 
@@ -551,6 +595,7 @@ namespace evs30Api.Controllers
         }
 
         [HttpGet]
+        [AcceptVerbs("OPTIONS")]
         public string Metadata()
         {
             return _contextProvider.Metadata();
@@ -672,7 +717,6 @@ namespace evs30Api.Controllers
             return _contextProvider.Context.ResourceItems;
         }
 
-
         [HttpGet]
         public IQueryable<FeeSchedule> FeeSchedules()
         {
@@ -692,19 +736,79 @@ namespace evs30Api.Controllers
         }
 
         [HttpGet]
-        public IQueryable<Payment> Payments()
+        public IQueryable<TeamMemberPayment> TeamMemberPayments()
         {
-            return _contextProvider.Context.Payments;
+            return _contextProvider.Context.TeamMemberPayments;
         }
 
         [HttpPost]
+        [AllowAnonymous]
+        [AcceptVerbs("OPTIONS")]
         public SaveResult SaveChanges(JObject saveBundle)
         {
             return _contextProvider.SaveChanges(saveBundle);
         }
 
     }
+
+    public class BreezeSimpleCorsHandler : DelegatingHandler
+    {
+        const string Origin = "Origin";
+        const string AccessControlRequestMethod = "Access-Control-Request-Method";
+        const string AccessControlRequestHeaders = "Access-Control-Request-Headers";
+        const string AccessControlAllowOrigin = "Access-Control-Allow-Origin";
+        const string AccessControlAllowMethods = "Access-Control-Allow-Methods";
+        const string AccessControlAllowHeaders = "Access-Control-Allow-Headers";
+        const string AccessControlAllowCredentials = "Access-Control-Allow-Credentials";
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var isCorsRequest = request.Headers.Contains(Origin);
+            var isPreflightRequest = request.Method == HttpMethod.Options;
+            if (isCorsRequest)
+            {
+                if (isPreflightRequest)
+                {
+                    var response = new HttpResponseMessage(HttpStatusCode.OK);
+                    response.Headers.Add(AccessControlAllowOrigin,
+                      request.Headers.GetValues(Origin).First());
+
+                    var accessControlRequestMethod =
+                      request.Headers.GetValues(AccessControlRequestMethod).FirstOrDefault();
+
+                    if (accessControlRequestMethod != null)
+                    {
+                        response.Headers.Add(AccessControlAllowMethods, accessControlRequestMethod);
+                    }
+
+                    var requestedHeaders = string.Join(", ",
+                       request.Headers.GetValues(AccessControlRequestHeaders));
+
+                    if (!string.IsNullOrEmpty(requestedHeaders))
+                    {
+                        response.Headers.Add(AccessControlAllowHeaders, requestedHeaders);
+                    }
+
+                    response.Headers.Add(AccessControlAllowCredentials, "true");
+
+                    var tcs = new TaskCompletionSource<HttpResponseMessage>();
+                    tcs.SetResult(response);
+                    return tcs.Task;
+                }
+                return base.SendAsync(request, cancellationToken).ContinueWith(t =>
+                {
+                    var resp = t.Result;
+                    resp.Headers.Add(AccessControlAllowOrigin, request.Headers.GetValues(Origin).First());
+                    resp.Headers.Add(AccessControlAllowCredentials, "true");
+                    return resp;
+                });
+            }
+            return base.SendAsync(request, cancellationToken);
+        }
+    }
 }
+
+
 
 
 //[HttpGet]

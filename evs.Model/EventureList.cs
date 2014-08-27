@@ -38,6 +38,7 @@ namespace evs.Model
         // Navigation property 
         //public virtual Eventure Eventure { get; set; }
         public ICollection<Registration> Registration { get; set; }
+        public Eventure Eventure { get; set; }
         //public Result Result { get; set; }
         //public virtual string EventureName { get; set; }
         //public ICollection<Coupon> Coupons { get; set; }

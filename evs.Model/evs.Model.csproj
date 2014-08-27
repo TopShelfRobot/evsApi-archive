@@ -85,7 +85,6 @@
     <Compile Include="StockQuestionSet.cs" />
     <Compile Include="Surcharge.cs" />
     <Compile Include="Team.cs" />
-    <Compile Include="TeamMembers.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Resource.cs" />
     <Compile Include="ResourceItemCategory.cs" />

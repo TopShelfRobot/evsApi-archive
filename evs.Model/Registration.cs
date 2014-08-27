@@ -22,7 +22,7 @@ namespace evs.Model
         public Int32 Quantity { get; set; }
         public Boolean Redeemed { get; set; }
         public Int32? ConvRegId { get; set; }
-        public Int32 StockAnswerSetId { get; set; }
+        public Int32? StockAnswerSetId { get; set; }
 
         public string Type { get; set; }
 

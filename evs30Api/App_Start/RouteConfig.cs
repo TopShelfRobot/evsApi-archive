@@ -52,8 +52,8 @@ namespace evs30Api.App_Start
 
             routes.MapRoute(
              name: "Payment",
-             url: "api/Payment/{id}",
-             defaults: new { controller = "Payment", action = "Post", id = UrlParameter.Optional }
+             url: "api/Payment/{action}",
+             defaults: new { controller = "Payment" }
               );
 
             routes.MapRoute(

@@ -14,8 +14,8 @@ using evs30Api.Filters;
 
 namespace evs30Api.Controllers
 {
-    [Authorize]
-    [InitializeSimpleMembership]
+    //[Authorize]
+    //[InitializeSimpleMembership]
     public class CouponController : ApiController
     {
         private evsContext db = new evsContext();

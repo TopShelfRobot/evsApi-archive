@@ -1,4 +1,5 @@
 using System.Web.Http;
+using evs30Api.Controllers;
 
 [assembly: WebActivator.PreApplicationStartMethod(
     typeof(evs30Api.App_Start.BreezeWebApiConfig), "RegisterBreezePreStart")]
@@ -14,12 +15,8 @@ namespace evs30Api.App_Start
     public static class BreezeWebApiConfig
     {
 
-
-
-
         public static void RegisterBreezePreStart()
         {
-
             //GlobalConfiguration.Configuration.Routes.MapHttpRoute(
             //      name: "BreezeCouponApi",
             //      routeTemplate: "breeze/ValidateCoupon{test}"
@@ -33,7 +30,9 @@ namespace evs30Api.App_Start
             //    //defaults: new { couponCode = RouteParameter.Optional, particpantId = RouteParameter.Optional, eventureListId = RouteParameter.Optional }
             //);
 
+            //GlobalConfiguration.Configuration.
 
+            GlobalConfiguration.Configuration.MessageHandlers.Add(new BreezeSimpleCorsHandler());   
 
             GlobalConfiguration.Configuration.Routes.MapHttpRoute(
                 name: "BreezeApi",
@@ -41,20 +40,21 @@ namespace evs30Api.App_Start
                 defaults: new { id = RouteParameter.Optional }
             );
 
-
-
             GlobalConfiguration.Configuration.Routes.MapHttpRoute(
                       name: "pay",
                       routeTemplate: "api/{controller}/{action}"
                   );
 
             GlobalConfiguration.Configuration.Routes.MapHttpRoute(
+                    name: "team",
+                    routeTemplate: "api/Payment/PostTeam"
+                );
+
+            GlobalConfiguration.Configuration.Routes.MapHttpRoute(
                      name: "kendoApi",
                      routeTemplate: "kendo/{controller}/{action}/{id}",
                      defaults: new { id = RouteParameter.Optional }
                  );
-
-
         }
     }
 }

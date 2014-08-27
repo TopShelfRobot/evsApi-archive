@@ -24,4 +24,3 @@ D:\source\evs30Api\evs.Model\bin\Debug\EntityFramework.dll
 D:\source\evs30Api\evs.Model\bin\Debug\EntityFramework.SqlServer.dll
 D:\source\evs30Api\evs.Model\bin\Debug\EntityFramework.xml
 D:\source\evs30Api\evs.Model\bin\Debug\EntityFramework.SqlServer.xml
-D:\source\evs30Api\evs.Model\obj\Debug\evs.Model.csprojResolveAssemblyReference.cache
