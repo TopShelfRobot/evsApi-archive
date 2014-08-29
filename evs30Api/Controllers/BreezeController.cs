@@ -163,8 +163,11 @@ namespace evs30Api.Controllers
                      {
                          ListName = m.Team.Registration.EventureList.DisplayName,
                          RegAmount = m.Team.Registration.ListAmount,   //totalAmount??
+                         userPaid = (decimal?)m.TeamMemberPayments.Sum(p => p.Amount) ?? 0,     //this is temp;  if they make multiple payments reciept will be wrong
                          m.Id,
-                         m.Team.Name
+                         m.Team.Name,
+                         teamMemberId = m.Id,
+                         teamId = m.Team.Id
                      })
                      .ToList();
         }
@@ -184,7 +187,7 @@ namespace evs30Api.Controllers
         {
             return _contextProvider.Context.TeamMembers
                               .Where(t => t.Team.TeamGuid == id && t.Active)
-                            .Sum(t => (decimal?)t.TeamMemberPayments.Sum(p => (decimal?)p.Amount) ?? 0);  
+                            .Sum(t => (decimal?)t.TeamMemberPayments.Sum(p => (decimal?)p.Amount) ?? 0);
         }
 
         [HttpGet]

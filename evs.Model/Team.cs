@@ -16,6 +16,7 @@ namespace evs.Model
         //public Boolean IsBye { get; set; }
         public Int32 RegistrationId { get; set; }
         public Boolean IsPaidInFull { get; set;}
+        public Int32 OwnerId { get; set; }
 
         //navigation
         public ICollection<TeamMember> TeamMembers { get; set; }
@@ -23,6 +24,7 @@ namespace evs.Model
         public virtual Registration Registration { get; set; }
         [ForeignKey("CoachId")]
         public virtual Participant Coach { get; set; }
+        public virtual Owner Owner { get; set; }
     }
 
     public class TeamMember

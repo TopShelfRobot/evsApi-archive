@@ -1,5 +1,6 @@
 ﻿using System;
 //using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
@@ -7,15 +8,16 @@ namespace evs.Model
 {
     public class Owner
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public Int32 Id { get; set; }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public Guid OwnerGuid { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string TermsText { get; set; }
         public string RefundsText { get; set; }
         public string LogoImageName { get; set; }
+        public string Url { get; set; }
 
         public decimal CardProcessorFeePercentPerCharge { get; set; }
         public Int32 CardProcessorFeeFlatPerChargeInCents { get; set; }
@@ -49,6 +51,8 @@ namespace evs.Model
         public string SendMailEmailAddress { get; set; }
         public string SendImageHtml { get; set; }
         public string SendConfirmEmailSubject { get; set; }
+        public string SendConfirmTeamEmailSubject { get; set; }
+        public string SendConfirmTeamInviteEmailSubject { get; set; }
 
         public string EventureName { get; set; }
         public string ListingName { get; set; }

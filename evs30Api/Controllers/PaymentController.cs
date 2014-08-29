@@ -164,7 +164,7 @@ namespace evs30Api.Controllers
 
                 if (order.LocalApplicationFee < 0)
                     order.LocalApplicationFee = 0;
-            
+
                 string custDesc = string.Empty;
                 string partEmail = string.Empty;
                 var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
@@ -288,7 +288,7 @@ namespace evs30Api.Controllers
                 }
             }
         }
-        
+
         [HttpPost]
         [AllowAnonymous]
         [AcceptVerbs("OPTIONS")]
@@ -551,7 +551,7 @@ namespace evs30Api.Controllers
                 }
             }
         }
-        
+
         [HttpPost]
         [AllowAnonymous]
         [AcceptVerbs("OPTIONS")]
@@ -563,6 +563,8 @@ namespace evs30Api.Controllers
                 //TODO:  add a team member payment
                 //int numOfRegs = 0;
                 decimal totalFees = 0;
+                Int32 teamId = 0;
+                string teamMemberGuid = string.Empty;    // = 0;
 
                 //public static EventureOrder populateOrderFromBundle(JObject saveBundle)
                 var order = new EventureOrder
@@ -576,7 +578,25 @@ namespace evs30Api.Controllers
                     Voided = false
                 };
                 db.Orders.Add(order);
-               
+
+                var custDesc = string.Empty;
+                var partEmail = string.Empty;
+                var partName = string.Empty;
+                var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
+                if (part != null)
+                {
+                    custDesc = part.FirstName + " " + part.LastName + "_ord" + order.Id;
+                    partEmail = part.Email;
+                    partName = part.FirstName + " " + part.LastName;
+                }
+                else
+                {
+                    //this should never happen  throw exception?
+                    //custDesc = "participant" + "_ord" + order.Id + "_id:" + order.HouseId;
+                    //partEmail = "email" + "_ord" + order.Id + "_id:" + order.HouseId;
+                    throw new Exception("couldn't find that houseId");
+                }
+
                 dynamic bundle = saveBundle;
                 foreach (dynamic regBundle in bundle.regs) //this is not nessessary now because only 1 reg in team
                 {
@@ -594,11 +614,37 @@ namespace evs30Api.Controllers
                     db.Registrations.Add(registration);
                     //db.SaveChanges();
 
-                    var team = new Team();
-                    team.Name = regBundle.teamName;    // (string)saveBundle["teamName"];
-                    team.RegistrationId = registration.Id;
-                    team.CoachId = order.HouseId;
+                    var team = new Team
+                        {
+                            Name = regBundle.teamName, // (string)saveBundle["teamName"];
+                            RegistrationId = registration.Id,
+                            CoachId = order.HouseId,
+                            OwnerId = order.OwnerId
+                        };
                     db.Teams.Add(team);
+                    db.SaveChanges();
+                    teamId = team.Id;      //this sucks
+
+                    //add coach to teamMember
+                    var teamCoach = new TeamMember
+                        {
+                            Name = partName,
+                            Email = partEmail,
+                            TeamId = team.Id,
+                            ParticipantId = order.HouseId,
+                            Active = true
+                        };
+                    db.TeamMembers.Add(teamCoach);
+                    db.SaveChanges();
+                    teamMemberGuid = teamCoach.TeamMemberGuid.ToString().ToUpper();     //this is returned to app in response
+
+                    var payment = new TeamMemberPayment();
+                    //{
+                    payment.TeamId = team.Id;
+                    payment.Amount = order.Amount;
+                    payment.TeamMemberId = teamCoach.Id;
+                    //};
+                    db.TeamMemberPayments.Add(payment);
 
                     foreach (dynamic teamBundle in regBundle.teamMembers)
                     //this is not nessessary now because only 1 reg in team
@@ -610,6 +656,7 @@ namespace evs30Api.Controllers
                         teamMember.Active = true;
                         db.TeamMembers.Add(teamMember);
                     }
+
                 }
                 //populate surcharge
                 if (bundle.charges != null)  //if no surcharges skip this
@@ -645,22 +692,6 @@ namespace evs30Api.Controllers
 
                 if (order.LocalApplicationFee < 0)
                     order.LocalApplicationFee = 0;
-
-                string custDesc = string.Empty;
-                string partEmail = string.Empty;
-                var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
-                if (part != null)
-                {
-                    custDesc = part.FirstName + " " + part.LastName + "_ord" + order.Id;
-                    partEmail = part.Email;
-                }
-                else
-                {
-                    //this should never happen  throw exception?
-                    //custDesc = "participant" + "_ord" + order.Id + "_id:" + order.HouseId;
-                    //partEmail = "email" + "_ord" + order.Id + "_id:" + order.HouseId;
-                    throw new Exception("couldn't find that houseId");
-                }
 
                 // create customer
                 var customerOptions = new StripeCustomerCreateOptions
@@ -702,32 +733,24 @@ namespace evs30Api.Controllers
                     //db.Orders.Add(order);
                     db.SaveChanges();
 
-                    //adjust reg.TotalAmount to for surcharge
-                    //mjb this might br going through entire db.reg
-                    //foreach (var reg in db.Registrations) //order id = order.Id
-                    //{
-                    //    if (reg.EventureListId == surcharge.EventureListId &&
-                    //        reg.ParticipantId == surcharge.ParticipantId)
-                    //        reg.TotalAmount = reg.TotalAmount + surcharge.Amount;
-                    //}
-                    ////if coupon adust Redeemed  //mjb
-                    //if (surcharge.ChargeType == "coupon")
-                    //{
-                    //    Coupon coupon = db.Coupons.Single(c => c.Id == surcharge.CouponId);
-                    //    coupon.Redeemed++;
-                    //    //db.SaveChanges(coupon);
-                    //}
-
                     //call mail
-                    HttpResponseMessage result = new MailController().SendConfirmMail(order.Id);
+                    //HttpResponseMessage result = new MailController().SendConfirmMail(order.Id);
+                    foreach (var member in db.TeamMembers.Where(m => m.TeamId == teamId))
+                    {
+                        //if member.partId is null
+                        if (member.ParticipantId == null)
+                        {
+                            HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);
+                            //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
+                        }
+                    }
 
                     //return Request.CreateResponse(HttpStatusCode.OK, stripeCharge);
 
-
-
                     var resp = Request.CreateResponse(HttpStatusCode.OK);
-                    //resp.Content = new StringContent();
-                    resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
+                    //order.Id.ToString()  we are using teamGuid for demo because we already have 
+                    //                     a getbyteamguid
+                    resp.Content = new StringContent(teamMemberGuid.ToString(), Encoding.UTF8, "text/plain");    
                     return resp;
 
                 }
@@ -779,14 +802,15 @@ namespace evs30Api.Controllers
         {
             try
             {
-                //int numOfRegs = 0;
                 decimal totalFees = 0;
+                Int32 teamMemberId = (Int32)saveBundle["teamMemberId"];
+                Int32 teamId = (Int32)saveBundle["teamId"];
 
                 //public static EventureOrder populateOrderFromBundle(JObject saveBundle)
                 var order = new EventureOrder
                 {
                     DateCreated = DateTime.Now,
-                    HouseId = (Int32)saveBundle["participantId"],
+                    HouseId = 1,      //(Int32)saveBundle["participantId"],
                     Amount = (Decimal)saveBundle["orderAmount"],
                     Token = (string)saveBundle["orderToken"],
                     OwnerId = (Int32)saveBundle["ownerId"],  //need to send
@@ -814,7 +838,7 @@ namespace evs30Api.Controllers
 
                 //var team = new Team
                 //    {
-                        
+
                 //    }
 
                 //populate surcharge
@@ -837,6 +861,33 @@ namespace evs30Api.Controllers
                         db.Surcharges.Add(surcharge);
                     }
                 }
+
+
+                Int32 participantId = 0;
+                //if (bundle.participant != null)
+                //{
+                //    dynamic part = bundle.charges;
+
+                //    var getPart = db.Participants.Where(p => p.Email == part.email).SingleOrDefault();
+                //    if (getPart != null)
+                //    {
+                //        //enter part and get part id
+
+                //    }
+                //    else
+                //    {
+                //        participantId = getPart.Id;
+                //    }
+
+                //}
+
+                var payment = new TeamMemberPayment();
+                //{
+                payment.TeamId = teamId;
+                payment.Amount = order.Amount;
+                payment.TeamMemberId = teamMemberId;
+                //};
+                db.TeamMemberPayments.Add(payment);
 
                 Owner owner = db.Owners.Where(o => o.Id == 1).SingleOrDefault();
                 if (owner == null)
@@ -865,7 +916,7 @@ namespace evs30Api.Controllers
                     //this should never happen  throw exception?
                     //custDesc = "participant" + "_ord" + order.Id + "_id:" + order.HouseId;
                     //partEmail = "email" + "_ord" + order.Id + "_id:" + order.HouseId;
-                    throw new Exception("No Hou");
+                    throw new Exception("No Partipant found to match houseId ");
                 }
 
                 // create customer
@@ -907,6 +958,9 @@ namespace evs30Api.Controllers
                     order.PaymentType = "credit";
                     //db.Orders.Add(order);
                     db.SaveChanges();
+
+
+                    //flip flag
 
                     //adjust reg.TotalAmount to for surcharge
                     //mjb this might br going through entire db.reg
