@@ -66,6 +66,7 @@ namespace evs30Api.Controllers
                     CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
                     Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
                     Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
+                    t.Registration.EventureList.ListingType,
                     EventName = t.Registration.EventureList.Eventure.Name
                 })
                 .ToList();

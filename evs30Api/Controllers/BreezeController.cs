@@ -162,6 +162,8 @@ namespace evs30Api.Controllers
                      .Select(m => new
                      {
                          ListName = m.Team.Registration.EventureList.DisplayName,
+                         m.Team.Registration.EventureList.ListingType,
+                         m.Team.Registration.EventureList.CurrentFee,
                          RegAmount = m.Team.Registration.ListAmount,   //totalAmount??
                          userPaid = (decimal?)m.TeamMemberPayments.Sum(p => p.Amount) ?? 0,     //this is temp;  if they make multiple payments reciept will be wrong
                          m.Id,
