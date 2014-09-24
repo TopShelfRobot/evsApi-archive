@@ -66,4 +66,26 @@ namespace evs.Model
         public string FacebookAppId { get; set; }
         public string FacebookAppSecretId { get; set; }
     }
+
+    public class Client
+    {
+        public Int32 Id { get; set; }
+        public string Name { get; set; }
+        public string Street { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string Zip { get; set; }
+        public string ContactName { get; set; }
+        public string ContactPhone { get; set; }
+        public string ContactEmail { get; set; }
+        public Int32 OwnerId { get; set; }
+    }
+
+    //public class User
+    //{
+
+    //    public Int32 Id { get; set; }
+    //    public string Email { get; set; }
+    //    public string AccessType { get; set; }
+    //}
 }

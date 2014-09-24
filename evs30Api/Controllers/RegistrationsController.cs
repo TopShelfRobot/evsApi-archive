@@ -547,10 +547,11 @@ namespace evs30Api.Controllers
             return db.Registrations.FirstOrDefault(r => r.Id == id);
         }
 
-        public IEnumerable<Registration> GetRegistrationsByPartId(int id)
+        public object GetRegistrationsByPartId(int id)
         {
             //need to check order.Status == 'Complete'   //mjb 
-            return db.Registrations.Where(r => r.ParticipantId == id);
+            return db.Registrations.Where(r => r.ParticipantId == id).Select(r => new { r.EventureList.DisplayName, r.TotalAmount, r.Quantity, r.DateCreated, r.Id, r.EventureOrderId, r.StockAnswerSetId });
+            //return db.Registrations.Where(r => r.ParticipantId == id);
         }
 
         public IEnumerable<Registration> GetRegistrationsByOwnerId(int id)

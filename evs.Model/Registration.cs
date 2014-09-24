@@ -26,9 +26,9 @@ namespace evs.Model
 
         public string Type { get; set; }
 
-        public StockAnswerSet StockAnswerSet { get; set; }
-        public Participant Participant { get; set; }
-        public EventureList EventureList { get; set; }
+        public virtual StockAnswerSet StockAnswerSet { get; set; }
+        public virtual Participant Participant { get; set; }
+        public virtual EventureList EventureList { get; set; }
         //public ICollection<Surcharge> Surcharges { get; set; }
         public EventureOrder EventureOrder { get; set; }
         

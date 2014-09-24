@@ -170,8 +170,7 @@ namespace evs30Api.Controllers
                          m.Team.Name,
                          teamMemberId = m.Id,
                          teamId = m.Team.Id
-                     })
-                     .ToList();
+                     }).ToList();
         }
 
         [HttpGet]
@@ -188,8 +187,8 @@ namespace evs30Api.Controllers
         public object GetTeamMemberPaymentSumByTeamGuid(Guid id)
         {
             return _contextProvider.Context.TeamMembers
-                              .Where(t => t.Team.TeamGuid == id && t.Active)
-                            .Sum(t => (decimal?)t.TeamMemberPayments.Sum(p => (decimal?)p.Amount) ?? 0);
+                                .Where(t => t.Team.TeamGuid == id && t.Active)
+                                .Sum(t => (decimal?)t.TeamMemberPayments.Sum(p => (decimal?)p.Amount) ?? 0);
         }
 
         [HttpGet]
@@ -744,6 +743,24 @@ namespace evs30Api.Controllers
         public IQueryable<TeamMemberPayment> TeamMemberPayments()
         {
             return _contextProvider.Context.TeamMemberPayments;
+        }
+
+        [HttpGet]
+        public IQueryable<Question> Questions()
+        {
+            return _contextProvider.Context.Question;
+        }
+
+        [HttpGet]
+        public IQueryable<QuestionOption> QuestionOptions()
+        {
+            return _contextProvider.Context.QuestionOption;
+        }
+
+        [HttpGet]
+        public IQueryable<Answer> Answers()
+        {
+            return _contextProvider.Context.Answer;
         }
 
         [HttpPost]

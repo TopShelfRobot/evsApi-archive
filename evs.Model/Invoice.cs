@@ -19,4 +19,12 @@ namespace evs.Model
         //public virtual Registration Registration { get; set; }
         public virtual ICollection<InvoiceList> InvoiceDetails { get; set; }
     }
+
+    public class InvoiceList
+    {
+        public Int32 Id { get; set; }
+        public Int32 InvoiceId { get; set; }
+
+        public virtual Invoice Invoice { get; set; }
+    }
 }

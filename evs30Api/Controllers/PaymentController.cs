@@ -240,9 +240,6 @@ namespace evs30Api.Controllers
                     HttpResponseMessage result = new MailController().SendConfirmMail(order.Id);
 
                     //return Request.CreateResponse(HttpStatusCode.OK, stripeCharge);
-
-
-
                     var resp = Request.CreateResponse(HttpStatusCode.OK);
                     //resp.Content = new StringContent();
                     resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");

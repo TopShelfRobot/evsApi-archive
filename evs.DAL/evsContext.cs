@@ -21,7 +21,7 @@ namespace evs.DAL
         
         public DbSet<Registration> Registrations { get; set; }
         public DbSet<EventureOrder> Orders { get; set; }
-        public DbSet<Payment> Payments { get; set; }
+        //public DbSet<Payment> Payments { get; set; }
 
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Addon> Addons { get; set; }
@@ -33,6 +33,10 @@ namespace evs.DAL
         public DbSet<StockQuestionSet> StockQuestionSets { get; set; }
         public DbSet<Report> Reports { get; set; }
 
+        public DbSet<Answer> Answer { get; set; }
+        public DbSet<Question> Question { get; set; }
+        public DbSet<QuestionOption> QuestionOption { get; set; }
+        
         public DbSet<Resource> Resources { get; set; }
         //public DbSet<ResourceService> ResourceServices { get; set; }
         public DbSet<ResourceItemCategory> ResourceItemCategories { get; set; }

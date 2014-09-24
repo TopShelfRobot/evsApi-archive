@@ -200,7 +200,7 @@ namespace evs30Api.Controllers
         }
 
         [HttpGet]
-        public object GetVolunteerDataByEventure(int id)      //mjb this needs complete
+        public object GetVolunteerDataByEventureId(int id)      //mjb this needs complete
         {
             string query =
                 "select j.id, j.name, (select count(*) from [VolunteerShift] where volunteerjobid = j.id) as shifts, " +
