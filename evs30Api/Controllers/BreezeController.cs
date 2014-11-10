@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Mvc.Html;
 using Breeze.ContextProvider;
 using Breeze.ContextProvider.EF6;
 using Breeze.WebApi2;
@@ -99,6 +100,27 @@ namespace evs30Api.Controllers
             }
         }
 
+        public class DtoYearOverYear
+        {
+
+
+            public string Eventure { get; set; }
+            public string Month { get; set; }
+            public Int32 Year { get; set; }
+            public Int32 Yeartwo { get; set; }
+            public Int32 Yearthree { get; set; }
+
+            public DtoYearOverYear(string eventure, string month, Int32 year, Int32 yeartwo, Int32 yearthree)
+            {
+
+                Eventure = eventure;
+                Month = month;
+                Year = year;
+                Yeartwo = yeartwo;
+                Yearthree = yearthree;
+            }
+        }
+
         public class DtoTrends
         {
             public Int32 Last30Count { get; set; }
@@ -162,7 +184,7 @@ namespace evs30Api.Controllers
                      .Select(m => new
                      {
                          ListName = m.Team.Registration.EventureList.DisplayName,
-                         m.Team.Registration.EventureList.ListingType,
+                         m.Team.Registration.EventureList.EventureListType,
                          m.Team.Registration.EventureList.CurrentFee,
                          RegAmount = m.Team.Registration.ListAmount,   //totalAmount??
                          userPaid = (decimal?)m.TeamMemberPayments.Sum(p => p.Amount) ?? 0,     //this is temp;  if they make multiple payments reciept will be wrong
@@ -170,6 +192,20 @@ namespace evs30Api.Controllers
                          m.Team.Name,
                          teamMemberId = m.Id,
                          teamId = m.Team.Id
+                     }).ToList();
+        }
+
+        [HttpGet]
+        public object GetTeamMemberPaymentInfoByPaymentId(Int32 id)    //this will only be used on member payment receipt
+        {
+            return _contextProvider.Context.TeamMemberPayments
+                     .Where(p => p.Id == id)
+                     .Select(p => new
+                     {
+                         p.Amount,
+                         p.TeamMember.Name,
+                         teamname = p.TeamMember.Team.Name,
+                         ListName = p.TeamMember.Team.Registration.EventureList.Name
                      }).ToList();
         }
 
@@ -291,6 +327,64 @@ namespace evs30Api.Controllers
                                regId = t.RegistrationId
                            };    //this should really look at reg for original cost
             return transfer.ToList();
+        }
+
+        public class EventPartial
+        {
+            public Int32 Id { get; set; }
+            public string text { get; set; }
+
+            public EventPartial(Int32 id, string name)
+            {
+                Id = id;
+                text = name;
+            }
+
+        }
+        public class DtoEventuresByYear
+        {
+            public Int32 text { get; set; }
+            public List<EventPartial> items = new List<EventPartial>();
+
+            public DtoEventuresByYear(Int32 year, List<EventPartial> eventures)
+            {
+                text = year;
+                items = eventures;
+            }
+        }
+
+
+        public List<DtoEventuresByYear> GetEventuresGroupedByYearByOwnerId(int id)
+        {
+            //DateTime now = DateTime.Now;
+            //return db.Eventures.Where(e => e.OwnerId == id && (e.DateEventure > now || e.Active));
+            //var query = db.Eventures
+            //foreach (var e in eventureInfo)
+            //{
+
+            //}
+
+            var x = new List<DtoEventuresByYear>();
+
+            var eps = new List<EventPartial>();
+            eps.Add(new EventPartial(1, "2015 Louisville Marathone"));
+            eps.Add(new EventPartial(2, "2015 Bluegrass Festival"));
+            eps.Add(new EventPartial(3, "2015 Lexington Half Marathon"));
+            x.Add(new DtoEventuresByYear(2015, eps));
+
+            //var eps1 = new List<EventPartial>();
+            //eps.Add(new EventPartial(5, "2011 big event"));
+            //eps.Add(new EventPartial(9, "2011 bad event"));
+            //x.Add(new DtoEventuresByYear(2011, eps1));
+
+            //var eps2 = new List<EventPartial>();
+            //eps.Add(new EventPartial(19, "2012 big event"));
+            //eps.Add(new EventPartial(22, "2012 bad event"));
+            //eps.Add(new EventPartial(25, "2012 wolf event"));
+            //x.Add(new DtoEventuresByYear(2012, eps2));
+
+            return x;
+
         }
 
         [HttpGet]
@@ -497,6 +591,39 @@ namespace evs30Api.Controllers
             capacity.Capacity = capacitySum;
 
             return capacity;
+        }
+
+        [HttpGet]
+        public object GetYearOverYearData()
+        {
+            ////var rList = new List<DtoCapacity>();
+            //var capacity = new DtoCapacity(0, 0);
+
+            //var capacitySum = _contextProvider.Context.EventureLists.Where(ol => ol.EventureId == id).Sum(s => (int?)s.Capacity) ?? 0;
+            ////.Sum(income =>  (decimal?)income.Amount) ?? 0;
+
+            //var queryOwnerEventures = _contextProvider.Context.Eventures.Where(e => e.Id == id).Select(e => e.Id);
+            //var queryOwnersLists = _contextProvider.Context.EventureLists.Where(el => queryOwnerEventures.Contains(el.EventureId)).Select(l => l.Id);
+            //var regcount = _contextProvider.Context.Registrations.Count(r => queryOwnersLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete");
+
+            ////rList.Add(new DtoCapacity(regcount, capacitySum));
+            ////rList.Add(new DtoCapacity(232, 666));
+
+            //capacity.Regs = regcount;
+            //capacity.Capacity = capacitySum;
+
+            //return capacity;
+
+            var data = new List<DtoYearOverYear>();
+            data.Add(new DtoYearOverYear("Urban Bourbon", "November", 20, 10, 13));
+            data.Add(new DtoYearOverYear("Urban Bourbon", "December", 17, 12, 34));
+            data.Add(new DtoYearOverYear("Urban Bourbon", "January", 14, 17, 22));
+            data.Add(new DtoYearOverYear("Urban Bourbon", "February", 22, 18, 17));
+
+
+
+            return data;
+
         }
 
         [HttpGet]
@@ -763,6 +890,55 @@ namespace evs30Api.Controllers
             return _contextProvider.Context.Answer;
         }
 
+        [HttpGet]
+        public IQueryable<VolunteerJob> VolunteerJobs()
+        {
+            return _contextProvider.Context.VolunteerJobs;
+        }
+
+        [HttpGet]
+        public IQueryable<Volunteer> Volunteers()
+        {
+            return _contextProvider.Context.Volunteers;
+        }
+
+        [HttpGet]
+        public IQueryable<VolunteerShift> VolunteerShifts()
+        {
+            return _contextProvider.Context.VolunteerShifts;
+        }
+
+
+        //[HttpGet]
+        //public IQueryable<EventureListType> EventureListTypes()
+        //{
+        //    return _contextProvider.Context.EventureListTypes;
+        //}
+
+        [HttpGet]
+        public IQueryable<VolunteerSchedule> VolunteerSchedules()
+        {
+            return _contextProvider.Context.VolunteerSchedules;
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [AcceptVerbs("OPTIONS")]
+        //[System.Web.Mvc.ValidateAntiForgeryToken]
+        public HttpResponseMessage SendTeamPaymentConfirmMail(Int32 id)
+        {
+            HttpResponseMessage result = new MailController().SendTeamPaymentConfirmMail(id);
+            var resp = new HttpResponseMessage(HttpStatusCode.OK);
+            return resp;
+        }
+
+        public HttpResponseMessage SendSoccerTryoutInviteMail(Int32 id)
+        {
+            HttpResponseMessage result = new MailController().SendSoccerTryoutInviteMail(id);
+            var resp = new HttpResponseMessage(HttpStatusCode.OK);
+            return resp;
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [AcceptVerbs("OPTIONS")]
@@ -771,6 +947,25 @@ namespace evs30Api.Controllers
             return _contextProvider.SaveChanges(saveBundle);
         }
 
+        [HttpGet]
+        public IEnumerable<NumericValueSelectListItem> EventureListTypeLookups()
+        {
+            var listTypes = EnumHelper.GetSelectList(typeof(EventureListType))
+                .Select(x => new NumericValueSelectListItem()
+                {
+                    Text = x.Text,
+                    Value = int.Parse(x.Value)
+                });
+
+            return listTypes;
+        }
+
+    }
+
+    public class NumericValueSelectListItem
+    {
+        public string Text { get; set; }
+        public int Value { get; set; }
     }
 
     public class BreezeSimpleCorsHandler : DelegatingHandler

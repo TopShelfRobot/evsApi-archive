@@ -1,8 +1,4 @@
 ﻿using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
 
 namespace evs.Model
 {
@@ -19,9 +15,10 @@ namespace evs.Model
         public Int32? CouponId { get; set; }
         public DateTime DateCreated { get; set; }
         public Int32 ConvOrderId { get; set; }
+        public SurchargeType SurchargeType { get; set; }
 
         public virtual EventureOrder EventureOrder { get; set; }
-        public virtual Participant Resource { get; set; }    //will this work
+        public virtual Participant Participant { get; set; }    //will this work
     }
 
     public class Coupon
@@ -35,7 +32,7 @@ namespace evs.Model
         public DateTime DateEnd { get; set; }
         public Int32 Capacity { get; set; }
         public Int32 CouponTypeLinkId { get; set; }
-        public string CouponType { get; set; }
+        public string CouponType { get; set; }    //deprecated
         public Int32 Usage { get; set; }
         public Int32 Redeemed { get; set; }
         public Boolean IsOnlyForOwned { get; set; }
@@ -46,7 +43,11 @@ namespace evs.Model
         //public virtual Registration Registration { get; set; }EventureListId
     }
 
-    public class Addon
+    public class Discount
+    {
+    }
+
+    public class Addon   //deprecated
     {
         public Int32 Id { get; set; }
         public bool Active { get; set; }
@@ -60,4 +61,36 @@ namespace evs.Model
         public Boolean IsOnlyForOwned { get; set; }
         public Int32 OwnerId { get; set; }
     }
+
+    public class EventListCharge
+    {
+        public Int32 Id { get; set; }
+        public Int32 RegistrationId { get; set; }
+        public decimal Amount { get; set; }
+        public SurchargeType SurchargeType { get; set; }
+        public Int32? CouponId { get; set; }
+        public Int32 OwnerId { get; set; }
+    }
+
+    //public class SurchargeType     //enum??
+    //{
+    //    public Int32 Id { get; set; }
+    //    public string Name { get; set; }
+    //    public Int32 OwnerId { get; set; }
+    //}
+
+    public enum SurchargeType
+    {
+        Coupon = 1,
+        //CouponEvent,
+        //CouponList
+        Discount,
+        //DiscountEvent,
+        //DiscountList,
+        //FeeList,
+        //FeeEvent,
+        OnlineFee
+    }
+
 }
+ 

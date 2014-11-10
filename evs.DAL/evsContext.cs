@@ -10,19 +10,20 @@ namespace evs.DAL
         //public TourismContext() : base("name=TourismContext")
         static evsContext()
         {
-           Database.SetInitializer(new MigrateDatabaseToLatestVersion<evsContext, Configuration>());
-          //Database.SetInitializer(new DropCreateDatabaseAlways<evsContext>());
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<evsContext, Configuration>());
+            //Database.SetInitializer(new DropCreateDatabaseAlways<evsContext>());
         }
-        
+
         public DbSet<EventureList> EventureLists { get; set; }
         public DbSet<Eventure> Eventures { get; set; }
         public DbSet<Participant> Participants { get; set; }
         public DbSet<EventureGroup> EventureGroups { get; set; }
-        
+        //public DbSet<EventureListType> EventureListTypes { get; set; }
+
+
         public DbSet<Registration> Registrations { get; set; }
         public DbSet<EventureOrder> Orders { get; set; }
-        //public DbSet<Payment> Payments { get; set; }
-
+       
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Addon> Addons { get; set; }
         public DbSet<Surcharge> Surcharges { get; set; }
@@ -36,14 +37,13 @@ namespace evs.DAL
         public DbSet<Answer> Answer { get; set; }
         public DbSet<Question> Question { get; set; }
         public DbSet<QuestionOption> QuestionOption { get; set; }
-        
+
         public DbSet<Resource> Resources { get; set; }
-        //public DbSet<ResourceService> ResourceServices { get; set; }
         public DbSet<ResourceItemCategory> ResourceItemCategories { get; set; }
         public DbSet<ResourceItem> ResourceItems { get; set; }
         public DbSet<EventurePlanItem> PlanItems { get; set; }
         public DbSet<EventureExpense> Expenses { get; set; }
-    
+
         public DbSet<Client> Clients { get; set; }
         public DbSet<EventureService> EventureServices { get; set; }
 
@@ -55,7 +55,7 @@ namespace evs.DAL
 
         public DbSet<EventureLog> EventureLogs { get; set; }
         public DbSet<EventureTransfer> EventureTransfers { get; set; }
-        
+
         public DbSet<Player> Players { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<Roster> Rosters { get; set; }
@@ -65,27 +65,30 @@ namespace evs.DAL
         public DbSet<Facility> Facilitys { get; set; }  //spell
         public DbSet<GameSchedule> GameSchedules { get; set; }
 
-        public DbSet<Volunteer> Volunteer { get; set; }
-        public DbSet<VolunteerSchedule> VolunteerSchedule { get; set; }  //mjb
-        public DbSet<VolunteerJob> VolunteerJob { get; set; }
-        public DbSet<VolunteerShift> VolunteerShift { get; set; }
+        //these should all end in s
+        public DbSet<Volunteer> Volunteers { get; set; }
+        public DbSet<VolunteerSchedule> VolunteerSchedules { get; set; }  //mjb
+        public DbSet<VolunteerJob> VolunteerJobs { get; set; }
+        public DbSet<VolunteerShift> VolunteerShifts { get; set; }
 
+        public DbSet<EventListCharge> EventListCharges { get; set; }
+        //public DbSet<SurchargeType> SurchargeTypes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             //modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
-            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();  
+            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
 
-           // modelBuilder.Entity<ResourceItem>()
-           //.HasRequired(d => d.Week)
-           //.WithMany(w => w.Days)
-           //.WillCascadeOnDelete(false);
+            // modelBuilder.Entity<ResourceItem>()
+            //.HasRequired(d => d.Week)
+            //.WithMany(w => w.Days)
+            //.WillCascadeOnDelete(false);
 
 
             //modelBuilder.Configurations.Add(new OrderMap());
             //modelBuilder.Configurations.Add(new ProductMap());
-            
+
             //modelBuilder.Entity<QResult>()
             //    .HasRequired(c => c.Registration)
             //    .WithMany()

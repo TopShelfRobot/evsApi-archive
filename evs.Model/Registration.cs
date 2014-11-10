@@ -24,6 +24,7 @@ namespace evs.Model
         public Int32? ConvRegId { get; set; }
         public Int32? StockAnswerSetId { get; set; }
 
+
         public string Type { get; set; }
 
         public virtual StockAnswerSet StockAnswerSet { get; set; }
@@ -31,6 +32,9 @@ namespace evs.Model
         public virtual EventureList EventureList { get; set; }
         //public ICollection<Surcharge> Surcharges { get; set; }
         public EventureOrder EventureOrder { get; set; }
+        public ICollection<Answer> Answers { get; set; }
+        public ICollection<EventListCharge> EventListCharges { get; set; }
+        
         
         //public virtual EventureGroup EventureGroup { get; set; }
 

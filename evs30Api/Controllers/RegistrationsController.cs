@@ -21,7 +21,7 @@ namespace evs30Api.Controllers
 {
     public class RegistrationsController : ApiController
     {
-        evsContext db = new evsContext();
+        private evsContext db = new evsContext();
 
         //move this stuff to its own class maybe statistics
         public class DtoGraph
@@ -68,6 +68,18 @@ namespace evs30Api.Controllers
             }
         }
 
+        public class EventRev
+        {
+            public string Eventure { get; set; }
+            public decimal RevenuePercent { get; set; }
+        }
+
+        public class CategoryExpense
+        {
+            public string Category { get; set; }
+            public decimal ExpensePercent { get; set; }
+        }
+
         //public class  DtoCapacity
         //{
         //    public Int32 Regs { get; set; }
@@ -79,7 +91,26 @@ namespace evs30Api.Controllers
         //        Capacity = capacity;
         //    }
         //}
+        public class DtoYearOverYear
+        {
 
+
+            public string Eventure { get; set; }
+            public string Month { get; set; }
+            public Int32 Year { get; set; }
+            public Int32 Yeartwo { get; set; }
+            public Int32 Yearthree { get; set; }
+
+            public DtoYearOverYear(string eventure, string month, Int32 year, Int32 yeartwo, Int32 yearthree)
+            {
+
+                Eventure = eventure;
+                Month = month;
+                Year = year;
+                Yeartwo = yeartwo;
+                Yearthree = yearthree;
+            }
+        }
 
         //[HttpPost]
         //[AllowAnonymous]
@@ -270,6 +301,65 @@ namespace evs30Api.Controllers
 
             return cList.ToArray();
         }
+
+        public object GetRevenuePerEvent(int id)
+        {
+
+            var eventureInfo = from r in db.Registrations
+                               join l in db.EventureLists
+                               on r.EventureListId equals l.Id
+                               join e in db.Eventures
+                               on l.EventureId equals e.Id
+                               group r by e.Name into g
+                               select new { name = g.Key, thesum = g.Sum(r => r.TotalAmount) };
+
+            var revs = new List<EventRev>();
+
+            foreach (var e in eventureInfo)
+            {
+                var rev = new EventRev();
+                rev.Eventure = e.name;
+                rev.RevenuePercent = e.thesum;
+                revs.Add(rev);
+            }
+
+            return revs;
+        }
+
+        public object GetExpensePerCategory(int id)
+        {
+            var exp = from e in db.Expenses
+                      join c in db.ResourceItemCategories
+                      on e.ResourceItemCategoryId equals c.Id
+                      group e by c.Name into g
+                      select new { name = g.Key, thesum = g.Sum(e => e.Cost) };
+
+            var expenses = new List<CategoryExpense>();
+
+            foreach (var e in exp)
+            {
+                var expense = new CategoryExpense();
+                expense.Category = e.name;
+                expense.ExpensePercent = e.thesum;
+                expenses.Add(expense);
+            }
+
+            //var expense = new CategoryExpense();
+            //expense.Category = "cat 1";
+            //expense.ExpensePercent = 11;
+            //expenses.Add(expense);
+            //expense = new CategoryExpense();
+            //expense.Category = "cat 2";
+            //expense.ExpensePercent = 15;
+            //expenses.Add(expense);
+            //expense = new CategoryExpense();
+            //expense.Category = "cat 3";
+            //expense.ExpensePercent = 22;
+            //expenses.Add(expense);
+
+            return expenses;
+        }
+
         
         public object DoDcStuffxset()
         {
@@ -326,6 +416,48 @@ namespace evs30Api.Controllers
             return graph;
         }
 
+
+        [HttpGet]
+        public object GetYearOverYearData(Int32 id)
+        {
+            ////var rList = new List<DtoCapacity>();
+            //var capacity = new DtoCapacity(0, 0);
+
+            //var capacitySum = _contextProvider.Context.EventureLists.Where(ol => ol.EventureId == id).Sum(s => (int?)s.Capacity) ?? 0;
+            ////.Sum(income =>  (decimal?)income.Amount) ?? 0;
+
+            //var queryOwnerEventures = _contextProvider.Context.Eventures.Where(e => e.Id == id).Select(e => e.Id);
+            //var queryOwnersLists = _contextProvider.Context.EventureLists.Where(el => queryOwnerEventures.Contains(el.EventureId)).Select(l => l.Id);
+            //var regcount = _contextProvider.Context.Registrations.Count(r => queryOwnersLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete");
+
+            ////rList.Add(new DtoCapacity(regcount, capacitySum));
+            ////rList.Add(new DtoCapacity(232, 666));
+
+            //capacity.Regs = regcount;
+            //capacity.Capacity = capacitySum;
+
+            //return capacity;
+
+            var data = new List<DtoYearOverYear>();
+
+            if(id==1){
+            data.Add(new DtoYearOverYear("Urban Bourbon", "November", 20, 10, 13));
+            data.Add(new DtoYearOverYear("Urban Bourbon", "December", 17, 12, 34));
+            data.Add(new DtoYearOverYear("Urban Bourbon", "January", 14, 17, 22));
+            data.Add(new DtoYearOverYear("Urban Bourbon", "February", 22, 18, 17));
+            }
+            else
+            {
+                data.Add(new DtoYearOverYear("Urban Bourbon", "November", 14, 17, 13));
+                data.Add(new DtoYearOverYear("Urban Bourbon", "December", 14, 17, 34));
+                data.Add(new DtoYearOverYear("Urban Bourbon", "January", 14, 17, 22));
+                data.Add(new DtoYearOverYear("Urban Bourbon", "February", 14, 17, 17));
+                data.Add(new DtoYearOverYear("Urban Bourbon", "March", 14, 17, 22));
+                data.Add(new DtoYearOverYear("Urban Bourbon", "April", 14, 17, 17));
+            }
+            return data;
+        }
+
         public object GetOwnerGraph(int id)
         //need to check order.Status == 'Complete'   //mjb 
         {
@@ -378,6 +510,59 @@ namespace evs30Api.Controllers
         }
 
         public object GetEventureGraph(int id)
+        {
+            //need to check order.Status == 'Complete'   //mjb 
+            var graph = new List<DtoGraph>();
+
+            //var queryOwnerEventures = db.Eventures.Where(e => e.OwnerId == id).Select(e => e.Id);
+
+            var queryLists = db.EventureLists.Where(el => el.EventureId == id).Select(l => l.Id);
+
+            var query = from r in db.Registrations
+                        where queryLists.Contains(r.EventureListId)
+                        group r by r.DateCreated.Month
+                            into reggroup
+                            select new
+                            {
+                                regmonth = reggroup.Key,
+                                regcount = reggroup.Sum(s => s.Quantity),
+                                revsum = reggroup.Sum(s => s.TotalAmount)
+                            };
+
+            int month = 1;
+            foreach (var g in query)
+            {
+                if (g.regmonth != month)  //enter a zero for that month
+                {
+                    do
+                    {
+                        //myList.Add(month, 0);
+                        graph.Add(new DtoGraph(month, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month).Substring(0, 3), 0, 0));
+                        month++;
+
+                    } while (month != g.regmonth);
+                }
+                //myList.Add(g.regmonth, g.Count());
+                graph.Add(new DtoGraph(g.regmonth, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(g.regmonth).Substring(0, 3), g.regcount, g.revsum));
+                month++;
+            }
+            //must catch any months with 0 at end of 
+            if (month < 12)
+            {
+                do
+                {
+                    //Console.Write(month + "|0---");
+                    //myList.Add(month, 0);
+                    graph.Add(new DtoGraph(month, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month).Substring(0, 3), 0, 0));
+                    month++;
+
+                } while (month < 13);
+            }
+
+            return graph;
+        }
+
+        public object GetEventureGraphByOwnerId(int id)
         {
             //need to check order.Status == 'Complete'   //mjb 
             var graph = new List<DtoGraph>();
@@ -537,8 +722,8 @@ namespace evs30Api.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
             db.Dispose();
+            base.Dispose(disposing);
         }
 
         //is this used??

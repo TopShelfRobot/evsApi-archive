@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
@@ -13,6 +15,7 @@ using Amazon.SimpleEmail.Model;
 using System.Net;
 using evs.DAL;
 using evs.Model;
+using System.Web;
 
 //using evs.Model;
 
@@ -464,9 +467,9 @@ namespace evs30Api.Controllers
                 }
                 else
                 {
-                    
+
                     addresses.Add(houseEmail);
-                    
+
                     var owner = db.Owners.Where(o => o.Id == ownerId).SingleOrDefault();
                     subject = owner.SendConfirmEmailSubject;
                     sender = owner.SendMailEmailAddress;
@@ -474,6 +477,149 @@ namespace evs30Api.Controllers
                     ccs.Add("podaniel@firstegg.com");
                     ccs.Add(sender);
                     //emailText = "<img src=\"https://reg.headfirstperformance.com/Content/images/logo.png\"><br><br>";
+                    emailText = owner.SendImageHtml;
+                }
+                emailText = emailText + "Order Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
+                emailText = emailText + "Dear " + houseName + ",<BR><BR>Thank you for purchasing your registration. This email serves as your receipt. Your confirmation number is " + orderNum + ". <BR><BR><BR>You have been charged for the following:";
+                emailText = emailText + "<BR>" + lineItems;
+
+                var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
+
+                AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
+                //ccs and bcc seem to be reversed
+
+                if (mail.ErrorException == null)
+                {
+                    if (Request != null)
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    else
+                        return new HttpResponseMessage(HttpStatusCode.OK);
+                }
+                else
+                {
+                    var log = new EventureLog();
+                    log.Message = "orderId: " + id + "_email failed" + mail.ErrorException;
+                    log.Caller = "Mail Api_SendConfirmMail";
+                    log.Status = "Error";
+                    log.LogDate = System.DateTime.Now.ToLocalTime();
+                    db.EventureLogs.Add(log);
+                    db.SaveChanges();
+                    if (Request != null)
+                        return Request.CreateResponse(HttpStatusCode.OK); //change this ??  //mjb
+                    else
+                    {
+                        return new HttpResponseMessage(HttpStatusCode.OK);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var logE = new EventureLog();
+                logE.Message = "orderId: " + id + "_Error Handler: " + ex.Message;
+                logE.Caller = "Mail Api_SendConfirmMail";
+                logE.Status = "ERROR";
+                logE.LogDate = System.DateTime.Now.ToLocalTime();
+                db.EventureLogs.Add(logE);
+                db.SaveChanges();
+
+                if (Request != null)
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                }
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [AcceptVerbs("OPTIONS")]
+        [System.Web.Mvc.ValidateAntiForgeryToken]
+        public HttpResponseMessage SendTeamPaymentConfirmMail(int id)
+        {
+            //needs to be a send amazon email
+            //Type : confirm, reset password
+            // to, cc, bc, sender, reply, subject, text
+
+            try
+            {
+
+                var payment = db.TeamMemberPayments.Where(p => p.Id == id).Select(p => new
+                {
+                    p.Id,
+                    p.Amount,
+                    p.TeamMember.Name,
+                    p.TeamMember.Email,
+                    teamName = p.TeamMember.Team.Name
+                }).SingleOrDefault();
+
+
+                Int32 ownerId = 1;
+                string houseName = string.Empty;
+                //string carriageReturn = "<BR>";
+                string orderNum = string.Empty;
+                string houseEmail = string.Empty;
+                string lineItems = "<TABLE cellpadding=\"8\" cellspacingBono=\"8\"><tr><td>Name</td><td>Email</td><td>Team</td><td>Quantity</td><td>Price</td></tr>";
+                int numReg = 0;
+                decimal orderAmount = 0;
+
+                //foreach (var reg in regs)
+                //{
+                houseName = payment.Name;
+                orderNum = Convert.ToString(payment.Id);
+                lineItems = lineItems + "<TR><TD>" + payment.Name + "</TD><TD>" + payment.Email + "</TD><TD>" +
+                            payment.teamName + "</TD><TD Align=\"right\">" + "1" + "</TD><TD Align=\"right\">" + payment.Amount + "</TD></TR>";
+                //numReg = numReg + reg.regQuantity;
+                orderAmount = payment.Amount;
+                //this is a little ugly but works
+                //ownerId = reg.OwnerId;
+                houseEmail = payment.Email;
+                //}
+
+                lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
+
+                //foreach (var fee in fees)
+                //{
+                //    lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + fee.Description + "</TD><TD></TD><TD Align=\"right\">" + fee.Amount + "</TD></TR>";
+                //    orderAmount = orderAmount + fee.Amount;
+                //}
+
+                lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
+                lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + "Total" + "</TD><TD></TD><TD Align=\"right\">" + orderAmount + "</TD></TR>";
+
+                lineItems = lineItems + "</TABLE>";
+
+                //string numOfRegs = Convert.ToString(numReg);
+
+                var addresses = new List<string>();
+                var mode = ConfigurationManager.AppSettings["MailMode"];
+                var emailText = string.Empty;
+                var subject = string.Empty;
+                var sender = string.Empty;
+                var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
+                var bcc = new List<string>();
+                //this is actually bbc
+                //an amazon issue?
+
+                if (mode == "TEST")
+                {
+                    addresses.Add("boone@firstegg.com");
+                    subject = "TEST: Eventure Sports Confirmation";
+                    sender = "boone@eventuresports.com";
+                    emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>";
+                }
+                else
+                {
+
+                    addresses.Add(houseEmail);
+
+                    var owner = db.Owners.SingleOrDefault(o => o.Id == ownerId);
+                    subject = owner.SendConfirmTeamEmailSubject;
+                    sender = owner.SendMailEmailAddress;
+                    ccs.Add("boone@eventuresports.com");
+                    ccs.Add("podaniel@firstegg.com");
+                    ccs.Add(sender);
                     emailText = owner.SendImageHtml;
                 }
                 emailText = emailText + "Order Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
@@ -542,7 +688,7 @@ namespace evs30Api.Controllers
                         m.Email,
                         m.Name,
                         m.Team.Coach.FirstName,
-                        m.Team.Coach.LastName,                      
+                        m.Team.Coach.LastName,
                         m.Team.Registration.EventureList.DisplayName,
                         m.Team.TeamGuid,
                         teamName = m.Team.Name,
@@ -555,7 +701,7 @@ namespace evs30Api.Controllers
                 if (teamMember == null)
                 {
                     throw new Exception("Could not find TeamMember from id: " + id.ToString());
-                } 
+                }
 
                 var addresses = new List<string>();
                 var mode = ConfigurationManager.AppSettings["MailMode"];
@@ -590,6 +736,122 @@ namespace evs30Api.Controllers
                 emailText = emailText + "Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
                 emailText = emailText + "Dear " + teamMember.Name + ",<BR><BR>You have been invited by " + teamMember.FirstName + ' ' + teamMember.LastName + " to join team " + teamMember.teamName + " in the " + teamMember.DisplayName;
                 emailText = emailText + " league. <BR> Please click on the following link: " + url;
+
+                var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
+
+                AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
+                //ccs and bcc seem to be reversed
+
+                if (mail.ErrorException == null)
+                {
+                    if (Request != null)
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    else
+                        return new HttpResponseMessage(HttpStatusCode.OK);
+                }
+                else
+                {
+                    var log = new EventureLog();
+                    log.Message = "orderId: " + id + "_email failed" + mail.ErrorException;
+                    log.Caller = "Mail Api_SendConfirmMail";
+                    log.Status = "Error";
+                    log.LogDate = System.DateTime.Now.ToLocalTime();
+                    db.EventureLogs.Add(log);
+                    db.SaveChanges();
+                    if (Request != null)
+                        return Request.CreateResponse(HttpStatusCode.OK); //change this ??  //mjb
+                    else
+                    {
+                        return new HttpResponseMessage(HttpStatusCode.OK);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var logE = new EventureLog();
+                logE.Message = "orderId: " + id + "_Error Handler: " + ex.Message;
+                logE.Caller = "Mail Api_SendConfirmMail";
+                logE.Status = "ERROR";
+                logE.LogDate = System.DateTime.Now.ToLocalTime();
+                db.EventureLogs.Add(logE);
+                db.SaveChanges();
+
+                if (Request != null)
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                }
+            }
+        }
+
+        public HttpResponseMessage SendSoccerTryoutInviteMail(int id)
+        {
+            //needs to be a send amazon email
+            //Type : confirm, reset password
+            // to, cc, bc, sender, reply, subject, text
+            try
+            {
+                var teamMember = db.TeamMembers.Where(m => m.Id == id).Select(m => new
+                {
+                    m.TeamMemberGuid,
+                    m.Email,
+                    m.Name,
+                    m.Team.Coach.FirstName,
+                    m.Team.Coach.LastName,
+                    m.Team.Registration.EventureList.DisplayName,
+                    m.Team.TeamGuid,
+                    teamName = m.Team.Name,
+                    m.Team.Owner.Url,
+                    m.Team.Owner.SendImageHtml,
+                    m.Team.Owner.SendMailEmailAddress,
+                    m.Team.Owner.SendConfirmTeamInviteEmailSubject
+                }).SingleOrDefault();
+
+                if (teamMember == null)
+                {
+                    throw new Exception("Could not find TeamMember from id: " + id.ToString());
+                }
+
+                var addresses = new List<string>();
+                var mode = ConfigurationManager.AppSettings["MailMode"];
+                var emailText = string.Empty;
+                var subject = string.Empty;
+                var sender = string.Empty;
+                var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
+                var bcc = new List<string>();
+                //this is actually bbc
+                //an amazon issue?
+
+                if (mode == "TEST")
+                {
+                    addresses.Add("boone@firstegg.com");
+                    subject = "TEST: Eventure Sports Confirmation";
+                    sender = "boone@eventuresports.com";
+                    emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>";
+                }
+                else
+                {
+                    addresses.Add(teamMember.Email);
+                    subject = teamMember.SendConfirmTeamInviteEmailSubject;
+                    sender = teamMember.SendMailEmailAddress;
+                    ccs.Add("boone@eventuresports.com");
+                    //ccs.Add("podaniel@firstegg.com");
+                    //ccs.Add(sender);
+                    emailText = teamMember.SendImageHtml;
+                }
+
+                string url = teamMember.Url + "/reg.html#/team/" + teamMember.TeamGuid.ToString().ToUpper() + "/member/" +
+                             teamMember.TeamMemberGuid.ToString().ToUpper() + "/payment";
+                emailText = emailText + "<table width=\"100%\"><tr><td><tablewidth=\"600\" align=\"center\" style=\"font-family:Helvetica;\">";
+
+                emailText = emailText + "Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
+                //emailText = emailText + "Dear " + teamMember.Name;
+                emailText = emailText + " <tr><td><h3>Dear " + teamMember.Name + ",</h3></td></tr>";
+                emailText = emailText +
+                            " <tr><td style=\"line-height:140%;\"><p>We are pleased to invite you to attend the Louisville City FC Invitational Tryouts scheduled for November 22 and 23 at Collegiate Fields.  In order to secure your place at the upcoming tryouts you will need to submit payment and provide your travel itinerary prior to October 31st.  If you have not registered and paid in full by October 31st your invitation at the tryout is not guaranteed.</p><p>Cost<br>$160 for local participants NOT requiring a hotel accommodations<br>$310 for commuter participants requiring a hotel accommodations for two nights (Nov. 21 & 22)</p><p>Hotel<br>Holiday Inn Louisville Airport<br>447 Farmington Avenue<br>Louisville, KY  40209<br><a href=\"http://www.ihg.com/holidayinn/hotels/us/en/louisville/sdfcd/hoteldetail\">Hotel Details</a><br><strong>NOTE:</strong>&nbsp;&nbsp;&nbsp;Please do not call the hotel.  Louisville City FC is handling your hotel arrangements directly<br>The Holiday Inn provides a free shuttle to and from the airport<br>Transportation from the hotel to Collegiate Field will be provided<br></p><p>Additional Information<ul><li>Two (2) tryout t-shirts will be provided</li><li>Collegiate fields are a grass surface.  Please bring appropriate footwear</li><li>If participant is awarded a playing contract, tryout fee will be reimbursed</li><li>If tryout is cancelled due to unforeseen inclement weather, $75 will be reimbursed for local participants, and $150 will be reimbursed for commuters</li></ul></p><p>Congratulations on your selection and we look forward to seeing you at tryouts on November 22 and 23.</p><p>Should you have any questions please contact Amanda Duffy at <a href=\"mailto:aduffy@louisvillecityfc.com\">aduffy@louisvillecityfc.com</a>.</p></td></tr></table></td></tr></table>";
+                emailText = emailText + "<BR> Please click on the following link: " + url;
 
                 var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
 
@@ -1299,6 +1561,62 @@ namespace evs30Api.Controllers
                 return fileStream;
             }
 
+
+            //public class BreezeSimpleCorsHandler : DelegatingHandler
+            //{
+            //    const string Origin = "Origin";
+            //    const string AccessControlRequestMethod = "Access-Control-Request-Method";
+            //    const string AccessControlRequestHeaders = "Access-Control-Request-Headers";
+            //    const string AccessControlAllowOrigin = "Access-Control-Allow-Origin";
+            //    const string AccessControlAllowMethods = "Access-Control-Allow-Methods";
+            //    const string AccessControlAllowHeaders = "Access-Control-Allow-Headers";
+            //    const string AccessControlAllowCredentials = "Access-Control-Allow-Credentials";
+
+            //    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            //    {
+            //        var isCorsRequest = request.Headers.Contains(Origin);
+            //        var isPreflightRequest = request.Method == HttpMethod.Options;
+            //        if (isCorsRequest)
+            //        {
+            //            if (isPreflightRequest)
+            //            {
+            //                var response = new HttpResponseMessage(HttpStatusCode.OK);
+            //                response.Headers.Add(AccessControlAllowOrigin,
+            //                  request.Headers.GetValues(Origin).First());
+
+            //                var accessControlRequestMethod =
+            //                  request.Headers.GetValues(AccessControlRequestMethod).FirstOrDefault();
+
+            //                if (accessControlRequestMethod != null)
+            //                {
+            //                    response.Headers.Add(AccessControlAllowMethods, accessControlRequestMethod);
+            //                }
+
+            //                var requestedHeaders = string.Join(", ",
+            //                   request.Headers.GetValues(AccessControlRequestHeaders));
+
+            //                if (!string.IsNullOrEmpty(requestedHeaders))
+            //                {
+            //                    response.Headers.Add(AccessControlAllowHeaders, requestedHeaders);
+            //                }
+
+            //                response.Headers.Add(AccessControlAllowCredentials, "true");
+
+            //                var tcs = new TaskCompletionSource<HttpResponseMessage>();
+            //                tcs.SetResult(response);
+            //                return tcs.Task;
+            //            }
+            //            return base.SendAsync(request, cancellationToken).ContinueWith(t =>
+            //            {
+            //                var resp = t.Result;
+            //                resp.Headers.Add(AccessControlAllowOrigin, request.Headers.GetValues(Origin).First());
+            //                resp.Headers.Add(AccessControlAllowCredentials, "true");
+            //                return resp;
+            //            });
+            //        }
+            //        return base.SendAsync(request, cancellationToken);
+            //    }
+            //}
 
             /*
                private static void SignEmail(MailMessage message)

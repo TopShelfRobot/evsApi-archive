@@ -19,7 +19,7 @@ namespace evs30Api.Controllers
         //[AcceptVerbs("OPTIONS")]
         //[System.Web.Mvc.ValidateAntiForgeryToken]
         [HttpGet]
-        public object GetTeamRegistrationsByCoachId(int id)
+        public object GetTeamRegistrationsByCoachId(Int32 id)
         {
             return db.Teams.Where(t => t.CoachId == id
                                     && t.Registration.EventureOrder.Status == "Complete")
@@ -36,7 +36,7 @@ namespace evs30Api.Controllers
         }
 
         [HttpGet]
-        public object GetTeamRegistrationsByHouseId(int id)
+        public object GetTeamRegistrationsByHouseId(Int32 id)
         {
             return db.Teams.Where(t => t.Registration.EventureOrder.HouseId == id  
                                     && t.Registration.EventureOrder.Status == "Complete")
@@ -54,7 +54,7 @@ namespace evs30Api.Controllers
         }
 
         [HttpGet]
-        public object GetTeamRegistrationsByOwnerId(int id)
+        public object GetTeamRegistrationsByOwnerId(Int32 id)
         {
             return db.Teams.Where(t => t.Registration.EventureOrder.OwnerId == id
                                     && t.Registration.EventureOrder.Status == "Complete")
@@ -66,14 +66,14 @@ namespace evs30Api.Controllers
                     CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
                     Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
                     Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
-                    t.Registration.EventureList.ListingType,
+                    t.Registration.EventureList.EventureListTypeId,
                     EventName = t.Registration.EventureList.Eventure.Name
                 })
                 .ToList();
         }
 
         [HttpGet]
-        public object GetTeamMembersByTeamId(int id)
+        public object GetTeamMembersByTeamId(Int32 id)
         {
             return db.TeamMembers.Where(t => t.Team.Id == id
                                             && t.Active)
@@ -83,14 +83,24 @@ namespace evs30Api.Controllers
                     t.Id,
                     t.TeamId,
                     t.Email,
-                    //Balance = t.Team.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
+                    Balance = t.Team.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
                     Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
                     EventureOrderId = t.Team.Registration.EventureOrder.Id
                 })
                 .ToList();
         }
 
-      
+        [HttpGet]
+        public object GetPaymentsByTeamMemberId(Int32 id)
+        {
+            return db.TeamMemberPayments.Where(p => p.TeamMemberId == id)
+            .Select(p => new
+            {
+                p.Id,
+                p.Amount,
+            })
+            .ToList();
+        }
 
         //[HttpGet]
         //public object GetTeamMemberPaymentSumByTeamMemberGuid(Guid id)

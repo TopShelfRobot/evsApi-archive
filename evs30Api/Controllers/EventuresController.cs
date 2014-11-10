@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web;
 using System.Web.Http;
 using evs.Model;
 using evs.DAL;
@@ -16,8 +14,8 @@ namespace evs30Api.Controllers
     public class EventuresController : ApiController
     {
         private evsContext db = new evsContext();
-
-        // GET api/Eventures
+       
+       // GET api/Eventures
         public IEnumerable<Eventure> GetEventures()
         {
             return db.Eventures.AsEnumerable();
@@ -31,7 +29,6 @@ namespace evs30Api.Controllers
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
-
             return eventure;
         }
 
@@ -47,6 +44,8 @@ namespace evs30Api.Controllers
             DateTime now = DateTime.Now;
             return db.Eventures.Where(e => e.OwnerId == id && (e.DateEventure > now || e.Active ));
         }
+
+        
 
         // PUT api/Eventures/5
         public HttpResponseMessage PutEventure(int id, Eventure eventure)

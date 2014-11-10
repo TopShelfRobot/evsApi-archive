@@ -12,7 +12,7 @@ namespace evs.Model
         public Int32 Id { get; set; }
         public Int32 HouseId { get; set; }
         public Int32 OwnerId { get; set; }
-       
+
         public decimal Amount { get; set; }
         public Int32 CardProcessorFeeInCents { get; set; }
         public Int32 LocalFeeInCents { get; set; }
@@ -34,11 +34,25 @@ namespace evs.Model
         public Boolean Voided { get; set; }
         public Int32 ConvOrderId { get; set; }
         public string PaymentType { get; set; }
-   
-        //[ForeignKey("HouseId")]
+        public Int32 PaymentTypeId { get; set; }  //cash, credit, check
+        public Int32 OrderTypeId { get; set; }    //manual online reg
+        
+    
+
+    //[ForeignKey("HouseId")]
         //public virtual Participant House { get; set; }
 
         public ICollection<Registration> Registrations { get; set; }
         public ICollection<Surcharge> Surcharges { get; set; } 
     }
+
+    public class PaymentType
+    {
+        public Int32 Id { get; set; }
+    }
+    public class OrderType
+    {
+        public Int32 Id { get; set; }
+    }
+
 }

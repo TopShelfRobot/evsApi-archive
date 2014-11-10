@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+//using System.Data.Entity;
+//using System.Data.Entity.Infrastructure;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+//using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Linq;
 using evs.DAL;
 //using System;
-using System.Collections.Generic;
+
 using System.Linq;
 using System.Web.Http;
 using evs.Model;
@@ -15,7 +19,7 @@ namespace evs30Api.Controllers
 {
     public class ParticipantsController : ApiController
     {
-        evsContext db = new evsContext();
+        private evsContext db = new evsContext();
 
         public class DtoShift
         {
@@ -108,7 +112,7 @@ namespace evs30Api.Controllers
 
         public object GetVolunteersByOwnerId(int id)
         {
-            return db.Volunteer.Where(v => v.Participant.OwnerId == id)
+            return db.Volunteers.Where(v => v.Participant.OwnerId == id)
                 .Select(v => new { v.Participant.FirstName, v.Participant.LastName, v.Participant.Email, v.Participant.PhoneMobile, v.Id })
                 .ToList();
 
@@ -117,7 +121,7 @@ namespace evs30Api.Controllers
         public object GetVolunteerScheduleByVolunteerId(int id)
         {
             var estZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            var queryVols = db.VolunteerSchedule.Where(s => s.VolunteerId == id)
+            var queryVols = db.VolunteerSchedules.Where(s => s.VolunteerId == id)
                 .Select(s => new
                 {
                     s.Eventure.DisplayHeading,
@@ -139,7 +143,7 @@ namespace evs30Api.Controllers
 
         public object GetVolunteersByEventureId(int id)
         {
-            return db.VolunteerSchedule.Where(s => s.EventureId == id)
+            return db.VolunteerSchedules.Where(s => s.EventureId == id)
                 .Select(s => new { s.Volunteer.Participant.FirstName, s.Volunteer.Participant.LastName, s.Volunteer.Participant.Email, s.VolunteerShift.VolunteerJob.Name, s.VolunteerShift.TimeBegin, s.VolunteerShift.TimeEnd })
                 .ToList();
         }
@@ -169,7 +173,7 @@ namespace evs30Api.Controllers
         public object GetVolunteersByVolunteerJobId(int id)
         {
             var estZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            var queryVols = db.VolunteerSchedule.Where(s => s.VolunteerShift.VolunteerJobId == id)
+            var queryVols = db.VolunteerSchedules.Where(s => s.VolunteerShift.VolunteerJobId == id)
                 .Select(s => new { s.Id, s.Volunteer.Participant.FirstName, s.Volunteer.Participant.LastName, s.Volunteer.Participant.Email, s.VolunteerShift.VolunteerJob.Name, s.VolunteerShift.TimeBegin, s.VolunteerShift.TimeEnd })
                 .OrderBy(s => s.TimeBegin);
 
@@ -185,7 +189,7 @@ namespace evs30Api.Controllers
 
         public object GetVolunteerJobsByEventureId(int id)
         {
-            return db.VolunteerJob.Where(j => j.EventureId == id)
+            return db.VolunteerJobs.Where(j => j.EventureId == id)
                 .Select(j => new { j.Name, j.Description, j.Id })
                 .ToList();
         }
@@ -232,19 +236,19 @@ namespace evs30Api.Controllers
                 schedule.VolunteerShiftId = shiftId;
                 schedule.DateCreated = DateTime.Now;
 
-                if (db.Volunteer.Any(v => v.ParticipantId == houseId))
+                if (db.Volunteers.Any(v => v.ParticipantId == houseId))
                 {
-                    schedule.VolunteerId = db.Volunteer.SingleOrDefault(v => v.ParticipantId == houseId).Id;
+                    schedule.VolunteerId = db.Volunteers.SingleOrDefault(v => v.ParticipantId == houseId).Id;
                 }
                 else
                 {
                     volunteer.ParticipantId = houseId;
                     volunteer.DateCreated = DateTime.Now;
-                    db.Volunteer.Add(volunteer);
+                    db.Volunteers.Add(volunteer);
                     schedule.VolunteerId = volunteer.Id;
                 }
 
-                db.VolunteerSchedule.Add(schedule);
+                db.VolunteerSchedules.Add(schedule);
                 db.SaveChanges();
 
 
@@ -286,8 +290,8 @@ namespace evs30Api.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
             db.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

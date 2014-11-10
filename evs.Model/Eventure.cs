@@ -33,6 +33,7 @@ namespace evs.Model
         public Int32? ClientId { get; set; }
         public Boolean IsGroupRequired { get; set; }
         public Boolean IsTeam { get; set; }
+        public string Location { get; set; }
    
         // Navigation property
         public ICollection<EventureList> EventureLists { get; set; }
@@ -44,7 +45,6 @@ namespace evs.Model
 
         [Required]
         public string Name { get; set; }
-
         public string DisplayName { get; set; }
         public Int32 EventureId { get; set; }
         public Int32 Capacity { get; set; }
@@ -65,12 +65,16 @@ namespace evs.Model
         //public Boolean IsManaged { get; set; }
         //public Int32? GroupId { get; set; }
         public string Charity { get; set; }
-        public Int32 ListingType { get; set; }
+        //public Int32 Type { get; set; }
+
+        public Int32? EventureListTypeId { get; set; }
+        
 
         // Navigation property 
         //public virtual Eventure Eventure { get; set; }
         public ICollection<Registration> Registration { get; set; }
         public Eventure Eventure { get; set; }
+        public EventureListType EventureListType { get; set; }
         //public Result Result { get; set; }
         //public virtual string EventureName { get; set; }
         //public ICollection<Coupon> Coupons { get; set; }
@@ -79,4 +83,20 @@ namespace evs.Model
         //public ICollection<QQuestion> Questions { get; set; }
         //public ICollection<FeeSchedule> FeeSchedules { get; set; }
     }
+
+    //public class EventureListType   //enum
+    //{
+    //    public Int32 Id { get; set; }
+    //    public string Name { get; set; }
+    //    public Int32 OwnerId { get; set; }  
+    //}
+
+    public enum EventureListType
+    {
+        Standard = 1,
+        TeamSponsored,
+        TeamSuggest,
+        TeamIndividual
+    }
+
 }

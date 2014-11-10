@@ -14,6 +14,7 @@ namespace evs.Model
         public string Options { get; set; }
         public Boolean Active { get; set; }
         public Int32 EventureListId { get; set; }
+        public Int32 Order { get; set; }
         public bool IsRequired { get; set; }
 
         public ICollection<QuestionOption> QuestionOptions { get; set; }
@@ -24,9 +25,9 @@ namespace evs.Model
         public Int32 Id { get; set; }
         public string AnswerText { get; set; }
         public Int32 QuestionId { get; set; }
-
-        //public virtual Question Question { get; set; }
-        
+        public Int32 RegistrationId { get; set; }
+        public virtual Registration Registration { get; set; }
+        public virtual Question Question { get; set; }  
     }
 
     public class QuestionOption
@@ -34,10 +35,10 @@ namespace evs.Model
         public Int32 Id { get; set; }
         public string OptionText { get; set; }
         public Int32 QuestionId { get; set; }
-
         //public virtual Question Question { get; set; }
     }
 
+    //deprecated -- only for backwards compatibility
     public class StockAnswerSet
     {
         public Int32 Id { get; set; }
@@ -82,6 +83,7 @@ namespace evs.Model
 
     }
 
+    //deprecated -- only for backwards compatibility
     public class StockQuestionSet
     {
         public Int32 Id { get; set; }

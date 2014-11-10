@@ -218,8 +218,8 @@ namespace evs30Api.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
             db.Dispose();
+            base.Dispose(disposing);
         }
 
         public class DtoGraph

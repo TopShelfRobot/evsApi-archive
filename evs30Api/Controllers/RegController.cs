@@ -16,7 +16,7 @@
 //    public class RegController : Controller
 //    {
 //        //
-//        // GET: /Reg/
+//        // GET: /Reg/reg.html#/eventure
 
 //        public ActionResult Index(string id)
 //        {

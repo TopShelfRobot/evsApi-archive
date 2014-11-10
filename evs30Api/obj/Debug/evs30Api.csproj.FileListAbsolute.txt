@@ -27,7 +27,6 @@ D:\source\evs30Api\evs30Api\bin\System.Web.Helpers.dll
 D:\source\evs30Api\evs30Api\bin\System.Web.Http.dll
 D:\source\evs30Api\evs30Api\bin\System.Web.Http.OData.dll
 D:\source\evs30Api\evs30Api\bin\System.Web.Http.WebHost.dll
-D:\source\evs30Api\evs30Api\bin\System.Web.Mvc.dll
 D:\source\evs30Api\evs30Api\bin\System.Web.Optimization.dll
 D:\source\evs30Api\evs30Api\bin\System.Web.Razor.dll
 D:\source\evs30Api\evs30Api\bin\System.Web.WebPages.Deployment.dll
@@ -62,7 +61,6 @@ D:\source\evs30Api\evs30Api\bin\System.Web.Helpers.xml
 D:\source\evs30Api\evs30Api\bin\System.Web.Http.xml
 D:\source\evs30Api\evs30Api\bin\System.Web.Http.OData.xml
 D:\source\evs30Api\evs30Api\bin\System.Web.Http.WebHost.xml
-D:\source\evs30Api\evs30Api\bin\System.Web.Mvc.xml
 D:\source\evs30Api\evs30Api\bin\System.Web.Optimization.xml
 D:\source\evs30Api\evs30Api\bin\System.Web.Razor.xml
 D:\source\evs30Api\evs30Api\bin\System.Web.WebPages.xml
@@ -102,3 +100,9 @@ D:\source\evs30Api\evs30Api\bin\zh-Hant\System.Spatial.resources.dll
 D:\source\evs30Api\evs30Api\obj\Debug\evs30Api.dll
 D:\source\evs30Api\evs30Api\obj\Debug\evs30Api.pdb
 D:\source\evs30Api\evs30Api\obj\Debug\evs30Api.csprojResolveAssemblyReference.cache
+D:\source\evs3.0\bin\evs30Api.dll
+D:\source\evs3.0\bin\evs30Api.pdb
+D:\bin\evs30Api.dll
+D:\bin\evs30Api.pdb
+D:\source\evs30Api\..evs3.0\bin\evs30Api.dll
+D:\source\evs30Api\..evs3.0\bin\evs30Api.pdb
