@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs.Model", "evs.Model\evs.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs3.0", "..\evs3.0\evs3.0.csproj", "{BC5048A5-FFB5-4819-B24C-70CB7D6B34C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs.API", "evs.API\evs.API.csproj", "{44F82517-9EB8-483D-B4D4-91AC7AE91320}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{BC5048A5-FFB5-4819-B24C-70CB7D6B34C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC5048A5-FFB5-4819-B24C-70CB7D6B34C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC5048A5-FFB5-4819-B24C-70CB7D6B34C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44F82517-9EB8-483D-B4D4-91AC7AE91320}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44F82517-9EB8-483D-B4D4-91AC7AE91320}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44F82517-9EB8-483D-B4D4-91AC7AE91320}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44F82517-9EB8-483D-B4D4-91AC7AE91320}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
