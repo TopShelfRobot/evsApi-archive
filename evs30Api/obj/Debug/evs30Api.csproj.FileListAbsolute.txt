@@ -106,3 +106,4 @@ D:\bin\evs30Api.dll
 D:\bin\evs30Api.pdb
 D:\source\evs30Api\..evs3.0\bin\evs30Api.dll
 D:\source\evs30Api\..evs3.0\bin\evs30Api.pdb
+D:\source\evs3.0\bin\evs30Api.dll.config

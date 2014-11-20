@@ -35,3 +35,7 @@ D:\source\evs30Api\evs.DAL\bin\EntityFramework.dll
 D:\source\evs30Api\evs.DAL\bin\evs.Model.dll
 D:\source\evs30Api\evs.DAL\bin\evs.Model.pdb
 D:\source\evs30Api\evs.DAL\bin\EntityFramework.xml
+D:\source\evs30Api\evs.DAL\bin\Microsoft.AspNet.Identity.EntityFramework.dll
+D:\source\evs30Api\evs.DAL\bin\Microsoft.AspNet.Identity.Core.dll
+D:\source\evs30Api\evs.DAL\bin\Microsoft.AspNet.Identity.EntityFramework.xml
+D:\source\evs30Api\evs.DAL\bin\Microsoft.AspNet.Identity.Core.xml

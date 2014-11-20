@@ -807,9 +807,9 @@ namespace evs30Api.Controllers
         }
 
         [HttpGet]
-        public IQueryable<Client> Clients()
+        public IQueryable<EventureClient> EventureClients()
         {
-            return _contextProvider.Context.Clients;
+            return _contextProvider.Context.EventureClients;
         }
 
         [HttpGet]

@@ -32,8 +32,8 @@ namespace evs30Api.Controllers
             return eventure;
         }
 
-        // GET api/Eventures
-        public IEnumerable<Eventure> GetAllEventuresByOwnerId(int id)
+        // GET api/Eventures 
+        public IEnumerable<Eventure> GetAllEventuresByOwnerId(int id)   //mjb moved
         {
             return db.Eventures.Where(e => e.OwnerId == id).OrderByDescending(e => e.Id);
         }

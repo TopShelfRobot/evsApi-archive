@@ -1,21 +1,23 @@
-﻿//using System;
+﻿using System;
 //using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+//using Microsoft.AspNet.Identity.EntityFramework;
+
 //using System.Data.Entity;
 //using System.Globalization;
 //using System.Web.Security;
 
 namespace evs.Model
 {
-    //public class UsersContext : DbContext
+    //public class evsContext : IdentityDbContext<IdentityUser>
     //{
     //    //public UsersContext()
     //    //    : base("DefaultConnection")
     //    //{
     //    //}
 
-    //    public DbSet<UserProfile> UserProfiles { get; set; }
+    //    //public DbSet<UserProfile> UserProfiles { get; set; }
     //}
 
     public class UserModel
@@ -125,4 +127,42 @@ namespace evs.Model
         public string ProviderDisplayName { get; set; }
         public string ProviderUserId { get; set; }
     }
+
+    public class Client
+    {
+        [Key]
+        public string Id { get; set; }
+        [Required]
+        public string Secret { get; set; }
+        [Required]
+        [MaxLength(100)]
+        public string Name { get; set; }
+        public ApplicationTypes ApplicationType { get; set; }
+        public bool Active { get; set; }
+        public int RefreshTokenLifeTime { get; set; }
+        [MaxLength(100)]
+        public string AllowedOrigin { get; set; }
+    }
+
+    public class RefreshToken
+    {
+        [Key]
+        public string Id { get; set; }
+        [Required]
+        [MaxLength(50)]
+        public string Subject { get; set; }
+        [Required]
+        [MaxLength(50)]
+        public string ClientId { get; set; }
+        public DateTime IssuedUtc { get; set; }
+        public DateTime ExpiresUtc { get; set; }
+        [Required]
+        public string ProtectedTicket { get; set; }
+    }
+
+    public enum ApplicationTypes
+    {
+        JavaScript = 0,
+        NativeConfidential = 1
+    };
 }

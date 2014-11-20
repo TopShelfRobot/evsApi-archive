@@ -1,14 +1,16 @@
 ﻿using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using Microsoft.AspNet.Identity.EntityFramework;
 using evs.DAL.Migrations;
 using evs.Model;
 
 namespace evs.DAL
 {
     public class evsContext : DbContext
-    {
         //public TourismContext() : base("name=TourismContext")
+    {
         static evsContext()
+            //: base("evsContext")
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<evsContext, Configuration>());
             //Database.SetInitializer(new DropCreateDatabaseAlways<evsContext>());
@@ -44,7 +46,7 @@ namespace evs.DAL
         public DbSet<EventurePlanItem> PlanItems { get; set; }
         public DbSet<EventureExpense> Expenses { get; set; }
 
-        public DbSet<Client> Clients { get; set; }
+        public DbSet<EventureClient> EventureClients { get; set; }
         public DbSet<EventureService> EventureServices { get; set; }
 
         public DbSet<Dc_Part> DcParts { get; set; }
@@ -73,6 +75,10 @@ namespace evs.DAL
 
         public DbSet<EventListCharge> EventListCharges { get; set; }
         //public DbSet<SurchargeType> SurchargeTypes { get; set; }
+
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Client> Clients { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

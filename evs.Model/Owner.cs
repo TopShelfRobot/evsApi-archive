@@ -67,7 +67,7 @@ namespace evs.Model
         public string FacebookAppSecretId { get; set; }
     }
 
-    public class Client
+    public class EventureClient
     {
         public Int32 Id { get; set; }
         public string Name { get; set; }

@@ -8,8 +8,6 @@ namespace evs.API.Controllers
     [RoutePrefix("api/Account")]
     public class AccountController : ApiController
     {
-        
-        //this is a test message
         private AuthRepository _repo = null;
 
         public AccountController()

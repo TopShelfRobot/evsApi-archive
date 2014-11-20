@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs30Api", "evs30Api\evs30Api.csproj", "{A3AEF73A-FF33-4CBF-B593-6AD85709402F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs.DAL", "evs.DAL\evs.DAL.csproj", "{71058869-7971-4CC2-8265-B0B882C700B8}"
