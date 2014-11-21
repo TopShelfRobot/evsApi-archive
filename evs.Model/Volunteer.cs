@@ -19,6 +19,7 @@ namespace evs.Model
         public Int32 EventureId { get; set; }
         //public Int32 VolunteerJobId { get; set; }
         public Int32 VolunteerShiftId { get; set; }
+        public Boolean Active { get; set; }
 
         //navigation
         public virtual Volunteer Volunteer { get; set; }
@@ -35,6 +36,7 @@ namespace evs.Model
         public String AgeRestriction { get; set; }
         public DateTime DateCreated { get; set; }
         public Int32 EventureId { get; set; }
+        public Boolean Active { get; set; }
     }
 
     public class VolunteerShift
@@ -47,6 +49,7 @@ namespace evs.Model
         public Int32 Capacity { get; set; }
         public DateTime DateCreated { get; set; }
         public Int32 VolunteerJobId { get; set; }
+        public Boolean Active { get; set; }
         //navigation
         public virtual VolunteerJob VolunteerJob { get; set; }
     }

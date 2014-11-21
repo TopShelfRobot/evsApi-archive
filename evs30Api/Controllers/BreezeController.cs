@@ -960,6 +960,18 @@ namespace evs30Api.Controllers
             return listTypes;
         }
 
+        [HttpGet]
+        public IEnumerable<NumericValueSelectListItem> AmountTypeLookups()
+        {
+            var amountTypes = EnumHelper.GetSelectList(typeof(AmountType))
+                .Select(x => new NumericValueSelectListItem()
+                {
+                    Text = x.Text,
+                    Value = int.Parse(x.Value)
+                });
+
+            return listTypes;
+        }
     }
 
     public class NumericValueSelectListItem

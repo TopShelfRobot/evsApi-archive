@@ -24,6 +24,6 @@ D:\source\evs30Api\evs.Model\bin\EntityFramework.dll
 D:\source\evs30Api\evs.Model\bin\EntityFramework.SqlServer.dll
 D:\source\evs30Api\evs.Model\bin\EntityFramework.xml
 D:\source\evs30Api\evs.Model\bin\EntityFramework.SqlServer.xml
-D:\source\evs30Api\evs.Model\obj\Debug\evs.Model.csprojResolveAssemblyReference.cache
 D:\source\evs30Api\evs.Model\bin\Microsoft.AspNet.Identity.Core.dll
 D:\source\evs30Api\evs.Model\bin\Microsoft.AspNet.Identity.Core.xml
+D:\source\evs30Api\evs.Model\obj\Debug\evs.Model.csprojResolveAssemblyReference.cache

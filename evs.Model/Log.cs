@@ -13,5 +13,9 @@ namespace evs.Model
         public string  Caller { get; set; }
         public string Status { get; set; }
         public DateTime LogDate { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
     }
 }

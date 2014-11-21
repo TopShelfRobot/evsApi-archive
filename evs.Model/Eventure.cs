@@ -34,6 +34,10 @@ namespace evs.Model
         public Boolean IsGroupRequired { get; set; }
         public Boolean IsTeam { get; set; }
         public string Location { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
    
         // Navigation property
         public ICollection<EventureList> EventureLists { get; set; }
@@ -59,6 +63,7 @@ namespace evs.Model
         public string WaiverText { get; set; }
         public Boolean IsWaiverDisplayed { get; set; }
         //public Boolean IsGroupDisplayed { get; set; }
+        public Boolean IsBundle { get; set; }
         public string MinAge { get; set; }
         public string MaxAge { get; set; }
         public string MaxRunTime { get; set; }
@@ -66,8 +71,8 @@ namespace evs.Model
         //public Int32? GroupId { get; set; }
         public string Charity { get; set; }
         //public Int32 Type { get; set; }
-
-        public Int32? EventureListTypeId { get; set; }
+        public DateTime DateCreated { get; set; }
+        public Int32? EventureListTypeId { get; set; }  //eventually won't be ?
         
 
         // Navigation property 

@@ -12,15 +12,15 @@ namespace evs.API
 {
     public class AuthRepository : IDisposable
     {
-        //private AuthContext _ctx = new evsContext();
-        private evsContext _ctx = new evsContext();
+       // private AuthContext _ctx;// = new evsContext();
+        private evsContext _ctx ;//= new evsContext();
         
         private UserManager<IdentityUser> _userManager;
 
         public AuthRepository()
         {
             _ctx = new evsContext();
-            //_ctx = new AuthContext();
+           // _ctx = new AuthContext();
             _userManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
         }
 

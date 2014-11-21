@@ -18,6 +18,10 @@ namespace evs.Model
         //public Int32 ListingId { get; set; }
         public Int32 EventureListId { get; set; }
         //public string Desc { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
 
         //public virtual EventureList EventureList { get; set; }
         }

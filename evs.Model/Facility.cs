@@ -28,6 +28,11 @@ namespace evs.Model
         public DateTime Date { get; set; }    //these should link to DateID
         public DateTime Time { get; set; }    //and time id
 
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
+
         //public Int32 FaciltyId { get; set; }
 
         public Facility Facility { get; set; }
@@ -45,12 +50,22 @@ namespace evs.Model
         public string Day { get; set; }
         public string Time { get; set; }
 
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
+
         //public Participant Participant { get; set; }
     }
 
     public class Roster
     {
         public Int32 Id { get; set; }
+
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
 
         public ICollection<Player> Players { get; set; }
         public Team Team { get; set; }
@@ -61,6 +76,11 @@ namespace evs.Model
     public class GameSchedule
     {
         public Int32 Id { get; set; }
+
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
 
         public ICollection<Game> Games { get; set; }
     }

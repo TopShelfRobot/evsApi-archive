@@ -5,7 +5,7 @@ namespace evs.Model
     public class Surcharge
     {
         public Int32 Id { get; set; }
-        public Int32 EventureOrderId  { get; set; }
+        public Int32 EventureOrderId { get; set; }
         public decimal Amount { get; set; }
         public string ChargeType { get; set; }   //listcoupon, listfee, eventcoupon
         public string Description { get; set; }
@@ -13,9 +13,12 @@ namespace evs.Model
         public Int32? EventureListId { get; set; }
         public Int32? ParticipantId { get; set; }
         public Int32? CouponId { get; set; }
-        public DateTime DateCreated { get; set; }
         public Int32 ConvOrderId { get; set; }
         public SurchargeType SurchargeType { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
 
         public virtual EventureOrder EventureOrder { get; set; }
         public virtual Participant Participant { get; set; }    //will this work
@@ -27,7 +30,8 @@ namespace evs.Model
         public string Code { get; set; }
         public bool Active { get; set; }
         public decimal Amount { get; set; }
-        public Int32 DiscountType { get; set; }
+        public Int32 DiscountType { get; set; }  //this is being converted to amountType
+        public AmountType AmountType { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
         public Int32 Capacity { get; set; }
@@ -37,14 +41,35 @@ namespace evs.Model
         public Int32 Redeemed { get; set; }
         public Boolean IsOnlyForOwned { get; set; }
         public Int32 OwnerId { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
         //public Int32 RegistrationId { get; set; }
-
         //public virtual EventureList EventureList { get; set; }
         //public virtual Registration Registration { get; set; }EventureListId
     }
 
-    public class Discount
+    //public class Discount
+    //{
+    //    public Int32 Id { get; set; }
+    //    public bool Active { get; set; }
+    //    public decimal Amount { get; set; 
+    //    public AmountType AmountType { get; set; }
+    //    Boolean 
+    //}
+
+    public class Refund
     {
+        public Int32 Id { get; set; }
+        public decimal Amount { get; set; }
+        public Int32 eventureOrderId { get; set; }
+        public string description { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
+        //public Int32 registrationId { get; set; }
     }
 
     public class Addon   //deprecated
@@ -70,14 +95,11 @@ namespace evs.Model
         public SurchargeType SurchargeType { get; set; }
         public Int32? CouponId { get; set; }
         public Int32 OwnerId { get; set; }
+        public Int32 SurchargeId { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
     }
 
-    //public class SurchargeType     //enum??
-    //{
-    //    public Int32 Id { get; set; }
-    //    public string Name { get; set; }
-    //    public Int32 OwnerId { get; set; }
-    //}
 
     public enum SurchargeType
     {
@@ -92,5 +114,10 @@ namespace evs.Model
         OnlineFee
     }
 
+    public enum AmountType
+    {
+        Dollars = 0,
+        Percent
+    }
+
 }
- 

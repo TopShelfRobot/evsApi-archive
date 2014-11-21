@@ -17,8 +17,7 @@ namespace evs.Model
         public Int32 CardProcessorFeeInCents { get; set; }
         public Int32 LocalFeeInCents { get; set; }
         public Int32 LocalApplicationFee { get; set; }
-        public DateTime DateCreated { get; set; }
-
+        
         public string AuthorizationCode { get; set; }
         public string Token { get; set; }
         public string CardId { get; set; }
@@ -33,9 +32,14 @@ namespace evs.Model
         public string Status { get; set; }
         public Boolean Voided { get; set; }
         public Int32 ConvOrderId { get; set; }
-        public string PaymentType { get; set; }
+        public PaymentType PaymentType { get; set; }
         public Int32 PaymentTypeId { get; set; }  //cash, credit, check
-        public Int32 OrderTypeId { get; set; }    //manual online reg
+        public OrderType OrderTypeId { get; set; }    //manual online reg
+
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
         
     
 
@@ -46,13 +50,17 @@ namespace evs.Model
         public ICollection<Surcharge> Surcharges { get; set; } 
     }
 
-    public class PaymentType
+    public enum PaymentType
     {
-        public Int32 Id { get; set; }
+        credit = 0,
+        cash = 1,
+        giftCertificate = 2,
+        check = 3
     }
-    public class OrderType
+    public enum OrderType
     {
-        public Int32 Id { get; set; }
+        online = 0,
+        manual
     }
 
 }

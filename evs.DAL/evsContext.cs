@@ -6,11 +6,11 @@ using evs.Model;
 
 namespace evs.DAL
 {
-    public class evsContext : DbContext
+    public class evsContext : IdentityDbContext<IdentityUser>
         //public TourismContext() : base("name=TourismContext")
     {
-        static evsContext()
-            //: base("evsContext")
+        public evsContext()
+            : base("evsContext")
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<evsContext, Configuration>());
             //Database.SetInitializer(new DropCreateDatabaseAlways<evsContext>());
@@ -82,6 +82,7 @@ namespace evs.DAL
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             //modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
             modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();

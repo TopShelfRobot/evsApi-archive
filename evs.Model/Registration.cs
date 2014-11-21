@@ -9,7 +9,6 @@ namespace evs.Model
         public Int32 Id { get; set; }
         //[MaxLength(75)]
         //public string Name { get; set; }           //this is redundant  //mjb 052814
-        public DateTime DateCreated { get; set; }
         public Int32 ParticipantId { get; set; }
         public Int32 EventureListId { get; set; }
         public Int32 EventureOrderId { get; set; }
@@ -23,6 +22,11 @@ namespace evs.Model
         public Boolean Redeemed { get; set; }
         public Int32? ConvRegId { get; set; }
         public Int32? StockAnswerSetId { get; set; }
+
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
 
 
         public string Type { get; set; }

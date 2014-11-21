@@ -15,6 +15,10 @@ namespace evs.Model
         }
     
         public Int32 Id { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
     
         //public virtual Registration Registration { get; set; }
         public virtual ICollection<InvoiceList> InvoiceDetails { get; set; }
@@ -24,6 +28,10 @@ namespace evs.Model
     {
         public Int32 Id { get; set; }
         public Int32 InvoiceId { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
 
         public virtual Invoice Invoice { get; set; }
     }

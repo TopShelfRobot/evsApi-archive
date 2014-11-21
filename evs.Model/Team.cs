@@ -17,6 +17,11 @@ namespace evs.Model
         public Int32 RegistrationId { get; set; }
         public Boolean IsPaidInFull { get; set;}
         public Int32 OwnerId { get; set; }
+        public DateTime DateCreated { get; set; }
+        public Boolean Active { get; set;}
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
 
         //navigation
         public ICollection<TeamMember> TeamMembers { get; set; }
@@ -39,6 +44,10 @@ namespace evs.Model
         public string Name { get; set; }
         public string Email { get; set; }
         public Boolean Active { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
 
         //navigation
         public virtual Team Team { get; set; }
@@ -51,6 +60,12 @@ namespace evs.Model
         public Int32 TeamId { get; set; }
         public decimal Amount { get; set; }
         public Int32 TeamMemberId { get; set; }
+        public Boolean Active { get; set; }
+        public DateTime DateCreated { get; set; }
+        public Int32 EventureOrderId { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
 
         //navigation
         public virtual TeamMember TeamMember { get; set; }

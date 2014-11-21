@@ -17,10 +17,13 @@ namespace evs.Model
         public bool IsComplete  { get; set; }
         public string Message { get; set; }
         public Decimal AmountTotal { get; set; }
-        public DateTime DateCreated { get; set; }
         public string ParticipantId { get; set; }
         public Int32? EventureOrderId { get; set; }
         public Int32? StockAnswerSetId { get; set; }
+        public DateTime DateCreated { get; set; }
+        //public DateTime DateModified { get; set; }
+        //public Int32 ModifiedById { get; set; }
+        //public Int32 CreatedById { get; set; }
     }
 
 }
