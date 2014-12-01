@@ -72,7 +72,7 @@ namespace evs.Model
         public string Charity { get; set; }
         //public Int32 Type { get; set; }
         public DateTime DateCreated { get; set; }
-        public Int32? EventureListTypeId { get; set; }  //eventually won't be ?
+        //public Int32? EventureListTypeId { get; set; }  //eventually won't be ?
         
 
         // Navigation property 

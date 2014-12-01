@@ -18,6 +18,7 @@ namespace evs.API
         public static OAuthBearerAuthenticationOptions OAuthBearerOptions { get; private set; }
         public static GoogleOAuth2AuthenticationOptions googleAuthOptions { get; private set; }
         public static FacebookAuthenticationOptions facebookAuthOptions { get; private set; }
+
         public void Configuration(IAppBuilder app)
         {
             ConfigureOAuth(app);
@@ -59,8 +60,8 @@ namespace evs.API
             //Configure Facebook External Login
             facebookAuthOptions = new FacebookAuthenticationOptions()
             {
-                AppId = "xxxxxx",
-                AppSecret = "xxxxxx",
+                AppId = "447816931997733",
+                AppSecret = "ed72d01390147d4be82cd86e6d7106e4",
                 Provider = new FacebookAuthProvider()
             };
             app.UseFacebookAuthentication(facebookAuthOptions);

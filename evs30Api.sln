@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs3.0", "..\evs3.0\evs3.0.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs.API", "evs.API\evs.API.csproj", "{44F82517-9EB8-483D-B4D4-91AC7AE91320}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs.Service", "evs.Service\evs.Service.csproj", "{37978114-5B92-4867-BB06-6BDFC5050C26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs.Common", "evs.Common\evs.Common.csproj", "{C26955DC-7942-4390-9736-72E219396CBA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{44F82517-9EB8-483D-B4D4-91AC7AE91320}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44F82517-9EB8-483D-B4D4-91AC7AE91320}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44F82517-9EB8-483D-B4D4-91AC7AE91320}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37978114-5B92-4867-BB06-6BDFC5050C26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37978114-5B92-4867-BB06-6BDFC5050C26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37978114-5B92-4867-BB06-6BDFC5050C26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37978114-5B92-4867-BB06-6BDFC5050C26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C26955DC-7942-4390-9736-72E219396CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C26955DC-7942-4390-9736-72E219396CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C26955DC-7942-4390-9736-72E219396CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C26955DC-7942-4390-9736-72E219396CBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
