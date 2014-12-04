@@ -15,10 +15,10 @@ namespace evs.Model
         //public EventureList EventureList { get; set; }
         //public Boolean IsBye { get; set; }
         public Int32 RegistrationId { get; set; }
-        public Boolean IsPaidInFull { get; set;}
+        public Boolean IsPaidInFull { get; set; }
         public Int32 OwnerId { get; set; }
         public DateTime DateCreated { get; set; }
-        public Boolean Active { get; set;}
+        public Boolean Active { get; set; }
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }

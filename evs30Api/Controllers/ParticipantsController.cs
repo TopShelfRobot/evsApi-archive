@@ -51,12 +51,12 @@ namespace evs30Api.Controllers
             return db.Participants.FirstOrDefault(p => p.Id == id);
         }
 
-        //used id instead of ownerID so i can use same route since i hope to replace this soon anyway
-        public IEnumerable<Participant> GetParticipantsByOwnerId(int id)
-        {
-            return db.Participants.Where(p => p.OwnerId == id).OrderByDescending(p => p.Id);
+        ////used id instead of ownerID so i can use same route since i hope to replace this soon anyway
+        //public IEnumerable<Participant> GetParticipantsByOwnerId(int id)
+        //{
+        //    return db.Participants.Where(p => p.OwnerId == id).OrderByDescending(p => p.Id);
 
-        }
+        //}
 
         public IEnumerable<Participant> GetParticipantsByHouseId(int id)
         {
@@ -110,13 +110,13 @@ namespace evs30Api.Controllers
             return db.Participants.Where(p => queryRegPartIdsByEventureList.Contains(p.Id));
         }
 
-        public object GetVolunteersByOwnerId(int id)
-        {
-            return db.Volunteers.Where(v => v.Participant.OwnerId == id)
-                .Select(v => new { v.Participant.FirstName, v.Participant.LastName, v.Participant.Email, v.Participant.PhoneMobile, v.Id })
-                .ToList();
+        //public object GetVolunteersByOwnerId(int id)
+        //{
+        //    return db.Volunteers.Where(v => v.Participant.OwnerId == id)
+        //        .Select(v => new { v.Participant.FirstName, v.Participant.LastName, v.Participant.Email, v.Participant.PhoneMobile, v.Id })
+        //        .ToList();
 
-        }
+        //}
 
         public object GetVolunteerScheduleByVolunteerId(int id)
         {

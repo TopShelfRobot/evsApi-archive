@@ -15,12 +15,15 @@ using System.Data.Entity.Core.Objects;
 
 namespace evs.API.Controllers
 {
+    [BreezeController]
+    [RoutePrefix("api/registration")]
     public class RegistrationController : ApiController
     {
         readonly evsContext _db = new evsContext();
         readonly EFContextProvider<evsContext> _contextProvider = new EFContextProvider<evsContext>();
 
         [HttpGet]
+        [Authorize]
         public IEnumerable<EventureList> EventureListsByEventureId(int eventureId)
         {
             return _db.EventureLists
@@ -31,6 +34,31 @@ namespace evs.API.Controllers
                         && l.Capacity > l.Registration.Count()
                         );
         }
+
+        [HttpGet]
+        //[Authorize]
+        public object getPublicOwnerByOwnerId(int ownerId)
+        {
+            return _contextProvider.Context.Owners
+               .Where(o => o.Id == ownerId)
+               .Select(o => new
+               {
+                   o.IsDuplicateOrderAllowed,
+                   o.IsAddSingleFeeForAllRegs,
+                   o.AddSingleFeeForAllRegsPercent,
+                   o.AddSingleFeeType,
+                   o.AddSingleFeeForAllRegsFlat,
+                   o.EventureName,
+                   o.ListingName,
+                   o.GroupName,
+                   o.ParticipantButtonText,
+                   o.ListStatement,
+                   o.TermsText,
+                   o.RefundsText,
+                   o.StripePublishableKey
+               }).ToList();
+        }
+
 
         [HttpGet]
         public IEnumerable<Participant> ParticipantsByHouseId(int houseId)
@@ -65,7 +93,7 @@ namespace evs.API.Controllers
         {
             return _contextProvider.Context.Eventures;
         }
-        
+
         [HttpGet]
         public IQueryable<EventureList> EventureLists()
         {

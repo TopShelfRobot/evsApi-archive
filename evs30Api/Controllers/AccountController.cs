@@ -21,7 +21,7 @@ namespace evs30Api.Controllers
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
-        private evsContext db = new evsContext();
+        //private evsContext db = new evsContext();
 
         // GET: /Account/Login
         [AllowAnonymous]
