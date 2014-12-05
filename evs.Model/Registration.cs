@@ -6,6 +6,12 @@ namespace evs.Model
 {
     public class Registration
     {
+
+        public Registration() 
+        {
+            this.Answers = new List<Answer>();
+            //this.EventListCharge = new List<EventListCharge>();
+        }
         public Int32 Id { get; set; }
         //[MaxLength(75)]
         //public string Name { get; set; }           //this is redundant  //mjb 052814
@@ -37,7 +43,7 @@ namespace evs.Model
         //public ICollection<Surcharge> Surcharges { get; set; }
         public EventureOrder EventureOrder { get; set; }
         public ICollection<Answer> Answers { get; set; }
-        public ICollection<EventListCharge> EventListCharges { get; set; }
+        //public ICollection<EventListCharge> EventListCharges { get; set; }
         
         
         //public virtual EventureGroup EventureGroup { get; set; }

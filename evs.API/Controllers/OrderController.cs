@@ -8,6 +8,7 @@ using System.Text;
 using System.Web.Http;
 using evs.Model;
 using evs.Service;
+using evs.DAL;
 
 namespace evs.API.Controllers
 {
@@ -26,15 +27,22 @@ namespace evs.API.Controllers
 
         //public OrderController(IOrderService orderService)
         //{
-        //    _orderService = orderService;           
+        //    _orderService = orderService;
         //}
+
+        //public OrderController()
+        //{
+            
+        //}
+
+        readonly evsContext db = new evsContext();
 
         //[HttpPost("create")]
         [Route("Post")]
         public HttpResponseMessage CreateOrder(JObject orderBundle)
         {
             //TransactionStatus transactionStatus;
-            var results = 54; //new StudentValidation().Validate(studentViewModel);
+           // var results = new StudentValidation().Validate(studentViewModel);
 
             //if (!results.IsValid)
             //{
@@ -51,57 +59,47 @@ namespace evs.API.Controllers
 
             //transactionStatus = _studentService.CreateStudent(stundentBo);
 
+            try
+            {
 
+                //quick val  check required?
 
+                //deserial obj
+                var order = BuildOrder(orderBundle);
 
-             //orderAmount: cart.getTotalPrice(),
-             //   orderHouseId: cart.houseId,
-             //   ownerId: cart.ownerId,
-             //   teamId: cart.teamId,
-             //   teamMemberId: cart.teamMemberId,
-             //   regs: cart.registrations
+                //validate  //capacity and such
 
+                //calculate fees
 
-            //quick val  check required?
+                //create stripe service,customer, charge
 
-            //deserial obj
+                //charge card
 
-            //validate  //capacity and such
-
-            //calculate fees
-
-            //create stripe service,customer, charge
-
-            //charge card
-
-            //if good
+                //if good
                 //record charege
                 //create order
 
-            //not good return reason
+                //not good return reason
 
+                //var x = _orderService.CreateOrder(order);
 
+                db.Orders.Add(order);
+                db.SaveChanges();
 
+                var resp = Request.CreateResponse(HttpStatusCode.OK);
+                //resp.Content = new StringContent();
+                resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
+                return resp;
 
-            //var order = BuildOrder(orderBundle);
+            }
+            catch (Exception ex)
+            {
+                var x = ex.InnerException;
+                var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, x.ToString());
+                return badResponse; 
 
+            }
 
-
-
-
-
-
-
-
-
-
-
-
-
-            var resp = Request.CreateResponse(HttpStatusCode.OK);
-            //resp.Content = new StringContent();
-            resp.Content = new StringContent("69", Encoding.UTF8, "text/plain");
-            return resp;
             
             //if (transactionStatus.Status == false)
             //{
@@ -120,56 +118,111 @@ namespace evs.API.Controllers
         }
 
 
-        //private EventureOrder BuildOrder(JObject saveBundle)
-        //{
-        //    var order = new EventureOrder
-        //    {
-        //        DateCreated = DateTime.Now,
-        //        HouseId = (Int32)saveBundle["orderHouseId"],
-        //        Amount = (Decimal)saveBundle["orderAmount"],
-        //        Token = (string)saveBundle["stripeToken"],   //is this safe??
-        //        OwnerId = (Int32)saveBundle["ownerId"],
-        //        Status = "Init",
-        //        Voided = false
-        //    };
-        //    //db.Orders.Add(order);
-        //    dynamic bundle = saveBundle;
-        //    foreach (var regBundle in bundle.regs)
-        //    {
+        private EventureOrder BuildOrder(JObject orderBundle)
+        {
+            //orderAmount: cart.getTotalPrice(),
+            //   orderHouseId: cart.houseId,
+            //   ownerId: cart.ownerId,
+            //   teamId: cart.teamId,
+            //   teamMemberId: cart.teamMemberId,
+            //   regs: cart.registrations
 
-        //        var registration = new Registration
-        //            {
-        //                EventureListId = regBundle.eventureListId,
-        //                ParticipantId = regBundle.partId,
-        //                ListAmount = regBundle.fee,
-        //                Quantity = regBundle.quantity,
-        //                //EventureOrderId = order.Id,    
-        //                EventureOrder = order,
-        //                DateCreated = DateTime.Now,
-        //                TotalAmount = Convert.ToDecimal(regBundle.fee),
-        //                Type = "reg",
-        //            };
-        //        //var eventureListTypeId = regBundle.eventureListTypeId;
-        //        //db.Registrations.Add(registration);
-               
+            var order = new EventureOrder
+            {
+                DateCreated = DateTime.Now,
+                HouseId = (Int32)orderBundle["orderHouseId"],
+                Amount = (Decimal)orderBundle["orderAmount"],
+                Token = (string)orderBundle["stripeToken"],   //is this safe??
+                OwnerId = (Int32)orderBundle["ownerId"],
+                Status = "Init",
+                Voided = false
+            };
+            //db.Orders.Add(order);
+            dynamic bundle = orderBundle;
+            foreach (var regBundle in bundle.regs)
+            {
+                //populate surcharge
+                if (bundle.charges != null)  //if no surcharges skip this
+                {
+                    foreach (dynamic surchargeBundle in bundle.charges)
+                    {
+                        var surcharge = new Surcharge
+                        {
+                            Amount = surchargeBundle.amount,
+                            EventureListId = surchargeBundle.listId,
+                            ChargeType = surchargeBundle.chargeType,
+                            Description = surchargeBundle.desc,
+                            ParticipantId = surchargeBundle.partId,
+                            //EventureOrderId = order.Id,
+                            EventureOrder = order,
+                            DateCreated = DateTime.Now,
+                            CouponId = surchargeBundle.couponId
 
-        //        foreach (var answerBundle in regBundle.answers)
-        //        {
-        //            var answer = new Answer
-        //            {
-        //                AnswerText = answerBundle.answer,
-        //                QuestionId = answerBundle.questionId,
-        //                Registration = registration
-        //            };
-        //            //registration.Answers.Add(answer);
-        //            registration.Answers.Add(answer);
-        //        }
-        //        order.Registrations.Add(registration);
-        //    }
-            
-        //    //return (StudentBo)new StudentBo().InjectFrom(studentViewModel);
-        //    return order;
-        //}
+                            //Amount = 17,
+                            //EventureListId = 1,
+                            //ChargeType = "tet",
+                            //Description = "test",
+                            //ParticipantId = 1,
+                            //ConvOrderId = 1,
+                            //SurchargeType = SurchargeType.Discount,
+                            //EventureOrderId = order.Id,
+                            //EventureOrder = order,
+                            //DateCreated = DateTime.Now,
+                            //CouponId = 0
+                        };
+                        //totalFees = 33; //totalFees + Convert.ToDecimal(surchargeBundle.amount);
+                        //db.Surcharges.Add(surcharge);
+                        order.Surcharges.Add(surcharge);
+                    }
+                }
+
+                Registration registration = new Registration
+                    {
+                        EventureListId = regBundle.eventureListId,
+                        ParticipantId = regBundle.partId,
+                        ListAmount = regBundle.fee,
+                        Quantity = regBundle.quantity,
+                        //EventureOrderId = order.Id,    
+                        EventureOrder = order,
+                        DateCreated = DateTime.Now,
+                        TotalAmount = Convert.ToDecimal(regBundle.fee),
+                        Type = "reg",
+                        Redeemed = true
+                    };
+               // order.
+
+                var eventureListTypeId = regBundle.eventureListTypeId;
+                order.Registrations.Add(registration);
+
+
+                foreach (var answerBundle in regBundle.answers)
+                {
+                    var answer = new Answer
+                    {
+                        AnswerText = answerBundle.answer,
+                        QuestionId = answerBundle.questionId//,
+                        //Registration = registration
+                    };
+                    //registration.Answers.Add(answer);
+                    registration.Answers.Add(answer);
+                }
+                order.Registrations.Add(new Registration
+                {
+                    EventureListId = regBundle.eventureListId,
+                    ParticipantId = regBundle.partId,
+                    ListAmount = regBundle.fee,
+                    Quantity = regBundle.quantity,
+                    //EventureOrderId = order.Id,    
+                    EventureOrder = order,
+                    DateCreated = DateTime.Now,
+                    TotalAmount = Convert.ToDecimal(regBundle.fee),
+                    Type = "reg",
+                });
+            }
+
+            //return (StudentBo)new StudentBo().InjectFrom(studentViewModel);
+            return order;
+        }
         
         
 

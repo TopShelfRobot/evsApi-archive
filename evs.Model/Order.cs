@@ -9,6 +9,13 @@ namespace evs.Model
 {
     public class EventureOrder
     {
+
+        public EventureOrder() 
+        {
+            this.Surcharges= new List<Surcharge>();
+            this.Registrations = new List<Registration>();
+        }
+
         public Int32 Id { get; set; }
         public Int32 HouseId { get; set; }
         public Int32 OwnerId { get; set; }
