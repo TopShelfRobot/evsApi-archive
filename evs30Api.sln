@@ -12,6 +12,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs3.0", "..\evs3.0\evs3.0.csproj", "{BC5048A5-FFB5-4819-B24C-70CB7D6B34C8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs.API", "evs.API\evs.API.csproj", "{44F82517-9EB8-483D-B4D4-91AC7AE91320}"
+	ProjectSection(ProjectDependencies) = postProject
+		{37978114-5B92-4867-BB06-6BDFC5050C26} = {37978114-5B92-4867-BB06-6BDFC5050C26}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evs.Service", "evs.Service\evs.Service.csproj", "{37978114-5B92-4867-BB06-6BDFC5050C26}"
 EndProject
