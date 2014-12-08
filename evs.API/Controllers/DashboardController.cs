@@ -50,6 +50,15 @@ namespace evs.API.Controllers
 
         //}
 
+
+        [HttpGet]
+        //[Authorize]                
+        public IEnumerable<Eventure> GetAllEventuresByOwnerId(int id)
+        {
+            return _contextProvider.Context.Eventures.Where(e => e.OwnerId == id).OrderByDescending(e => e.Id);
+        }
+
+
         [HttpGet]
         //[Authorize]
         public object getPublicOwnerByOwnerId(int ownerId)
