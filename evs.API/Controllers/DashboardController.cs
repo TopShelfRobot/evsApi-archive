@@ -50,6 +50,31 @@ namespace evs.API.Controllers
 
         //}
 
+        [HttpGet]
+        //[Authorize]
+        public object getPublicOwnerByOwnerId(int ownerId)
+        {
+            return _contextProvider.Context.Owners
+               .Where(o => o.Id == ownerId)
+               .Select(o => new
+               {
+                   o.IsDuplicateOrderAllowed,
+                   o.IsAddSingleFeeForAllRegs,
+                   o.AddSingleFeeForAllRegsPercent,
+                   o.AddSingleFeeType,
+                   o.AddSingleFeeForAllRegsFlat,
+                   o.EventureName,
+                   o.ListingName,
+                   o.GroupName,
+                   o.ParticipantButtonText,
+                   o.ListStatement,
+                   o.TermsText,
+                   o.RefundsText,
+                   o.StripePublishableKey,
+                   o.Name
+               }).ToList();
+        }
+
 
 
         //[AcceptVerbs("OPTIONS")]

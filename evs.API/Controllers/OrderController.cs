@@ -108,9 +108,7 @@ namespace evs.API.Controllers
                     //mjb fix order.PaymentType = "credit";
                     //db.Orders.Add(order);
                     //db.SaveChanges();
-
-
-
+                    
                     //not good return reason
                     OrderService _orderService = new OrderService();
                     var x = _orderService.CreateOrder(order);
@@ -122,7 +120,6 @@ namespace evs.API.Controllers
                     //resp.Content = new StringContent();
                     resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
                     return resp;
-
                 }
                 else
                 {
@@ -132,9 +129,6 @@ namespace evs.API.Controllers
                     var badResponse = Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
                     return badResponse; 
                 }
-
-               
-
             }
             catch (Exception ex)
             {
@@ -181,44 +175,35 @@ namespace evs.API.Controllers
                 Status = "Init",
                 Voided = false
             };
+
+            //populate surcharges
+
+            //getting foreign key issues on 
+            if (bundle.charges != null)  //if no surcharges skip this
+            {
+                foreach (dynamic surchargeBundle in bundle.charges)
+                {
+                    var surcharge = new Surcharge
+                    {
+                        Amount = surchargeBundle.amount,
+                        EventureListId = surchargeBundle.listId,
+                        ChargeType = surchargeBundle.chargeType,
+                        Description = surchargeBundle.desc,
+                        ParticipantId = surchargeBundle.partId,
+                        //EventureOrderId = order.Id,
+                        EventureOrder = order,
+                        DateCreated = DateTime.Now,
+                        CouponId = surchargeBundle.couponId
+                    };
+                    //totalFees = 33; //totalFees + Convert.ToDecimal(surchargeBundle.amount);
+                    order.Surcharges.Add(surcharge);
+                }
+            }
             //db.Orders.Add(order);
             dynamic bundle = orderBundle;
             foreach (var regBundle in bundle.regs)
             {
-                //populate surcharge
-                if (bundle.charges != null)  //if no surcharges skip this
-                {
-                    foreach (dynamic surchargeBundle in bundle.charges)
-                    {
-                        var surcharge = new Surcharge
-                        {
-                            Amount = surchargeBundle.amount,
-                            EventureListId = surchargeBundle.listId,
-                            ChargeType = surchargeBundle.chargeType,
-                            Description = surchargeBundle.desc,
-                            ParticipantId = surchargeBundle.partId,
-                            //EventureOrderId = order.Id,
-                            EventureOrder = order,
-                            DateCreated = DateTime.Now,
-                            CouponId = surchargeBundle.couponId
-
-                            //Amount = 17,
-                            //EventureListId = 1,
-                            //ChargeType = "tet",
-                            //Description = "test",
-                            //ParticipantId = 1,
-                            //ConvOrderId = 1,
-                            //SurchargeType = SurchargeType.Discount,
-                            //EventureOrderId = order.Id,
-                            //EventureOrder = order,
-                            //DateCreated = DateTime.Now,
-                            //CouponId = 0
-                        };
-                        //totalFees = 33; //totalFees + Convert.ToDecimal(surchargeBundle.amount);
-                        //db.Surcharges.Add(surcharge);
-                        order.Surcharges.Add(surcharge);
-                    }
-                }
+                
 
                 Registration registration = new Registration
                     {
@@ -237,39 +222,21 @@ namespace evs.API.Controllers
 
                 var eventureListTypeId = regBundle.eventureListTypeId;
                 order.Registrations.Add(registration);
-
-
+                
                 foreach (var answerBundle in regBundle.answers)
                 {
                     var answer = new Answer
                     {
                         AnswerText = answerBundle.answer,
-                        QuestionId = answerBundle.questionId//,
-                        //Registration = registration
+                        QuestionId = answerBundle.questionId,
+                        Registration = registration
                     };
                     //registration.Answers.Add(answer);
                     registration.Answers.Add(answer);
                 }
-                order.Registrations.Add(new Registration
-                {
-                    EventureListId = regBundle.eventureListId,
-                    ParticipantId = regBundle.partId,
-                    ListAmount = regBundle.fee,
-                    Quantity = regBundle.quantity,
-                    //EventureOrderId = order.Id,    
-                    EventureOrder = order,
-                    DateCreated = DateTime.Now,
-                    TotalAmount = Convert.ToDecimal(regBundle.fee),
-                    Type = "reg",
-                });
             }
-
-            //return (StudentBo)new StudentBo().InjectFrom(studentViewModel);
             return order;
         }
-        
-        
-
     }
 
 
