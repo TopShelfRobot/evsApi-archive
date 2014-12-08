@@ -176,9 +176,7 @@ namespace evs.API.Controllers
                 Voided = false
             };
 
-            //populate surcharges
-
-            //getting foreign key issues on 
+            dynamic bundle = orderBundle;
             if (bundle.charges != null)  //if no surcharges skip this
             {
                 foreach (dynamic surchargeBundle in bundle.charges)
@@ -200,7 +198,7 @@ namespace evs.API.Controllers
                 }
             }
             //db.Orders.Add(order);
-            dynamic bundle = orderBundle;
+            
             foreach (var regBundle in bundle.regs)
             {
                 

@@ -16,7 +16,7 @@ namespace evs.API.Controllers
 
         // GET api/Eventures 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public IEnumerable<Eventure> GetAllEventuresByOwnerId(int id)
         {
             return db.Eventures.Where(e => e.OwnerId == id).OrderByDescending(e => e.Id);
