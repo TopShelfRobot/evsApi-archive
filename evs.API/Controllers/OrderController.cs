@@ -71,25 +71,69 @@ namespace evs.API.Controllers
 
                 //calculate fees
 
+
+                Owner owner = db.Owners.Where(o => o.Id == 1).SingleOrDefault();
+                if (owner == null)
+                {
+                    throw new Exception("Owner Setup is Not Configured Correctly");
+                }
+
                 //create stripe service,customer, charge
-
                 //charge card
-
+                //var stripeService = new Stripe.
+                
                 //if good
                 //record charege
                 //create order
+                StripeService stripeService = new StripeService();
 
-                //not good return reason
+                //tring customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee
+                var stripeCharge = stripeService.CreateCharge("boone@email.com", "booney", order.Token, owner.AccessToken, owner.Name, order.Amount, 200);
 
-                //var x = _orderService.CreateOrder(order);
+                if (string.IsNullOrEmpty(stripeCharge.FailureCode))
+                {
+                    //orderService.CompleteOrder(stripeCharge)
+                    order.AuthorizationCode = stripeCharge.Id;
+                    //stripeCharge.
+                    order.CardNumber = stripeCharge.StripeCard.Last4;
+                    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
+                    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
+                    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
+                    //order.CardId = stripeCharge.StripeCard.;
+                    order.CardName = stripeCharge.StripeCard.Name;
+                    order.CardOrigin = stripeCharge.StripeCard.Country;
+                    //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
+                    order.Voided = false;
+                    order.Status = "Complete";
+                    //mjb fix order.PaymentType = "credit";
+                    //db.Orders.Add(order);
+                    //db.SaveChanges();
 
-                db.Orders.Add(order);
-                db.SaveChanges();
 
-                var resp = Request.CreateResponse(HttpStatusCode.OK);
-                //resp.Content = new StringContent();
-                resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
-                return resp;
+
+                    //not good return reason
+                    OrderService _orderService = new OrderService();
+                    var x = _orderService.CreateOrder(order);
+
+                    //db.Orders.Add(order);
+                    //db.SaveChanges();
+
+                    var resp = Request.CreateResponse(HttpStatusCode.OK);
+                    //resp.Content = new StringContent();
+                    resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
+                    return resp;
+
+                }
+                else
+                {
+                    //order.Status = stripeCharge.FailureMessage;
+                    //db.SaveChanges();
+                    //return 
+                    var badResponse = Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
+                    return badResponse; 
+                }
+
+               
 
             }
             catch (Exception ex)
