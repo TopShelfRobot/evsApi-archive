@@ -26,7 +26,6 @@ namespace evs.API.Controllers
         public IEnumerable<Participant> GetParticipantsByOwnerId(int id)
         {
             return db.Participants.Where(p => p.OwnerId == id).OrderByDescending(p => p.Id);
-
         }
 
 

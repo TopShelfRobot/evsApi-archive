@@ -63,6 +63,8 @@ namespace evs.Model
         public string GroupName { get; set; }
         public string ListStatement { get; set; }
         public string ParticipantButtonText { get; set; }
+        public string StripeOrderDescription { get; set; }
+        public string StripeCheckoutButtonText { get; set; }
 
         public string FacebookAppId { get; set; }
         public string FacebookAppSecretId { get; set; }
