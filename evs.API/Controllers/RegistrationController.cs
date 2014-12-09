@@ -56,7 +56,9 @@ namespace evs.API.Controllers
                    o.TermsText,
                    o.RefundsText,
                    o.StripePublishableKey,
-                   o.Name
+                   o.Name,
+                   o.StripeCheckoutButtonText,
+                   o.StripeOrderDescription
                }).ToList();
         }
 
