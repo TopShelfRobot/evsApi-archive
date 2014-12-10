@@ -96,7 +96,7 @@ namespace evs30Api.Controllers
             }
         }
 
-        public class DtoYearOverYear
+        public class DtoYearOverYear    //moved
         {
 
 
@@ -337,7 +337,7 @@ namespace evs30Api.Controllers
             }
 
         }
-        public class DtoEventuresByYear
+        public class DtoEventuresByYear  //moved
         {
             public Int32 text { get; set; }
             public List<EventPartial> items = new List<EventPartial>();

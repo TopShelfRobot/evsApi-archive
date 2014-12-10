@@ -53,24 +53,24 @@ namespace evs30Api.Controllers
                 .ToList();
         }
 
-        [HttpGet]
-        public object GetTeamRegistrationsByOwnerId(Int32 id)
-        {
-            return db.Teams.Where(t => t.Registration.EventureOrder.OwnerId == id
-                                    && t.Registration.EventureOrder.Status == "Complete")
-                .Select(t => new
-                {
-                    t.Name,
-                    t.Id,
-                    ListName = t.Registration.EventureList.DisplayName,
-                    CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
-                    Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
-                    Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
-                    t.Registration.EventureList.EventureListTypeId,
-                    EventName = t.Registration.EventureList.Eventure.Name
-                })
-                .ToList();
-        }
+        //[HttpGet]
+        //public object GetTeamRegistrationsByOwnerId(Int32 id)
+        //{
+        //    return db.Teams.Where(t => t.Registration.EventureOrder.OwnerId == id
+        //                            && t.Registration.EventureOrder.Status == "Complete")
+        //        .Select(t => new
+        //        {
+        //            t.Name,
+        //            t.Id,
+        //            ListName = t.Registration.EventureList.DisplayName,
+        //            CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
+        //            Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
+        //            Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
+        //            t.Registration.EventureList.EventureListTypeId,
+        //            EventName = t.Registration.EventureList.Eventure.Name
+        //        })
+        //        .ToList();
+        //}
 
         [HttpGet]
         public object GetTeamMembersByTeamId(Int32 id)

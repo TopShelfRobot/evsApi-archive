@@ -24,7 +24,8 @@ namespace evs.API
             ConfigureOAuth(app);
 
             HttpConfiguration config = new HttpConfiguration();
-            WebApiConfig.Register(config);
+            //WebApiConfig.Register(config);
+            GlobalConfiguration.Configure(WebApiConfig.Register);
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseWebApi(config);
         }
