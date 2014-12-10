@@ -584,20 +584,20 @@ namespace evs.API.Controllers
             return capacity;
         }
 
-        //[HttpGet]
-        //public IEnumerable<EventureList> EventureListsByOwnerId(int ownerId)
-        //{
-        //    var queryOwnerEventures = _contextProvider.Context
-        //        .Eventures.Where(e => e.OwnerId == ownerId)
-        //        .Select(e => e.Id);
+        [HttpGet]
+        public IEnumerable<EventureList> EventureListsByOwnerId(int id)
+        {
+            var queryOwnerEventures = _contextProvider.Context
+                .Eventures.Where(e => e.OwnerId == id)
+                .Select(e => e.Id);
 
-        //    return _contextProvider.Context.EventureLists
-        //        .Where(el => queryOwnerEventures.Contains(el.EventureId)
-        //            && (el.Active)
-        //            && (EntityFunctions.TruncateTime(el.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
-        //            && (EntityFunctions.TruncateTime(el.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now)))
-        //            .OrderBy(el => el.SortOrder).ToList();
-        //}
+            return _contextProvider.Context.EventureLists
+                .Where(el => queryOwnerEventures.Contains(el.EventureId)
+                    && (el.Active)
+                    && (EntityFunctions.TruncateTime(el.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
+                    && (EntityFunctions.TruncateTime(el.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now)))
+                    .OrderBy(el => el.SortOrder).ToList();
+        }
 
         [HttpGet]
         public IQueryable<EventureList> EventureListsByEventureId(int eventureId)

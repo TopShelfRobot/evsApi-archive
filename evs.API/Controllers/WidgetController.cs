@@ -18,14 +18,93 @@ namespace evs.API.Controllers
         readonly evsContext db = new evsContext();
 
         [HttpGet]
-        public object GetOwnerGraph(int id)
-        //need to check order.Status == 'Complete'   //mjb 
+        public IEnumerable<Eventure> GetAllEventuresByOwnerId(Int32 id)
+        {
+            return db.Eventures.Where(e => e.OwnerId == id).OrderByDescending(e => e.Id);
+        }
+
+        [HttpGet]
+        public IEnumerable<EventureList> GetEventureListsByEventureId(Int32 id)
+        {
+            return db.EventureLists.Where(e => e.EventureId == id);
+        }
+
+        [HttpGet]
+        public IEnumerable<EventureService> GetEventureServiceByEventureId(Int32 id)
+        {
+            //lazy #2  only should be querying by owner id
+            return db.EventureServices.Where(s => s.EventureId == id);
+        }
+
+        [HttpGet]
+        public IEnumerable<Participant> GetRegisteredParticipantsByEventureId(Int32 id)
+        {
+            //var queryEventureListIdsByEventureId = db.EventureLists.Where(l => l.EventureId == id).Select(l => l.Id);
+            //var queryRegPartIdsByEventureList =db.Registrations.Where(r => queryEventureListIdsByEventureId.Contains(r.EventureListId)).Select(r => r.ParticipantId);
+
+            var queryRegPartIdsByEventureList = from r in db.Registrations
+                                                join o in db.Orders
+                                                on r.EventureOrderId equals o.Id
+                                                join l in db.EventureLists
+                                                on r.EventureListId equals l.Id
+                                                where l.EventureId == id
+                                                && o.Status == "Complete"
+                                                select r.ParticipantId;
+
+            return db.Participants.Where(p => queryRegPartIdsByEventureList.Contains(p.Id)).OrderByDescending(p => p.Id);
+        }
+
+        [HttpGet]
+        public IEnumerable<Participant> GetParticipantsByOwnerId(Int32 id) //Int32 ownerId
+        {
+            return db.Participants.Where(p => p.OwnerId == id).OrderByDescending(p => p.Id);
+        }
+
+        [HttpGet]
+        public IEnumerable<Participant> GetParticipantsByHouseId(int id)
+        {
+            //return db.Participants.Where(p => p.OwnerId == id);
+            return db.Participants.Where(p => p.HouseId == id);
+
+        }
+
+        [HttpGet]
+        public IEnumerable<Participant> GetRegisteredParticipantsByEventureListId(Int32 id)
+        {
+            //var queryEventureListIdsByEventureListId = db.EventureLists.Where(l => l.Id == id).Select(l => l.Id);
+            //var queryRegPartIdsByEventureList = db.Registrations.Where(r => queryEventureListIdsByEventureListId.Contains(r.EventureListId)).Select(r => r.ParticipantId);
+            var queryRegPartIdsByEventureList = from r in db.Registrations
+                                                join o in db.Orders
+                                                on r.EventureOrderId equals o.Id
+                                                where r.EventureListId == id
+                                                && o.Status == "Complete"
+                                                select r.ParticipantId;
+
+            return db.Participants.Where(p => queryRegPartIdsByEventureList.Contains(p.Id));
+        }
+
+        [HttpGet]
+        public IEnumerable<Resource> GetResourcesByOwnerId(Int32 id)
+        {
+            //return db.Participants.Where(p => p.OwnerId == id);
+            return db.Resources.Where(v => v.OwnerId == id);
+        }
+
+        [HttpGet]
+        public IEnumerable<Coupon> GetCouponsByOwnerId(Int32 id)
+        {
+            return db.Coupons.Where(c => c.OwnerId == id).OrderByDescending(c => c.Id);
+        }
+
+        [HttpGet]
+        public object GetOwnerGraph(Int32 id)
         {
             var graph = new List<DtoGraph>();
 
             var queryOwnerEventures = db.Eventures.Where(e => e.OwnerId == id).Select(e => e.Id);
             var queryOwnersLists = db.EventureLists.Where(el => queryOwnerEventures.Contains(el.EventureId)).Select(l => l.Id);
 
+            //need to check order.Status == 'Complete'   //mjb 
             var query = from r in db.Registrations
                         where queryOwnersLists.Contains(r.EventureListId)
                         group r by r.DateCreated.Month
@@ -123,19 +202,110 @@ namespace evs.API.Controllers
             return graph;
         }
 
-
-
         [HttpGet]
-        public IEnumerable<Eventure> GetAllEventuresByOwnerId(Int32 id)
+        public object GetEventureListGraph(Int32 id)
         {
-            return db.Eventures.Where(e => e.OwnerId == id).OrderByDescending(e => e.Id);
+            //need to check order.Status == 'Complete'   //mjb 
+            var graph = new List<DtoGraph>();
+
+            //var queryOwnerEventures = db.Eventures.Where(e => e.OwnerId == id).Select(e => e.Id);
+
+            var query = from r in db.Registrations
+                        where r.EventureListId == id
+                        group r by r.DateCreated.Month
+                            into reggroup
+                            select new
+                            {
+                                regmonth = reggroup.Key,
+                                regcount = reggroup.Sum(s => s.Quantity),
+                                revsum = reggroup.Sum(s => s.TotalAmount)
+                            };
+
+            int month = 1;
+            foreach (var g in query)
+            {
+                if (g.regmonth != month)  //enter a zero for that month
+                {
+                    do
+                    {
+                        //myList.Add(month, 0);
+                        graph.Add(new DtoGraph(month, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month).Substring(0, 3), 0, 0));
+                        month++;
+
+                    } while (month != g.regmonth);
+                }
+                //myList.Add(g.regmonth, g.Count());
+                graph.Add(new DtoGraph(g.regmonth, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(g.regmonth).Substring(0, 3), g.regcount, g.revsum));
+                month++;
+            }
+            //must catch any months with 0 at end of 
+            if (month < 12)
+            {
+                do
+                {
+                    //Console.Write(month + "|0---");
+                    //myList.Add(month, 0);
+                    graph.Add(new DtoGraph(month, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month).Substring(0, 3), 0, 0));
+                    month++;
+
+                } while (month < 13);
+            }
+
+            return graph;
         }
 
         [HttpGet]
-        public IEnumerable<Participant> GetParticipantsByOwnerId(Int32 id) //Int32 ownerId
+        public object GetEventureGroupGraphByList(Int32 id)
         {
-            return db.Participants.Where(p => p.OwnerId == id).OrderByDescending(p => p.Id);
+            //need to check order.Status == 'Complete'   //mjb 
+            var groups = from g in db.EventureGroups
+                         //where g.Capacity > g.Registration.Count()
+                         //select new {g.Id, g.Name, grpCount = g.Registration.Count()};
+                         join r in db.Registrations.Where(r => r.EventureOrder.Status == "Complete")
+                       on g.Id equals r.GroupId into rg
+                         //on r.EventureOrder.Status equals "Complete"   //&& (g.Id equals r.GroupId)
+                         ////&& 
+                         where g.EventureListId == id
+                         orderby g.Name
+                         select new { groupName = g.Name, regCount = rg.Count(), id = g.Id };
+            //select new {g};   
+
+            return groups;
         }
+
+        [HttpGet]
+        public object GetRegistrationsByPartId(Int32 id)
+        {
+            //need to check order.Status == 'Complete'   //mjb 
+            return db.Registrations.Where(r => r.ParticipantId == id).Select(r => new { r.EventureList.DisplayName, r.TotalAmount, r.Quantity, r.DateCreated, r.Id, r.EventureOrderId, r.StockAnswerSetId });
+            //return db.Registrations.Where(r => r.ParticipantId == id);
+        }
+
+        [HttpGet]
+        public object GetRevenuePerEvent(Int32 id)
+        {
+
+            var eventureInfo = from r in db.Registrations
+                               join l in db.EventureLists
+                               on r.EventureListId equals l.Id
+                               join e in db.Eventures
+                               on l.EventureId equals e.Id
+                               group r by e.Name into g
+                               select new { name = g.Key, thesum = g.Sum(r => r.TotalAmount) };
+
+            var revs = new List<EventRev>();
+
+            foreach (var e in eventureInfo)
+            {
+                var rev = new EventRev();
+                rev.Eventure = e.name;
+                rev.RevenuePercent = e.thesum;
+                revs.Add(rev);
+            }
+
+            return revs;
+        }
+
 
         [HttpGet]
         public object GetTeamRegistrationsByOwnerId(Int32 id)
@@ -157,25 +327,27 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public object GetVolunteersByOwnerId(Int32 id)
+        public object GetTeamRegistrationsByHouseId(Int32 id)
         {
-            return db.Volunteers.Where(v => v.Participant.OwnerId == id)
-                .Select(v => new { v.Participant.FirstName, v.Participant.LastName, v.Participant.Email, v.Participant.PhoneMobile, v.Id })
+            return db.Teams.Where(t => t.Registration.EventureOrder.HouseId == id
+                                    && t.Registration.EventureOrder.Status == "Complete")
+                .Select(t => new
+                {
+                    t.Name,
+                    CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
+                    t.Id,
+                    ListName = t.Registration.EventureList.DisplayName,
+                    t.Registration.Participant.FirstName,
+                    t.Registration.Participant.LastName,
+                    EventName = t.Registration.EventureList.Eventure.Name
+                })
                 .ToList();
-
         }
 
         [HttpGet]
-        public IEnumerable<Resource> GetResourcesByOwnerId(Int32 id)
+        public object GetResourceItemsByResourceId(Int32 id)
         {
-            //return db.Participants.Where(p => p.OwnerId == id);
-            return db.Resources.Where(v => v.OwnerId == id);
-        }
-
-        [HttpGet]
-        public IEnumerable<Coupon> GetCouponsByOwnerId(int id)
-        {
-            return db.Coupons.Where(c => c.OwnerId == id).OrderByDescending(c => c.Id);
+            return db.ResourceItems.Where(i => i.ResourceId == id).Select(i => new { i.Id, i.Name, i.Cost, Category = i.ResourceItemCategory.Name, i.ResourceId });
         }
 
         [HttpGet]
@@ -195,44 +367,6 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<EventureList> GetEventureListsByEventureId(Int32 id)
-        {
-            return db.EventureLists.Where(e => e.EventureId == id);
-        }
-
-        [HttpGet]
-        public IEnumerable<EventureService> GetEventureServiceByEventureId(Int32 id)
-        {
-            //lazy #2  only should be querying by owner id
-            return db.EventureServices.Where(s => s.EventureId == id);
-        }
-
-        [HttpGet]
-        public object GetExpensesByEventureId(Int32 id)
-        {
-           return db.Expenses.Where(e => e.EventureId == id)
-                    .Select(e => new { e.Id, e.Cost, e.CostType, e.PerRegNumber, item = e.ResourceItem.Name, category = e.ResourceItemCategory.Name });   //category = e.ItemCategory.Name
-        }
-
-        [HttpGet]
-        public IEnumerable<Participant> GetRegisteredParticipantsByEventureId(Int32 id)
-        {
-            //var queryEventureListIdsByEventureId = db.EventureLists.Where(l => l.EventureId == id).Select(l => l.Id);
-            //var queryRegPartIdsByEventureList =db.Registrations.Where(r => queryEventureListIdsByEventureId.Contains(r.EventureListId)).Select(r => r.ParticipantId);
-
-            var queryRegPartIdsByEventureList = from r in db.Registrations
-                                                join o in db.Orders
-                                                on r.EventureOrderId equals o.Id
-                                                join l in db.EventureLists
-                                                on r.EventureListId equals l.Id
-                                                where l.EventureId == id
-                                                && o.Status == "Complete"
-                                                select r.ParticipantId;
-
-            return db.Participants.Where(p => queryRegPartIdsByEventureList.Contains(p.Id)).OrderByDescending(p => p.Id);
-        }
-
-        [HttpGet]
         public object GetNotificationsByEventureId(Int32 id)
         {
             var resource = from p in db.PlanItems
@@ -245,6 +379,22 @@ namespace evs.API.Controllers
                            select new { Id = p.Id, Task = p.Task, DateDue = p.DateDue, Resource = r.Name, IsCompleted = p.IsCompleted };
 
             return resource.ToList();
+        }
+
+        [HttpGet]
+        public object GetExpensesByEventureId(Int32 id)
+        {
+            return db.Expenses.Where(e => e.EventureId == id)
+                     .Select(e => new { e.Id, e.Cost, e.CostType, e.PerRegNumber, item = e.ResourceItem.Name, category = e.ResourceItemCategory.Name });   //category = e.ItemCategory.Name
+        }
+
+        [HttpGet]
+        public object GetVolunteersByOwnerId(Int32 id)
+        {
+            return db.Volunteers.Where(v => v.Participant.OwnerId == id)
+                .Select(v => new { v.Participant.FirstName, v.Participant.LastName, v.Participant.Email, v.Participant.PhoneMobile, v.Id })
+                .ToList();
+
         }
 
         [HttpGet]
@@ -307,6 +457,12 @@ namespace evs.API.Controllers
                 text = name;
             }
 
+        }
+
+        public class EventRev
+        {
+            public string Eventure { get; set; }
+            public decimal RevenuePercent { get; set; }
         }
     }
 }
