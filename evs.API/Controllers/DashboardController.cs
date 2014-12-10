@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using evs.DAL;
 using evs.Model;
 using System.Data.Entity.Core.Objects;
+using System.Web.Mvc.Html;
 
 namespace evs.API.Controllers
 {
@@ -50,9 +51,7 @@ namespace evs.API.Controllers
 
         //}
 
-
-
-       
+ 
 
 
         [HttpGet]
@@ -89,10 +88,7 @@ namespace evs.API.Controllers
                    o.StripeOrderDescription
                }).ToList();
         }
-
-
-
-
+         
         [HttpGet]
         public DtoTrends GetTrendsByEventId(int id)
         {
@@ -274,10 +270,7 @@ namespace evs.API.Controllers
                            };    //this should really look at reg for original cost
             return transfer.ToList();
         }
-
-       
-
-
+    
         public List<DtoEventuresByYear> GetEventuresGroupedByYearByOwnerId(int id)
         {
             //DateTime now = DateTime.Now;
@@ -708,24 +701,24 @@ namespace evs.API.Controllers
         //    return new { participants };  //, timeslots
         //}
 
-        //[HttpGet]
-        //public IEnumerable<NumericValueSelectListItem> AmountTypeLookups()
-        //{
-        //    var amountTypes = EnumHelper.GetSelectList(typeof(AmountType))
-        //        .Select(x => new NumericValueSelectListItem()
-        //        {
-        //            Text = x.Text,
-        //            Value = int.Parse(x.Value)
-        //        });
+        [HttpGet]
+        public IEnumerable<NumericValueSelectListItem> AmountTypeLookups()
+        {
+            var amountTypes = EnumHelper.GetSelectList(typeof(AmountType))
+                .Select(x => new NumericValueSelectListItem()
+                {
+                    Text = x.Text,
+                    Value = int.Parse(x.Value)
+                });
 
-        //    return amountTypes;
-        //}
+            return amountTypes;
+        }
 
-        //public class NumericValueSelectListItem
-        //{
-        //    public string Text { get; set; }
-        //    public int Value { get; set; }
-        //}
+        public class NumericValueSelectListItem
+        {
+            public string Text { get; set; }
+            public int Value { get; set; }
+        }
 
         //[HttpGet]
         //public IQueryable<Addon> Addons()
