@@ -11,6 +11,20 @@ using System.Net.Mail;
 using System.Text;
 using evs.DAL;
 using System.Configuration;
+
+
+using System.Configuration;
+
+using System.Threading;
+using System.Threading.Tasks;
+
+using Newtonsoft.Json.Linq;
+using System.Net;
+using evs.DAL;
+using evs.Model;
+using System.Web;
+
+
 //using evs.Model;
 
 namespace evs.API.Controllers
@@ -867,7 +881,8 @@ namespace evs.API.Controllers
 
                 using (MemoryStream memoryStream = ConvertMailMessageToMemoryStream(mailMessage))
                 {
-                    rawMessage.WithData(memoryStream);
+                   // rawMessage.WithData(memoryStream);
+                    //rawMessage.
                 }
 
                 SendRawEmailRequest request = new SendRawEmailRequest();

@@ -306,7 +306,6 @@ namespace evs.API.Controllers
             return revs;
         }
 
-
         [HttpGet]
         public object GetTeamRegistrationsByOwnerId(Int32 id)
         {
@@ -342,6 +341,58 @@ namespace evs.API.Controllers
                     EventName = t.Registration.EventureList.Eventure.Name
                 })
                 .ToList();
+        }
+
+        [HttpGet]
+        public object GetTeamMembersByTeamId(Int32 id)
+        {
+            return db.TeamMembers.Where(t => t.Team.Id == id
+                                            && t.Active)
+                .Select(t => new
+                {
+                    t.Name,
+                    t.Id,
+                    t.TeamId,
+                    t.Email,
+                    Balance = t.Team.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
+                    Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
+                    EventureOrderId = t.Team.Registration.EventureOrder.Id
+                })
+                .ToList();
+        }
+
+        [HttpGet]
+        public object GetTeamRegistrationsByCoachId(Int32 id)
+        {
+            return db.Teams.Where(t => t.CoachId == id
+                                    && t.Registration.EventureOrder.Status == "Complete")
+                .Select(t => new
+                {
+                    t.Name,
+                    t.Id,
+                    ListName = t.Registration.EventureList.DisplayName,
+                    CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
+                    Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
+                    Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
+                    EventName = t.Registration.EventureList.Eventure.Name
+                })
+                .ToList();
+        }
+
+        [HttpGet]
+        public object GetCouponUseByCouponId(Int32 id)
+        {
+            //return db.Coupons.Where(c => c.OwnerId == id).OrderByDescending(c => c.Id);
+            var surcharge = from s in db.Surcharges
+                            join l in db.EventureLists
+                            on s.EventureListId equals l.Id
+                            join p in db.Participants
+                            on s.ParticipantId equals p.Id
+                            where s.ChargeType == "coupon"
+                            && s.CouponId == id
+                            select new { s.Amount, s.Description, l.Name, s.EventureOrderId, p.FirstName, p.LastName, s.CouponId };
+
+            return surcharge;
         }
 
         [HttpGet]
@@ -418,17 +469,7 @@ namespace evs.API.Controllers
             public Int32 MaxCapacity { get; set; }
         }
 
-        public class DtoEventuresByYear
-        {
-            public Int32 text { get; set; }
-            public List<EventPartial> items = new List<EventPartial>();
-
-            public DtoEventuresByYear(Int32 year, List<EventPartial> eventures)
-            {
-                text = year;
-                items = eventures;
-            }
-        }
+       
 
         public class DtoGraph
         {
@@ -446,18 +487,19 @@ namespace evs.API.Controllers
             }
         }
 
-        public class EventPartial
-        {
-            public Int32 Id { get; set; }
-            public string text { get; set; }
+        //public class DtoEventuresByYear
+        //{
+        //    public Int32 text { get; set; }
+        //    public List<EventPartial> items = new List<EventPartial>();
 
-            public EventPartial(Int32 id, string name)
-            {
-                Id = id;
-                text = name;
-            }
+        //    public DtoEventuresByYear(Int32 year, List<EventPartial> eventures)
+        //    {
+        //        text = year;
+        //        items = eventures;
+        //    }
+        //}
 
-        }
+       
 
         public class EventRev
         {

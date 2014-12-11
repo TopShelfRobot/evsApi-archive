@@ -21,256 +21,77 @@ namespace evs.API.Controllers
     public class DashboardController : ApiController
     {
         readonly EFContextProvider<evsContext> _contextProvider = new EFContextProvider<evsContext>();
-        
-        //[HttpGet]
-        //public IEnumerable<EventureList> EventureListsByOwnerId(int ownerId)
-        //{
-        //    var queryOwnerEventures = _contextProvider.Context
-        //        .Eventures.Where(e => e.OwnerId == ownerId)
-        //        .Select(e => e.Id);
-
-        //    return _contextProvider.Context.EventureLists
-        //        .Where(el => queryOwnerEventures.Contains(el.EventureId)
-        //            && (el.Active)
-        //            && (EntityFunctions.TruncateTime(el.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
-        //            && (EntityFunctions.TruncateTime(el.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now)))
-        //            .OrderBy(el => el.SortOrder).ToList();
-        //}
-
-        //[HttpGet]  //reg
-        //public IQueryable<Participant> ParticipantsByHouseId(int houseId)
-        //{
-        //    return _contextProvider.Context.Participants
-        //                           .Where(p => p.HouseId == houseId) //.Where(p => p.Hous)eId = 1);
-        //                           .OrderBy(p => (p.HouseId == p.Id) ? -1 : 1);   //this should cause the one that is houseID to top
-        //}
-
-        //public IEnumerable<Eventure> GetAllEventuresByOwnerId(int id)
-        //{
-        //    return db.Eventures.Where(e => e.OwnerId == id).OrderByDescending(e => e.Id);
-
-        //}
-
- 
-
 
         [HttpGet]
         //[Authorize]                
-        public IEnumerable<Eventure> GetAllEventuresByOwnerId(int id)
+        public IEnumerable<Eventure> GetAllEventuresByOwnerId(Int32 id)
         {
             return _contextProvider.Context.Eventures.Where(e => e.OwnerId == id).OrderByDescending(e => e.Id);
         }
 
-
         [HttpGet]
-        //[Authorize]
-        public object getPublicOwnerByOwnerId(int ownerId)
+        public IEnumerable<EventureList> GetEventureListsByOwnerId(Int32 id)
         {
-            return _contextProvider.Context.Owners
-               .Where(o => o.Id == ownerId)
-               .Select(o => new
-               {
-                   o.IsDuplicateOrderAllowed,
-                   o.IsAddSingleFeeForAllRegs,
-                   o.AddSingleFeeForAllRegsPercent,
-                   o.AddSingleFeeType,
-                   o.AddSingleFeeForAllRegsFlat,
-                   o.EventureName,
-                   o.ListingName,
-                   o.GroupName,
-                   o.ParticipantButtonText,
-                   o.ListStatement,
-                   o.TermsText,
-                   o.RefundsText,
-                   o.StripePublishableKey,
-                   o.Name,
-                   o.StripeCheckoutButtonText,
-                   o.StripeOrderDescription
-               }).ToList();
-        }
-         
-        [HttpGet]
-        public DtoTrends GetTrendsByEventId(int id)
-        {
-            var queryLists = _contextProvider.Context
-                                        .EventureLists
-                                        .Where(el => el.EventureId == id)
-                                        .Select(l => l.Id);
+            var queryOwnerEventures = _contextProvider.Context
+                .Eventures.Where(e => e.OwnerId == id)
+                .Select(e => e.Id);
 
-            var last7Date = DateTime.Now.AddDays(-7).Date;
-            var reg7Count = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId)).Count(r => r.DateCreated > last7Date && r.EventureOrder.Status == "Complete");
-
-            var last30Date = DateTime.Now.AddDays(-30).Date;
-            var reg30Count = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId)).Count(r => r.DateCreated > last30Date && r.EventureOrder.Status == "Complete");
-
-            var last1Date = DateTime.Now.AddDays(-1).Date;
-            var reg1Count = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId)).Count(r => r.DateCreated > last1Date && r.EventureOrder.Status == "Complete");
-
-            var totalCount = _contextProvider.Context.Registrations.Count(r => queryLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete");
-
-
-            var reg7Amount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.DateCreated > last7Date && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
-            var reg30Amount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.DateCreated > last30Date && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
-            var reg1Amount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.DateCreated > last1Date && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
-            var totalAmount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
-
-
-            return new DtoTrends(reg30Count, reg7Count, reg1Count, totalCount, reg30Amount, reg7Amount, reg1Amount, totalAmount);
+            return _contextProvider.Context.EventureLists
+                .Where(el => queryOwnerEventures.Contains(el.EventureId)
+                    && (el.Active)
+                    && (EntityFunctions.TruncateTime(el.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
+                    && (EntityFunctions.TruncateTime(el.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now)))
+                    .OrderBy(el => el.SortOrder).ToList();
         }
 
         [HttpGet]
-        public object GetTeamMemberPaymentInfoByTeamMemberGuid(Guid id)
+        public IEnumerable<EventureList> EventureListsByEventureId(Int32 eventureId)
         {
-            return _contextProvider.Context.TeamMembers
-                     .Where(t => t.TeamMemberGuid == id && t.Active)
-                     .Select(m => new
-                     {
-                         ListName = m.Team.Registration.EventureList.DisplayName,
-                         m.Team.Registration.EventureList.EventureListType,
-                         m.Team.Registration.EventureList.CurrentFee,
-                         RegAmount = m.Team.Registration.ListAmount,   //totalAmount??
-                         userPaid = (decimal?)m.TeamMemberPayments.Sum(p => p.Amount) ?? 0,     //this is temp;  if they make multiple payments reciept will be wrong
-                         m.Id,
-                         m.Team.Name,
-                         teamMemberId = m.Id,
-                         teamId = m.Team.Id
-                     }).ToList();
+            return _contextProvider.Context.EventureLists
+                .Where(l => (l.EventureId == eventureId)
+                    && (l.Active)
+                    && (EntityFunctions.TruncateTime(l.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
+                    && (EntityFunctions.TruncateTime(l.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now))
+                    && l.Capacity > l.Registration.Count()
+                    );
         }
 
         [HttpGet]
-        public object GetTeamMemberPaymentInfoByPaymentId(Int32 id)    //this will only be used on member payment receipt
+        public IEnumerable<EventureOrder> OrderById(Int32 id)
         {
-            return _contextProvider.Context.TeamMemberPayments
-                     .Where(p => p.Id == id)
-                     .Select(p => new
-                     {
-                         p.Amount,
-                         p.TeamMember.Name,
-                         teamname = p.TeamMember.Team.Name,
-                         ListName = p.TeamMember.Team.Registration.EventureList.Name
-                     }).ToList();
+            return _contextProvider.Context.Orders
+                                             .Include("Registrations")
+                                             .Include("Registrations.Participant")
+                                             .Include("Surcharges")
+                                             .Where(o => (o.Id == id));
         }
 
         [HttpGet]
-        public object GetNotPaidTeamMemberCountByTeamGuid(Guid id)
+        public IEnumerable<EventureGroup> GroupsBelowCapacity(Int32 listId)      //mjb this needs complete
         {
-            var allTeamCount = _contextProvider.Context.TeamMembers.Count(t => t.Team.TeamGuid == id && t.Active);
+            string query =
+                " select distinct g.* from EventureGroup g " +
+                " left join Registration r on g.Id = r.GroupId " +
+                " where (select count(*) from Registration where groupid = g.id) < g.Capacity  " +
+                " AND g.Active = 1" +
+                " AND g.EventureListId = " + listId;
 
-            var paidTeamCount = _contextProvider.Context.TeamMembers.Count(t => t.Team.TeamGuid == id && t.Active && t.TeamMemberPayments.Count > 0);
-
-            return allTeamCount - paidTeamCount;
+            return _contextProvider.Context.Database.SqlQuery<EventureGroup>(query);
         }
 
         [HttpGet]
-        public object GetTeamMemberPaymentSumByTeamGuid(Guid id)
+        public IEnumerable<NumericValueSelectListItem> AmountTypeLookups()
         {
-            return _contextProvider.Context.TeamMembers
-                                .Where(t => t.Team.TeamGuid == id && t.Active)
-                                .Sum(t => (decimal?)t.TeamMemberPayments.Sum(p => (decimal?)p.Amount) ?? 0);
+            var amountTypes = EnumHelper.GetSelectList(typeof(AmountType))
+                .Select(x => new NumericValueSelectListItem()
+                {
+                    Text = x.Text,
+                    Value = int.Parse(x.Value)
+                });
+
+            return amountTypes;
         }
 
-        [HttpGet]
-        public DtoRevReg GetRegsRevByOwner(int id)
-        {
-            var dtoRegRev = new DtoRevReg(0, 0);
-
-            var queryOwnerEventures = _contextProvider.Context.Eventures
-                                        .Where(e => e.OwnerId == id)
-                                        .Select(e => e.Id);
-
-            var queryOwnersLists = _contextProvider.Context.EventureLists
-                                        .Where(el => queryOwnerEventures.Contains(el.EventureId))
-                                        .Select(l => l.Id);
-
-            var regcount = _contextProvider.Context.Registrations
-                .Where(r => queryOwnersLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete")
-                                .Sum(r => (int?)r.Quantity);
-
-            var rev = _contextProvider.Context.Registrations
-                .Where(r => queryOwnersLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete")
-                .Sum(r => (int?)r.TotalAmount);
-
-            dtoRegRev.Regs = regcount;
-            if (rev.Equals(null))
-                dtoRegRev.Rev = 0;
-            else
-                dtoRegRev.Rev = rev;
-
-            return dtoRegRev;
-        }
-
-        [HttpGet]
-        public object GetRegEditDisplayInfo(int id)
-        {
-            var query = from r in _contextProvider.Context.Registrations
-                        join el in _contextProvider.Context.EventureLists
-                            on r.EventureListId equals el.Id
-                        join q in _contextProvider.Context.StockQuestionSets
-                            on el.Id equals q.EventureListId
-                        //join g in _contextProvider.Context.EventureGroups
-                        //    on r.GroupId equals g.Id
-                        where r.Id == id
-                        select
-                            new
-                                {
-                                    el.DisplayName,
-                                    el.DateEventureList,
-                                    //g.Name, 
-                                    q.ShirtSize,
-                                    q.FinishTime,
-                                    q.BibName,
-                                    q.HowHear,
-                                    //q.OwnRv,
-                                    //q.NextRv,
-                                    //q.HowHearRv,
-                                    q.Notes,
-                                    q.School,
-                                    q.HowHearDropDown,
-                                    q.EstimatedSwimTime400,
-                                    q.EstimatedSwimTime,
-                                    q.AnnualIncome,
-                                    q.RelayTeamQuestion,
-                                    q.Usat,
-                                    q.ShirtUpgrade,
-                                    q.Wheelchair,
-                                    q.PuretapUnisex,
-                                    q.NortonUnisex,
-                                    q.BourbonGenderSpecific,
-                                    q.HearRunathon,
-                                    q.HearPure,
-                                    q.HearNorton,
-                                    q.HearBourbon,
-                                    q.ParticipatePure,
-                                    q.ParticipateNorton,
-                                    q.ParticipateBourbon,
-                                    q.Mile15,
-                                    q.SportsEmails,
-                                    q.BourbonWaiver
-                                };
-
-            return query.ToList();
-        }
-
-        [HttpGet]
-        public object GetTransferInfo(int id)
-        {
-            var transfer = from t in _contextProvider.Context.EventureTransfers
-                           join fl in _contextProvider.Context.EventureLists
-                           on t.EventureListIdFrom equals fl.Id
-                           join tl in _contextProvider.Context.EventureLists
-                           on t.EventureListIdTo equals tl.Id
-                           where t.Id == id
-                           select new
-                           {
-                               originalList = fl.Name,
-                               originalListCost = fl.CurrentFee,
-                               newList = tl.Name,
-                               newListCost = tl.CurrentFee,
-                               regId = t.RegistrationId
-                           };    //this should really look at reg for original cost
-            return transfer.ToList();
-        }
-    
         public List<DtoEventuresByYear> GetEventuresGroupedByYearByOwnerId(int id)
         {
             //DateTime now = DateTime.Now;
@@ -489,7 +310,7 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public DtoCapacity GetCapacityByEventureId(int id)
+        public DtoCapacity GetCapacityByEventureId(Int32 id)
         {
             //var rList = new List<DtoCapacity>();
             var capacity = new DtoCapacity(0, 0);
@@ -511,40 +332,66 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public object GetYearOverYearData()
+        public DtoTrends GetTrendsByEventId(Int32 id)
         {
-            ////var rList = new List<DtoCapacity>();
-            //var capacity = new DtoCapacity(0, 0);
+            var queryLists = _contextProvider.Context
+                                        .EventureLists
+                                        .Where(el => el.EventureId == id)
+                                        .Select(l => l.Id);
 
-            //var capacitySum = _contextProvider.Context.EventureLists.Where(ol => ol.EventureId == id).Sum(s => (int?)s.Capacity) ?? 0;
-            ////.Sum(income =>  (decimal?)income.Amount) ?? 0;
+            var last7Date = DateTime.Now.AddDays(-7).Date;
+            var reg7Count = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId)).Count(r => r.DateCreated > last7Date && r.EventureOrder.Status == "Complete");
 
-            //var queryOwnerEventures = _contextProvider.Context.Eventures.Where(e => e.Id == id).Select(e => e.Id);
-            //var queryOwnersLists = _contextProvider.Context.EventureLists.Where(el => queryOwnerEventures.Contains(el.EventureId)).Select(l => l.Id);
-            //var regcount = _contextProvider.Context.Registrations.Count(r => queryOwnersLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete");
+            var last30Date = DateTime.Now.AddDays(-30).Date;
+            var reg30Count = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId)).Count(r => r.DateCreated > last30Date && r.EventureOrder.Status == "Complete");
 
-            ////rList.Add(new DtoCapacity(regcount, capacitySum));
-            ////rList.Add(new DtoCapacity(232, 666));
+            var last1Date = DateTime.Now.AddDays(-1).Date;
+            var reg1Count = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId)).Count(r => r.DateCreated > last1Date && r.EventureOrder.Status == "Complete");
 
-            //capacity.Regs = regcount;
-            //capacity.Capacity = capacitySum;
-
-            //return capacity;
-
-            var data = new List<DtoYearOverYear>();
-            data.Add(new DtoYearOverYear("Urban Bourbon", "November", 20, 10, 13));
-            data.Add(new DtoYearOverYear("Urban Bourbon", "December", 17, 12, 34));
-            data.Add(new DtoYearOverYear("Urban Bourbon", "January", 14, 17, 22));
-            data.Add(new DtoYearOverYear("Urban Bourbon", "February", 22, 18, 17));
+            var totalCount = _contextProvider.Context.Registrations.Count(r => queryLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete");
 
 
+            var reg7Amount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.DateCreated > last7Date && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
+            var reg30Amount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.DateCreated > last30Date && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
+            var reg1Amount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.DateCreated > last1Date && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
+            var totalAmount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
 
-            return data;
 
+            return new DtoTrends(reg30Count, reg7Count, reg1Count, totalCount, reg30Amount, reg7Amount, reg1Amount, totalAmount);
         }
 
         [HttpGet]
-        public DtoCapacity GetCapacityByEventureListId(int id)
+        public DtoRevReg GetRegsRevByOwner(Int32 id)
+        {
+            var dtoRegRev = new DtoRevReg(0, 0);
+
+            var queryOwnerEventures = _contextProvider.Context.Eventures
+                                        .Where(e => e.OwnerId == id)
+                                        .Select(e => e.Id);
+
+            var queryOwnersLists = _contextProvider.Context.EventureLists
+                                        .Where(el => queryOwnerEventures.Contains(el.EventureId))
+                                        .Select(l => l.Id);
+
+            var regcount = _contextProvider.Context.Registrations
+                .Where(r => queryOwnersLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete")
+                                .Sum(r => (int?)r.Quantity);
+
+            var rev = _contextProvider.Context.Registrations
+                .Where(r => queryOwnersLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete")
+                .Sum(r => (int?)r.TotalAmount);
+
+            dtoRegRev.Regs = regcount;
+            if (rev.Equals(null))
+                dtoRegRev.Rev = 0;
+            else
+                dtoRegRev.Rev = rev;
+
+            return dtoRegRev;
+        }
+
+        [HttpGet]
+        public DtoCapacity GetCapacityByEventureListId(Int32 id)
         {
             var capacity = new DtoCapacity(0, 0);
 
@@ -561,7 +408,7 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public DtoCapacity GetCapacityByOwnerId(int id)
+        public DtoCapacity GetCapacityByOwnerId(Int32 id)
         {
             var capacity = new DtoCapacity(0, 0);
 
@@ -585,40 +432,166 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<EventureList> EventureListsByOwnerId(int id)
+        //[Authorize]
+        public object getPublicOwnerByOwnerId(Int32 ownerId)
         {
-            var queryOwnerEventures = _contextProvider.Context
-                .Eventures.Where(e => e.OwnerId == id)
-                .Select(e => e.Id);
-
-            return _contextProvider.Context.EventureLists
-                .Where(el => queryOwnerEventures.Contains(el.EventureId)
-                    && (el.Active)
-                    && (EntityFunctions.TruncateTime(el.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
-                    && (EntityFunctions.TruncateTime(el.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now)))
-                    .OrderBy(el => el.SortOrder).ToList();
+            return _contextProvider.Context.Owners
+               .Where(o => o.Id == ownerId)
+               .Select(o => new
+               {
+                   o.IsDuplicateOrderAllowed,
+                   o.IsAddSingleFeeForAllRegs,
+                   o.AddSingleFeeForAllRegsPercent,
+                   o.AddSingleFeeType,
+                   o.AddSingleFeeForAllRegsFlat,
+                   o.EventureName,
+                   o.ListingName,
+                   o.GroupName,
+                   o.ParticipantButtonText,
+                   o.ListStatement,
+                   o.TermsText,
+                   o.RefundsText,
+                   o.StripePublishableKey,
+                   o.Name,
+                   o.StripeCheckoutButtonText,
+                   o.StripeOrderDescription
+               }).ToList();
         }
 
         [HttpGet]
-        public IQueryable<EventureList> EventureListsByEventureId(int eventureId)
+        public object GetTeamMemberPaymentInfoByTeamMemberGuid(Guid id)
         {
-            return _contextProvider.Context.EventureLists
-                .Where(l => (l.EventureId == eventureId)
-                    && (l.Active)
-                    && (EntityFunctions.TruncateTime(l.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
-                    && (EntityFunctions.TruncateTime(l.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now))
-                    && l.Capacity > l.Registration.Count()
-                    );
+            return _contextProvider.Context.TeamMembers
+                     .Where(t => t.TeamMemberGuid == id && t.Active)
+                     .Select(m => new
+                     {
+                         ListName = m.Team.Registration.EventureList.DisplayName,
+                         m.Team.Registration.EventureList.EventureListType,
+                         m.Team.Registration.EventureList.CurrentFee,
+                         RegAmount = m.Team.Registration.ListAmount,   //totalAmount??
+                         userPaid = (decimal?)m.TeamMemberPayments.Sum(p => p.Amount) ?? 0,     //this is temp;  if they make multiple payments reciept will be wrong
+                         m.Id,
+                         m.Team.Name,
+                         teamMemberId = m.Id,
+                         teamId = m.Team.Id
+                     }).ToList();
         }
 
         [HttpGet]
-        public IQueryable<EventureOrder> OrderById(int id)
+        public object GetTeamMemberPaymentInfoByPaymentId(Int32 id)    //this will only be used on member payment receipt
         {
-            return _contextProvider.Context.Orders
-                                             .Include("Registrations")
-                                             .Include("Registrations.Participant")
-                                             .Include("Surcharges")
-                                             .Where(o => (o.Id == id));
+            return _contextProvider.Context.TeamMemberPayments
+                     .Where(p => p.Id == id)
+                     .Select(p => new
+                     {
+                         p.Amount,
+                         p.TeamMember.Name,
+                         teamname = p.TeamMember.Team.Name,
+                         ListName = p.TeamMember.Team.Registration.EventureList.Name
+                     }).ToList();
+        }
+
+        [HttpGet]
+        public object GetNotPaidTeamMemberCountByTeamGuid(Guid id)
+        {
+            var allTeamCount = _contextProvider.Context.TeamMembers.Count(t => t.Team.TeamGuid == id && t.Active);
+
+            var paidTeamCount = _contextProvider.Context.TeamMembers.Count(t => t.Team.TeamGuid == id && t.Active && t.TeamMemberPayments.Count > 0);
+
+            return allTeamCount - paidTeamCount;
+        }
+
+        [HttpGet]
+        public object GetTeamMemberPaymentSumByTeamGuid(Guid id)
+        {
+            return _contextProvider.Context.TeamMembers
+                                .Where(t => t.Team.TeamGuid == id && t.Active)
+                                .Sum(t => (decimal?)t.TeamMemberPayments.Sum(p => (decimal?)p.Amount) ?? 0);
+        }
+
+        [HttpGet]
+        public object GetRegEditDisplayInfo(Int32 id)
+        {
+            var query = from r in _contextProvider.Context.Registrations
+                        join el in _contextProvider.Context.EventureLists
+                            on r.EventureListId equals el.Id
+                        join q in _contextProvider.Context.StockQuestionSets
+                            on el.Id equals q.EventureListId
+                        //join g in _contextProvider.Context.EventureGroups
+                        //    on r.GroupId equals g.Id
+                        where r.Id == id
+                        select
+                            new
+                                {
+                                    el.DisplayName,
+                                    el.DateEventureList,
+                                    //g.Name, 
+                                    q.ShirtSize,
+                                    q.FinishTime,
+                                    q.BibName,
+                                    q.HowHear,
+                                    //q.OwnRv,
+                                    //q.NextRv,
+                                    //q.HowHearRv,
+                                    q.Notes,
+                                    q.School,
+                                    q.HowHearDropDown,
+                                    q.EstimatedSwimTime400,
+                                    q.EstimatedSwimTime,
+                                    q.AnnualIncome,
+                                    q.RelayTeamQuestion,
+                                    q.Usat,
+                                    q.ShirtUpgrade,
+                                    q.Wheelchair,
+                                    q.PuretapUnisex,
+                                    q.NortonUnisex,
+                                    q.BourbonGenderSpecific,
+                                    q.HearRunathon,
+                                    q.HearPure,
+                                    q.HearNorton,
+                                    q.HearBourbon,
+                                    q.ParticipatePure,
+                                    q.ParticipateNorton,
+                                    q.ParticipateBourbon,
+                                    q.Mile15,
+                                    q.SportsEmails,
+                                    q.BourbonWaiver
+                                };
+
+            return query.ToList();
+        }
+
+        [HttpGet]
+        public object GetTransferInfo(Int32 id)
+        {
+            var transfer = from t in _contextProvider.Context.EventureTransfers
+                           join fl in _contextProvider.Context.EventureLists
+                           on t.EventureListIdFrom equals fl.Id
+                           join tl in _contextProvider.Context.EventureLists
+                           on t.EventureListIdTo equals tl.Id
+                           where t.Id == id
+                           select new
+                           {
+                               originalList = fl.Name,
+                               originalListCost = fl.CurrentFee,
+                               newList = tl.Name,
+                               newListCost = tl.CurrentFee,
+                               regId = t.RegistrationId
+                           };    //this should really look at reg for original cost
+            return transfer.ToList();
+        }
+
+        [HttpGet]
+        public IEnumerable<NumericValueSelectListItem> EventureListTypeLookups()
+        {
+            var listTypes = EnumHelper.GetSelectList(typeof(EventureListType))
+                .Select(x => new NumericValueSelectListItem()
+                {
+                    Text = x.Text,
+                    Value = int.Parse(x.Value)
+                });
+
+            return listTypes;
         }
 
         //[HttpGet]
@@ -629,18 +602,6 @@ namespace evs.API.Controllers
         //                           .OrderBy(p => (p.HouseId == p.Id) ? -1 : 1);   //this should cause the one that is houseID to top
         //}
 
-        [HttpGet]
-        public IEnumerable<EventureGroup> GroupsBelowCapacity(int listId)      //mjb this needs complete
-        {
-            string query =
-                " select distinct g.* from EventureGroup g " +
-                " left join Registration r on g.Id = r.GroupId " +
-                " where (select count(*) from Registration where groupid = g.id) < g.Capacity  " +
-                " AND g.Active = 1" +
-                " AND g.EventureListId = " + listId;
-
-            return _contextProvider.Context.Database.SqlQuery<EventureGroup>(query);
-        }
 
         //[HttpGet]
         //[AcceptVerbs("OPTIONS")]
@@ -693,58 +654,11 @@ namespace evs.API.Controllers
             return _contextProvider.Context.EventureTransfers;
         }
 
-        //[HttpGet]
-        //public object Lookups()
-        //{
-        //    var participants = _contextProvider.Context.Participants;
-        //    //var timeslots =  _contextProvider.Context.TimeSlots;
-        //    return new { participants };  //, timeslots
-        //}
-
-        [HttpGet]
-        public IEnumerable<NumericValueSelectListItem> AmountTypeLookups()
-        {
-            var amountTypes = EnumHelper.GetSelectList(typeof(AmountType))
-                .Select(x => new NumericValueSelectListItem()
-                {
-                    Text = x.Text,
-                    Value = int.Parse(x.Value)
-                });
-
-            return amountTypes;
-        }
-
-        public class NumericValueSelectListItem
-        {
-            public string Text { get; set; }
-            public int Value { get; set; }
-        }
-
-        //[HttpGet]
-        //public IQueryable<Addon> Addons()
-        //{
-        //    return _contextProvider.Context.Addons;
-        //}
-
-        //[HttpGet]
-        //public IQueryable<StockQuestionSet> StockQuestionSets()
-        //{
-        //    return _contextProvider.Context.StockQuestionSets;
-        //}
-
-        //[HttpGet]
-        //public IQueryable<StockAnswerSet> StockAnswerSets()
-        //{
-        //    return _contextProvider.Context.StockAnswerSets;
-        //}
-
         [HttpGet]
         public IQueryable<Participant> Participants()
         {
             return _contextProvider.Context.Participants;
         }
-
-       
 
         [HttpGet]
         public IQueryable<Coupon> Coupons()
@@ -800,11 +714,11 @@ namespace evs.API.Controllers
             return _contextProvider.Context.FeeSchedules;
         }
 
-        //[HttpGet]
-        //public IQueryable<Team> Teams()
-        //{
-        //    return _contextProvider.Context.Teams;
-        //}
+        [HttpGet]
+        public IQueryable<Team> Teams()
+        {
+            return _contextProvider.Context.Teams;
+        }
 
         [HttpGet]
         public IQueryable<TeamMember> TeamMembers()
@@ -870,6 +784,11 @@ namespace evs.API.Controllers
         }
 
 
+        public class NumericValueSelectListItem
+        {
+            public string Text { get; set; }
+            public int Value { get; set; }
+        }
 
         public class DtoCoupon
         {
@@ -943,26 +862,7 @@ namespace evs.API.Controllers
             }
         }
 
-        public class DtoYearOverYear    //moved
-        {
-
-
-            public string Eventure { get; set; }
-            public string Month { get; set; }
-            public Int32 Year { get; set; }
-            public Int32 Yeartwo { get; set; }
-            public Int32 Yearthree { get; set; }
-
-            public DtoYearOverYear(string eventure, string month, Int32 year, Int32 yeartwo, Int32 yearthree)
-            {
-
-                Eventure = eventure;
-                Month = month;
-                Year = year;
-                Yeartwo = yeartwo;
-                Yearthree = yearthree;
-            }
-        }
+        //public class DtoYearOverYear    
 
         public class DtoTrends
         {
@@ -1003,7 +903,7 @@ namespace evs.API.Controllers
 
         }
 
-        public class DtoEventuresByYear  //moved
+        public class DtoEventuresByYear
         {
             public Int32 text { get; set; }
             public List<EventPartial> items = new List<EventPartial>();
@@ -1014,10 +914,47 @@ namespace evs.API.Controllers
                 items = eventures;
             }
         }
-        
-
-
-
 
     }
 }
+
+
+//[HttpGet]  //reg
+//public IQueryable<Participant> ParticipantsByHouseId(int houseId)
+//{
+//    return _contextProvider.Context.Participants
+//                           .Where(p => p.HouseId == houseId) //.Where(p => p.Hous)eId = 1);
+//                           .OrderBy(p => (p.HouseId == p.Id) ? -1 : 1);   //this should cause the one that is houseID to top
+//}
+
+//public IEnumerable<Eventure> GetAllEventuresByOwnerId(int id)
+//{
+//    return db.Eventures.Where(e => e.OwnerId == id).OrderByDescending(e => e.Id);
+
+//}
+
+//[HttpGet]
+//public object Lookups()
+//{
+//    var participants = _contextProvider.Context.Participants;
+//    //var timeslots =  _contextProvider.Context.TimeSlots;
+//    return new { participants };  //, timeslots
+//}
+
+//[HttpGet]
+//public IQueryable<Addon> Addons()
+//{
+//    return _contextProvider.Context.Addons;
+//}
+
+//[HttpGet]
+//public IQueryable<StockQuestionSet> StockQuestionSets()
+//{
+//    return _contextProvider.Context.StockQuestionSets;
+//}
+
+//[HttpGet]
+//public IQueryable<StockAnswerSet> StockAnswerSets()
+//{
+//    return _contextProvider.Context.StockAnswerSets;
+//}
