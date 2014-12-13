@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IValidationDictionary.cs" />
+    <Compile Include="MailService.cs" />
     <Compile Include="ModelStateWrapper.cs" />
     <Compile Include="OrderService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

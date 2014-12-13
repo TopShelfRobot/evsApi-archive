@@ -92,38 +92,7 @@ namespace evs.API.Controllers
             return amountTypes;
         }
 
-        public List<DtoEventuresByYear> GetEventuresGroupedByYearByOwnerId(int id)
-        {
-            //DateTime now = DateTime.Now;
-            //return db.Eventures.Where(e => e.OwnerId == id && (e.DateEventure > now || e.Active));
-            //var query = db.Eventures
-            //foreach (var e in eventureInfo)
-            //{
-
-            //}
-
-            var x = new List<DtoEventuresByYear>();
-
-            var eps = new List<EventPartial>();
-            eps.Add(new EventPartial(1, "2015 Louisville Marathone"));
-            eps.Add(new EventPartial(2, "2015 Bluegrass Festival"));
-            eps.Add(new EventPartial(3, "2015 Lexington Half Marathon"));
-            x.Add(new DtoEventuresByYear(2015, eps));
-
-            //var eps1 = new List<EventPartial>();
-            //eps.Add(new EventPartial(5, "2011 big event"));
-            //eps.Add(new EventPartial(9, "2011 bad event"));
-            //x.Add(new DtoEventuresByYear(2011, eps1));
-
-            //var eps2 = new List<EventPartial>();
-            //eps.Add(new EventPartial(19, "2012 big event"));
-            //eps.Add(new EventPartial(22, "2012 bad event"));
-            //eps.Add(new EventPartial(25, "2012 wolf event"));
-            //x.Add(new DtoEventuresByYear(2012, eps2));
-
-            return x;
-
-        }
+        
 
         [HttpGet]
         public DtoAccess GetOwnerInfo(string email, string ownerGuid)

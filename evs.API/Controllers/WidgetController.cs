@@ -460,6 +460,42 @@ namespace evs.API.Controllers
             return db.Database.SqlQuery<DtoVolunteerData>(query).ToList();
         }
 
+         [HttpGet]
+        public List<DtoEventuresByYear> GetEventuresGroupedByYearByOwnerId(Int32 id)
+        {
+            //DateTime now = DateTime.Now;
+            //return db.Eventures.Where(e => e.OwnerId == id && (e.DateEventure > now || e.Active));
+            //var query = db.Eventures
+            //foreach (var e in eventureInfo)
+            //{
+
+            //}
+
+            var x = new List<DtoEventuresByYear>();
+
+            var eps = new List<EventPartial>();
+            eps.Add(new EventPartial(1, "2015 Louisville Marathone"));
+            eps.Add(new EventPartial(2, "2015 Bluegrass Festival"));
+            eps.Add(new EventPartial(3, "2015 Lexington Half Marathon"));
+            x.Add(new DtoEventuresByYear(2015, eps));
+
+            //var eps1 = new List<EventPartial>();
+            //eps.Add(new EventPartial(5, "2011 big event"));
+            //eps.Add(new EventPartial(9, "2011 bad event"));
+            //x.Add(new DtoEventuresByYear(2011, eps1));
+
+            //var eps2 = new List<EventPartial>();
+            //eps.Add(new EventPartial(19, "2012 big event"));
+            //eps.Add(new EventPartial(22, "2012 bad event"));
+            //eps.Add(new EventPartial(25, "2012 wolf event"));
+            //x.Add(new DtoEventuresByYear(2012, eps2));
+
+            return x;
+
+        }
+
+        
+
         public class DtoVolunteerData
         {
             public Int32 Id { get; set; }
@@ -487,19 +523,30 @@ namespace evs.API.Controllers
             }
         }
 
-        //public class DtoEventuresByYear
-        //{
-        //    public Int32 text { get; set; }
-        //    public List<EventPartial> items = new List<EventPartial>();
+        public class DtoEventuresByYear
+        {
+            public Int32 text { get; set; }
+            public List<EventPartial> items = new List<EventPartial>();
 
-        //    public DtoEventuresByYear(Int32 year, List<EventPartial> eventures)
-        //    {
-        //        text = year;
-        //        items = eventures;
-        //    }
-        //}
+            public DtoEventuresByYear(Int32 year, List<EventPartial> eventures)
+            {
+                text = year;
+                items = eventures;
+            }
+        }
 
-       
+        public class EventPartial
+        {
+            public Int32 Id { get; set; }
+            public string text { get; set; }
+
+            public EventPartial(Int32 id, string name)
+            {
+                Id = id;
+                text = name;
+            }
+
+        }
 
         public class EventRev
         {

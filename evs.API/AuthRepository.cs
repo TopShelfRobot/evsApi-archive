@@ -8,19 +8,31 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using evs.DAL;
 using evs.Model;
 
+using System.Globalization;
+//using IdentitySample.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
+
 namespace evs.API
 {
     public class AuthRepository : IDisposable
     {
-       // private AuthContext _ctx;// = new evsContext();
-        private evsContext _ctx ;//= new evsContext();
-        
+        // private AuthContext _ctx;// = new evsContext();
+        private evsContext _ctx;//= new evsContext();
+
         private UserManager<IdentityUser> _userManager;
 
         public AuthRepository()
         {
             _ctx = new evsContext();
-           // _ctx = new AuthContext();
+            // _ctx = new AuthContext();
             _userManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
         }
 
@@ -102,12 +114,65 @@ namespace evs.API
             return user;
         }
 
+        public async Task<IdentityUser> FindAsync(string email)  //mjb
+        {
+            IdentityUser user = await _userManager.FindByNameAsync(email);
+
+            return user;
+        }
+
         public async Task<IdentityResult> CreateAsync(IdentityUser user)
         {
             var result = await _userManager.CreateAsync(user);
 
             return result;
         }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(string tkey)     //mjb 
+        {
+            var provider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("ResetPassword");
+            _userManager.UserTokenProvider = new Microsoft.AspNet.Identity.Owin.DataProtectorTokenProvider<IdentityUser>(provider.Create("ResetPassword"))
+              {
+                  TokenLifespan = TimeSpan.FromHours(3)
+              };
+
+            return _userManager.GeneratePasswordResetToken(tkey);
+        }
+
+        //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
+        public async Task<bool> SendEmailAsync(string id, string subject, string body)     //mjb 
+        {
+            await _userManager.SendEmailAsync(id, subject, body);
+            //return Ok();
+            return true;
+        }
+
+
+        //UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
+
+        public async Task<IdentityResult> ResetPasswordAsync(string id, string code, string password)     //mjb 
+        {
+
+            //try
+            //{
+                var provider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("ResetPassword");
+                _userManager.UserTokenProvider = new Microsoft.AspNet.Identity.Owin.DataProtectorTokenProvider<IdentityUser>(provider.Create("ResetPassword"))
+                {
+                    TokenLifespan = TimeSpan.FromHours(100)
+                };
+
+                var result =  await _userManager.ResetPasswordAsync(id, code, password);
+                return result;
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    var x = ex.InnerException;
+            //    List<string> errors = new List<string>() { ex.Message };
+            //    return IdentityResult.Failed(errors.ToArray());
+            //}
+        }
+
 
         public async Task<IdentityResult> AddLoginAsync(string userId, UserLoginInfo login)
         {

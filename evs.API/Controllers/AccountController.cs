@@ -16,6 +16,9 @@ using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Linq;
 using evs.Model;
 using evs.API.Results;
+//using System.Web.Mvc;
+using System.Web.Routing;
+//using System.Net.Http.
 
 namespace evs.API.Controllers
 {
@@ -448,5 +451,119 @@ namespace evs.API.Controllers
 
             return null;
         }
+
+        //
+        // POST: /Account/ForgotPassword
+        [HttpPost]
+        [AllowAnonymous]
+        //[ValidateAntiForgeryToken]
+        public async Task<IHttpActionResult> ForgotPassword(ForgotPasswordViewModel model)    //(ForgotPasswordViewModel model)
+        {
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+
+            IdentityUser user = await _repo.FindAsync(model.Email);
+
+            if (user == null)   // || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+            {
+                // User not found.  Don't reveal that the user does not exist or is not confirmed?
+                return Ok();
+            }
+
+            var code = await _repo.GeneratePasswordResetTokenAsync(user.Id);
+
+            code = System.Web.HttpUtility.UrlEncode(code);
+
+            //var code = System.Web.HttpUtility.urlEncode
+
+            //var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+            //string callbackUrl = this.Url.Link("ResetPassword", new { userId = user.Id, code = code });   //, protocol: Request.Url.Scheme
+            var callbackUrl = "http://localhost:65468/#/resetpassword?userId=" + code;
+            //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>")
+            await _repo.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
+
+
+            //ViewBag.Link = callbackUrl;
+            //return View("ForgotPasswordConfirmation");
+            //IHttpActionResult errorResult = GetErrorResult(result);
+
+            //if (errorResult != null)
+            //{
+            //    return errorResult;
+            //}
+
+            //return Ok();
+            //}
+
+            // If we got this far, something failed, redisplay form
+            //return View(model);
+            //return Ok(accessTokenResponse);
+            return Ok();
+        }
+
+
+        // POST: /Account/ResetPassword
+        [HttpPost]
+        [AllowAnonymous]
+        //[ValidateAntiForgeryToken]
+        public async Task<IHttpActionResult> ResetPassword(ResetPasswordViewModel model)    //mjb
+        {
+            //if (!ModelState.IsValid)
+            //{
+            //    return View(model);
+            //}
+
+            //IdentityUser user = await _repo.FindAsync("boone.mike@gmail.com");
+            var user = await _repo.FindAsync(model.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return Ok();
+            }
+            
+            var result = await _repo.ResetPasswordAsync(user.Id, model.Code, model.Password);
+            if (result.Succeeded)
+            {
+                //return RedirectToAction("ResetPasswordConfirmation", "Account");
+                return Ok();
+            }
+            else
+            {
+                return NotFound(); // BadRequest(result);
+            }
+        }
+
+
+        public class ForgotPasswordViewModel
+        {
+            [Required]
+            [EmailAddress]
+            [Display(Name = "Email")]
+            public string Email { get; set; }
+        }
+
+        public class ResetPasswordViewModel
+        {
+            [Required]
+            [EmailAddress]
+            [Display(Name = "Email")]
+            public string Email { get; set; }
+
+            [Required]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+            [DataType(DataType.Password)]
+            [Display(Name = "Password")]
+            public string Password { get; set; }
+
+            [DataType(DataType.Password)]
+            [Display(Name = "Confirm password")]
+            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            public string ConfirmPassword { get; set; }
+
+            public string Code { get; set; }
+        }
+
     }
 }
