@@ -19,6 +19,7 @@ using evs.API.Results;
 //using System.Web.Mvc;
 using System.Web.Routing;
 //using System.Net.Http.
+using evs.Service;
 
 namespace evs.API.Controllers
 {
@@ -26,10 +27,12 @@ namespace evs.API.Controllers
     public class AccountController : ApiController
     {
         private AuthRepository _repo = null;
+        private MailService _mailService = null;
 
         public AccountController()
         {
             _repo = new AuthRepository();
+            _mailService = new MailService();
         }
 
         private IAuthenticationManager Authentication
@@ -482,8 +485,8 @@ namespace evs.API.Controllers
             //string callbackUrl = this.Url.Link("ResetPassword", new { userId = user.Id, code = code });   //, protocol: Request.Url.Scheme
             var callbackUrl = "http://localhost:65468/#/resetpassword?userId=" + code;
             //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>")
-            await _repo.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
-
+            //await _repo.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
+            _mailService.SendResetPassword(user.UserName, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
 
             //ViewBag.Link = callbackUrl;
             //return View("ForgotPasswordConfirmation");

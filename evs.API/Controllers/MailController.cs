@@ -23,6 +23,7 @@ using System.Net;
 using evs.DAL;
 using evs.Model;
 using System.Web;
+using evs.Service;
 
 
 //using evs.Model;
@@ -196,6 +197,27 @@ namespace evs.API.Controllers
                 }
             }
         }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        [AcceptVerbs("OPTIONS")]
+        [System.Web.Mvc.ValidateAntiForgeryToken]
+        public HttpResponseMessage SendResetPasswordEmail(int id)
+        {
+
+
+            MailService _mailService = new MailService();
+            var x = _mailService.SendResetPassword("id", "b", "c");
+
+
+            return new HttpResponseMessage(HttpStatusCode.OK);
+
+
+        }
+
+
+
 
         //[HttpPost]
         //[AllowAnonymous]

@@ -93,8 +93,6 @@ namespace evs30Api.Controllers
         //}
         public class DtoYearOverYear
         {
-
-
             public string Eventure { get; set; }
             public string Month { get; set; }
             public Int32 Year { get; set; }
@@ -103,7 +101,6 @@ namespace evs30Api.Controllers
 
             public DtoYearOverYear(string eventure, string month, Int32 year, Int32 yeartwo, Int32 yearthree)
             {
-
                 Eventure = eventure;
                 Month = month;
                 Year = year;

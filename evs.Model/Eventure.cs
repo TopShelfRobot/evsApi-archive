@@ -14,7 +14,7 @@ namespace evs.Model
         [Required]
         public string Name { get; set; }
         public string Desc { get; set; }
-        public string  DisplayHeading { get; set; }
+        public string DisplayHeading { get; set; }
         public string DisplayDate { get; set; }
         public DateTime DateEventure { get; set; }
         public string ImageFileName { get; set; }
@@ -38,7 +38,7 @@ namespace evs.Model
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
-   
+
         // Navigation property
         public ICollection<EventureList> EventureLists { get; set; }
     }
@@ -73,13 +73,14 @@ namespace evs.Model
         //public Int32 Type { get; set; }
         public DateTime DateCreated { get; set; }
         //public Int32? EventureListTypeId { get; set; }  //eventually won't be ?
-        
+
 
         // Navigation property 
         //public virtual Eventure Eventure { get; set; }
         public ICollection<Registration> Registration { get; set; }
         public Eventure Eventure { get; set; }
         public EventureListType EventureListType { get; set; }
+        public ICollection<EventureListBundle> EvenutreListBundles { get; set; }
         //public Result Result { get; set; }
         //public virtual string EventureName { get; set; }
         //public ICollection<Coupon> Coupons { get; set; }
@@ -87,6 +88,13 @@ namespace evs.Model
         //public ICollection<EventureGroup> EventureGroups { get; set; }
         //public ICollection<QQuestion> Questions { get; set; }
         //public ICollection<FeeSchedule> FeeSchedules { get; set; }
+    }
+
+
+    public class EventureListBundle
+    {
+        public Int32 Id { get; set; }
+        public Int32 EvenureListId { get; set; }
     }
 
     //public class EventureListType   //enum

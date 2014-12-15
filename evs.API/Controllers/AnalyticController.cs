@@ -5,73 +5,53 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Script.Serialization;
+using evs.DAL;
 
 namespace evs.API.Controllers
 {
     [RoutePrefix("api/analytic")]
-    
+
     public class AnalyticController : ApiController
     {
+        readonly evsContext db = new evsContext();
 
         [HttpGet]
-        [Route("GetYearOverYearData/{ownerId}/{eventureId}/{year1}/{year2}")]   //   owner
-        public object GetYearOverYearData(Int32 ownerId, Int32 eventureId, string year1, string year2)
+        [Route("GetYearOverYearData/{ownerId}/{eventureId}/{startYear}/{endYear}/{valueTypeId}")]   //   owner
+        public object GetYearOverYearData(Int32 ownerId, Int32 eventureId, Int32 startYear, Int32 endYear, Int32 valueTypeId)
         {
-            ////var rList = new List<DtoCapacity>();
-            //var capacity = new DtoCapacity(0, 0);
+            //still have the issues of dates with no values;  we need to add a zero record
+            //need to implement revenue
 
-            //var capacitySum = _contextProvider.Context.EventureLists.Where(ol => ol.EventureId == id).Sum(s => (int?)s.Capacity) ?? 0;
-            ////.Sum(income =>  (decimal?)income.Amount) ?? 0;
+            //valueTypeId
+            //0 - reg count
+            //1 - revenue
 
-            //var queryOwnerEventures = _contextProvider.Context.Eventures.Where(e => e.Id == id).Select(e => e.Id);
-            //var queryOwnersLists = _contextProvider.Context.EventureLists.Where(el => queryOwnerEventures.Contains(el.EventureId)).Select(l => l.Id);
-            //var regcount = _contextProvider.Context.Registrations.Count(r => queryOwnersLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete");
+            var queryValidLists = db.EventureLists.Where(l => l.Eventure.OwnerId == ownerId && l.EventureId == eventureId).Select(l => l.Id);
 
-            ////rList.Add(new DtoCapacity(regcount, capacitySum));
-            ////rList.Add(new DtoCapacity(232, 666));
+            var results = (from l in db.Registrations.Where(r => queryValidLists.Contains(r.EventureListId) && r.EventureList.DateEventureList.Year >= startYear && r.EventureList.DateEventureList.Year <= endYear)
+                           // here I choose each field I want to group by
+                           group l by new { l.DateCreated.Year, l.DateCreated.Month } into g
+                           select new { Year = g.Key.Year, Month = g.Key.Month, Count = g.Count() }
+                            ).ToList().OrderBy(l => l.Month);
 
-            //capacity.Regs = regcount;
-            //capacity.Capacity = capacitySum;
+           var data = new List<DtoYearOverYear>();
 
-            //return capacity;
+           var stupid = true;
 
-            var data = new List<DtoYearOverYear>();
-
-
-            data.Add(new DtoYearOverYear("2014", Convert.ToDateTime("1/1/2014"), 20));
-            data.Add(new DtoYearOverYear("2013", Convert.ToDateTime("1/1/2013"), 16));
-            data.Add(new DtoYearOverYear("2012", Convert.ToDateTime("1/1/2012"), 0));
-
-
-            data.Add(new DtoYearOverYear("2014", Convert.ToDateTime("2/1/2014"), 14));
-            data.Add(new DtoYearOverYear("2013", Convert.ToDateTime("2/1/2013"), 22));
-            data.Add(new DtoYearOverYear("2012", Convert.ToDateTime("2/1/2012"), 0));
-
-            data.Add(new DtoYearOverYear("2014", Convert.ToDateTime("3/1/2014"), 17));
-            data.Add(new DtoYearOverYear("2013", Convert.ToDateTime("3/1/2013"), 20));
-            data.Add(new DtoYearOverYear("2012", Convert.ToDateTime("3/1/2012"), 0));
-
-            data.Add(new DtoYearOverYear("2014", Convert.ToDateTime("4/1/2014"), 17));
-            data.Add(new DtoYearOverYear("2013", Convert.ToDateTime("4/1/2013"), 20));
-            data.Add(new DtoYearOverYear("2012", Convert.ToDateTime("4/1/2012"), 66));
-
-            data.Add(new DtoYearOverYear("2014", Convert.ToDateTime("5/1/2014"), 57));
-            data.Add(new DtoYearOverYear("2013", Convert.ToDateTime("5/1/2013"), 40));
-            data.Add(new DtoYearOverYear("2012", Convert.ToDateTime("5/1/2012"), 56));
-
-            data.Add(new DtoYearOverYear("2014", Convert.ToDateTime("6/1/2014"), 66));
-            data.Add(new DtoYearOverYear("2013", Convert.ToDateTime("6/1/2013"), 33));
-            data.Add(new DtoYearOverYear("2012", Convert.ToDateTime("6/1/2012"), 44));
-
-            data.Add(new DtoYearOverYear("2014", Convert.ToDateTime("7/1/2014"), 77));
-            data.Add(new DtoYearOverYear("2013", Convert.ToDateTime("7/1/2013"), 99));
-            data.Add(new DtoYearOverYear("2012", Convert.ToDateTime("7/1/2012"), 66));
-
-
-
-
+            foreach (var r in results)
+            {
+                //r.Month = r.Month + "/1/" + r.Year.ToString();
+                
+                if (valueTypeId==0)
+                {
+                    if (stupid)
+                        data.Add(new DtoYearOverYear("2012", r.Month.ToString() + "/1/2012" , 37));
+                    stupid = !stupid;
+                }
+                data.Add(new DtoYearOverYear(r.Year.ToString(), r.Month.ToString() + "/1/" + r.Year.ToString(), r.Count));
+            
+            }
             return data;
-
         }
 
 
@@ -89,7 +69,7 @@ namespace evs.API.Controllers
             //{
             //    firstName = "Markoff",
             //    lastName = "Chaney",
-                
+
             //};
             //var json = new JavaScriptSerializer().Serialize(x);
             //Console.WriteLine(json);
@@ -100,7 +80,7 @@ namespace evs.API.Controllers
         //[HttpGet]
         //[Route("GetAgePieChartByEventureId/{ownerId}/{eventureId}")]     //5 year increments
         //public object GetAgePieChartByEventureId(Int32 ownerId, Int32 eventureId)
-        //{ 
+        //{
 
         //}
 
@@ -119,7 +99,7 @@ namespace evs.API.Controllers
         //}
         public class genderPie
         {
-            public genderPie (string gender, int share)
+            public genderPie(string gender, int share)
             {
                 Gender = gender;
                 Share = share;
@@ -128,7 +108,7 @@ namespace evs.API.Controllers
             public string Gender;
             public int Share;
         }
-        
+
 
         public class EventPartial
         {
@@ -145,16 +125,16 @@ namespace evs.API.Controllers
 
         public class DtoYearOverYear    //moved
         {
-            public DateTime Month { get; set; }         //category
+            public string Month { get; set; }         //category
             public string Year { get; set; }           //group by 
             public Int32 Registrations { get; set; }  //actual value
 
 
-            public DtoYearOverYear(string year, DateTime month, Int32 registrations)
+            public DtoYearOverYear(string year, string month, Int32 registrations)
             {
                 Month = month;
                 Year = year;
-                Registrations = registrations;               
+                Registrations = registrations;
             }
         }
 

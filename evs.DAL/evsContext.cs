@@ -20,6 +20,7 @@ namespace evs.DAL
         public DbSet<Eventure> Eventures { get; set; }
         public DbSet<Participant> Participants { get; set; }
         public DbSet<EventureGroup> EventureGroups { get; set; }
+        public DbSet<EventureListBundle> EventureListsBundles { get; set; }
         //public DbSet<EventureListType> EventureListTypes { get; set; }
 
 
