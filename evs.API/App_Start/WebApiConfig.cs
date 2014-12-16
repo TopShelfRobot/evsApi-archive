@@ -22,6 +22,12 @@ namespace evs.API
                 defaults: new { id = RouteParameter.Optional }
             );
 
+            config.Routes.MapHttpRoute(
+              name: "DefaultApi2",
+              routeTemplate: "api/{controller}/{action}",
+              defaults: new { id = RouteParameter.Optional }
+          );
+
             var jsonFormatter = config.Formatters.OfType<JsonMediaTypeFormatter>().First();
             jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }

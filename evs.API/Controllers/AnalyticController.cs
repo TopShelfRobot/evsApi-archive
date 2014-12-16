@@ -28,21 +28,19 @@ namespace evs.API.Controllers
 
             var queryValidLists = db.EventureLists.Where(l => l.Eventure.OwnerId == ownerId && l.EventureId == eventureId).Select(l => l.Id);
 
-            var results = (from l in db.Registrations.Where(r => queryValidLists.Contains(r.EventureListId) && r.EventureList.DateEventureList.Year >= startYear && r.EventureList.DateEventureList.Year <= endYear)
-                           // here I choose each field I want to group by
+            var results = (from l in db.Registrations.Where(r => queryValidLists.Contains(r.EventureListId) 
+                        && r.EventureList.DateEventureList.Year >= startYear && r.EventureList.DateEventureList.Year <= endYear)
                            group l by new { l.DateCreated.Year, l.DateCreated.Month } into g
                            select new { Year = g.Key.Year, Month = g.Key.Month, Count = g.Count() }
                             ).ToList().OrderBy(l => l.Month);
 
            var data = new List<DtoYearOverYear>();
 
-           var stupid = true;
+           var stupid = true;   //nonsense for testing purposes
 
             foreach (var r in results)
             {
-                //r.Month = r.Month + "/1/" + r.Year.ToString();
-                
-                if (valueTypeId==0)
+               if (valueTypeId==0)
                 {
                     if (stupid)
                         data.Add(new DtoYearOverYear("2012", r.Month.ToString() + "/1/2012" , 37));
@@ -59,54 +57,98 @@ namespace evs.API.Controllers
         [Route("GetGenderPieChartByEventureId/{ownerId}/{eventureId}")]
         public object GetGenderPieChartByEventureId(Int32 ownerId, Int32 eventureId)
         {
+            var agePieChart = new List<dtoKeyValue>();
+            agePieChart.Add(new dtoKeyValue("Male", 53.4));
+            agePieChart.Add(new dtoKeyValue("Female", 46.6));
 
-            var x = new List<genderPie>();
-            x.Add(new genderPie("male", 55));
-            x.Add(new genderPie("female", 45));
+            return agePieChart;
+        }
 
-            //EnvironmentVariableTarget
-            //var obj = new Lad
-            //{
-            //    firstName = "Markoff",
-            //    lastName = "Chaney",
+        [HttpGet]
+        [Route("GetAgePieChartByEventureId/{ownerId}/{eventureId}")]     //5 year increments
+        public object GetAgePieChartByEventureId(Int32 ownerId, Int32 eventureId)
+        {
 
-            //};
-            //var json = new JavaScriptSerializer().Serialize(x);
-            //Console.WriteLine(json);
-            return x;
+            //var queryRegPartIdsByEventureList = from r in db.Registrations
+            //                                    join o in db.Orders
+            //                                    on r.EventureOrderId equals o.Id
+            //                                    join l in db.EventureLists
+            //                                    on r.EventureListId equals l.Id
+            //                                    where l.EventureId == id
+            //                                    && o.Status == "Complete"
+            //                                    select r.ParticipantId;
+
+            //var results = (from l in db.Registrations.Where(r => queryValidLists.Contains(r.EventureListId)
+            //            && r.EventureList.DateEventureList.Year >= startYear && r.EventureList.DateEventureList.Year <= endYear)
+            //               group l by new { l.DateCreated.Year, l.DateCreated.Month } into g
+            //               select new { Year = g.Key.Year, Month = g.Key.Month, Count = g.Count() }
+            //                ).ToList().OrderBy(l => l.Month);
+
+
+            //return db.Participants.Where(p => queryRegPartIdsByEventureList.Contains(p.Id));
+
+            var agePieChart = new List<dtoKeyValue>();
+            agePieChart.Add(new dtoKeyValue("under 20", 5.9));
+            agePieChart.Add(new dtoKeyValue("21-25", 10.1));
+            agePieChart.Add(new dtoKeyValue("26-30", 17.3));
+            agePieChart.Add(new dtoKeyValue("31-35", 14.1));;
+            agePieChart.Add(new dtoKeyValue("36-40", 12.7));
+            agePieChart.Add(new dtoKeyValue("41-45", 14.1));
+            agePieChart.Add(new dtoKeyValue("46-50", 12.7));
+            agePieChart.Add(new dtoKeyValue("51-55", 5.1));
+            agePieChart.Add(new dtoKeyValue("56-60", 4.7));
+            agePieChart.Add(new dtoKeyValue("over 60", 3.3));
+
+            return agePieChart;
+           
+        }
+
+        [HttpGet]
+        [Route("GetZipCodeBarChartByEventureId/{ownerId}/{eventureId}")]    //top 10 zips
+        public object GetZipCodeBarChartByEventureId(Int32 ownerId, Int32 eventureId)
+        {
+
+         var zipCodeBarChart = new List<dtoKeyValue>();
+         zipCodeBarChart.Add(new dtoKeyValue("40205", 25.9));
+         zipCodeBarChart.Add(new dtoKeyValue("40299", 14.1));
+         zipCodeBarChart.Add(new dtoKeyValue("40244", 27.3));
+         zipCodeBarChart.Add(new dtoKeyValue("40242", 32.7));
+
+         return zipCodeBarChart;
+        }
+
+
+        [HttpGet]
+        [Route("GetStateColumnChartByEventureId/{ownerId}/{eventureId}")]
+        public object GetStateColumnChartByEventureId(Int32 ownerId, Int32 eventureId)
+        {
+            var stateBarChart = new List<dtoKeyValue>();
+            stateBarChart.Add(new dtoKeyValue("Kentucky", 365));
+            stateBarChart.Add(new dtoKeyValue("Indiana", 118));
+            stateBarChart.Add(new dtoKeyValue("Ohio", 9));
+            stateBarChart.Add(new dtoKeyValue("Tennessee", 32));
+            stateBarChart.Add(new dtoKeyValue("Michigan", 14));
+            stateBarChart.Add(new dtoKeyValue("Illinois", 27));
+            stateBarChart.Add(new dtoKeyValue("West Virginia", 14));
+            stateBarChart.Add(new dtoKeyValue("Other", 27));
+
+
+
+            return stateBarChart;
 
         }
 
-        //[HttpGet]
-        //[Route("GetAgePieChartByEventureId/{ownerId}/{eventureId}")]     //5 year increments
-        //public object GetAgePieChartByEventureId(Int32 ownerId, Int32 eventureId)
-        //{
 
-        //}
-
-        //[HttpGet]
-        //[Route("GetZipCodeBarChartByEventureId/{ownerId}/{eventureId}")]    //top 10 zips
-        //public object GetZipCodeBarChartByEventureId(Int32 ownerId, Int32 eventureId)
-        //{
-
-        //}
-
-        //[HttpGet]
-        //[Route("GetStateColumnChartByEventureId/{ownerId}/{eventureId}")]
-        //public object GetStateColumnChartByEventureId(Int32 ownerId, Int32 eventureId)
-        //{
-
-        //}
-        public class genderPie
+        public class dtoKeyValue
         {
-            public genderPie(string gender, int share)
+            public dtoKeyValue(string key, double value)
             {
-                Gender = gender;
-                Share = share;
+                Key = key;
+                Value = value;
             }
 
-            public string Gender;
-            public int Share;
+            public string Key;
+            public double Value;
         }
 
 
