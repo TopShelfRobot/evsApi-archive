@@ -114,8 +114,8 @@ namespace evs.API.Controllers
                     OrderService _orderService = new OrderService();
                     var x = _orderService.CreateOrder(order);
 
-                    //db.Orders.Add(order);
-                    //db.SaveChanges();
+                    db.Orders.Add(order);
+                    db.SaveChanges();
 
                     var resp = Request.CreateResponse(HttpStatusCode.OK);
                     //resp.Content = new StringContent();
@@ -188,7 +188,7 @@ namespace evs.API.Controllers
                         EventureListId = surchargeBundle.listId,
                         ChargeType = surchargeBundle.chargeType,
                         Description = surchargeBundle.desc,
-                        ParticipantId = surchargeBundle.partId,
+                        ParticipantId = (Int32)orderBundle["orderHouseId"],  //surchargeBundle.partId,
                         //EventureOrderId = order.Id,
                         EventureOrder = order,
                         DateCreated = DateTime.Now,

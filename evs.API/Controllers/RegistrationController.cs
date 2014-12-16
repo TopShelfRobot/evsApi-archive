@@ -97,7 +97,15 @@ namespace evs.API.Controllers
                }).ToList();
         }
 
-
+        [HttpGet]
+        public IEnumerable<EventureOrder> OrderById(Int32 id)
+        {
+            return _contextProvider.Context.Orders
+                                             .Include("Registrations")
+                                             .Include("Registrations.Participant")
+                                             .Include("Surcharges")
+                                             .Where(o => (o.Id == id));
+        }
 
         [HttpGet]
         public IEnumerable<Participant> ParticipantsByHouseId(int houseId)

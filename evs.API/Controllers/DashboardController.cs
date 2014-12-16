@@ -64,7 +64,7 @@ namespace evs.API.Controllers
                                              .Include("Registrations.Participant")
                                              .Include("Surcharges")
                                              .Where(o => (o.Id == id));
-        }
+        }     //remove this ????
 
         [HttpGet]
         public IEnumerable<EventureGroup> GroupsBelowCapacity(Int32 listId)      //mjb this needs complete
