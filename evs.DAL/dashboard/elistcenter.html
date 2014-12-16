@@ -1,0 +1,72 @@
+<section data-ng-controller="listingdetail as vm">
+  <div class="row">
+    <div class="col-lg-12">
+      <a ng-href="#/eventuredetail/{{vm.listing.eventureId}}" class="btn btn-info btn-sm"><em class="glyphicon glyphicon-circle-arrow-left"></em>&nbsp;Back</a>
+      <a ng-href="#/setlist/{{vm.listingId}}" class="btn btn-primary btn-sm"><em class="glyphicon glyphicon-edit"></em>&nbsp;Edit Listing</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-10">
+      <h1>{{vm.listing.name}}&nbsp;<small>{{vm.listing.dateEventureList | amDateFormat:'dddd, MMMM Do YYYY'}}</small></h1>
+    </div>
+    <div class="col-lg-2">
+      <p class="text-muted text-right">Owned Race</p>
+    </div>
+  </div>
+  <br>
+  <tabset justified="true">
+    <tab heading="Dashboard">
+      <br>
+      <div class="row">
+        <div class="col-lg-12">
+          <section id="registrationscontent">
+            <div id="regchart" kendo-chart k-options="vm.registrations"></div>
+          </section>
+        </div>
+      </div>
+    </tab>
+    <tab heading="Groups" ng-click="vm.Groups()">
+      <br>
+      <div class="row">
+        <div class="col-lg-12">
+          <section id="groupcontent">
+            <div id="groupchart" kendo-chart k-options="vm.groups" k-ng-delay="vm.groups"></div>
+          </section>
+        </div>
+      </div>
+    </tab>
+    <tab heading="Participants">
+      <br>
+      <div class="row">
+        <div class="col-lg-12">
+          <section id="participantcontent">
+            <div id="participantgrid" kendo-grid="vm.partgrid" k-options="vm.participantGridOptions"></div>
+          </section>
+        </div>
+      </div>
+    </tab>
+  </tabset>
+  <div class="row">
+    <div class="col-lg-6">
+      <h3>Capacity: {{vm.capacity.regs}}&nbsp;/&nbsp;{{vm.capacity.capacity}}</h3>
+    </div>
+    <div class="col-lg-6">
+      <div>
+        <table class="table table-condensed table-striped">
+          <thead>
+            <tr>
+              <th class="col-lg-4">Fee</th>
+              <th class="col-lg-8 text-right">Increase Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-ng-repeat="f in vm.fees">
+              <td>$&nbsp;{{f.amount}}</td>
+              <td class="text-right">{{f.dateBegin | amDateFormat:'MM/DD/YY'}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

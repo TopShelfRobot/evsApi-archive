@@ -1,0 +1,213 @@
+<section data-ng-controller="setlist as vm">
+  <div class="row">
+    <div class="col-lg-12">
+      <button ng-click="vm.cancel()" class="btn btn-danger btn-xs pull-right"><i class="glyphicon glyphicon-ban-circle"></i>&nbsp;Cancel</button>
+    </div>
+  </div>
+  <div class="row">
+    <form class="form-horizontal">
+      <legend >Listing Setup</legend>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label for="ListingName" class="col-lg-6 control-label">Listing Name:</label>
+          <div class="col-lg-6">
+            <input type="text" class="form-control" name="ListingName" placeholder="Listing Name" ng-model="vm.list.name" required />
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="ListingDisplayName" class="col-lg-6 control-label">Listing Display Name:</label>
+          <div class="col-lg-6">
+            <input type="text" class="form-control" name="ListingDisplayName" placeholder="Listing Display Name" ng-model="vm.list.displayName" required />
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="listingdate" class="col-lg-6 control-label">Listing Date:</label>
+          <div class="col-lg-6">
+            <p class="input-group">
+              <input type="text" name="DateListing"  class="form-control" datepicker-popup="{{vm.format}}" ng-model="vm.list.dateEventureList" is-open="vm.listOpen" datepicker-options="vm.dateOptions" date-disabled="disabled(date, mode)" close-text="Close" />
+              <span class="input-group-btn">
+              <button class="btn btn-default" ng-click="vm.open($event, 'listOpen')"><i class="glyphicon glyphicon-calendar"></i></button>
+              </span> </p>
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="DisplayOrder" class="col-lg-6 control-label">Display Order:</label>
+          <div class="col-lg-6">
+            <input type="number" class="form-control" name="DisplayOrder" ng-model="vm.list.sortOrder">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="ListingDescription" class="col-lg-6 control-label">Listing Description:</label>
+          <div class="col-lg-6">
+            <textarea class="form-control" name="ListingDescription" rows="5" placeholder="Please enter a listing description." ng-model="vm.list.desc"></textarea>
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="Terms" class="col-lg-6 control-label">Waiver:</label>
+          <div class="col-lg-6">
+            <textarea class="form-control" name="Terms" rows="5" placeholder="Please enter your waiver." ng-model="vm.list.waiverText" required></textarea>
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="imagePath" class="col-lg-6 control-label">Image Upload:</label>
+          <div class="col-lg-6">
+            <label class="btn btn-primary">
+              <input type="file" ng-file-select="onFileSelect($files)" style="display:none;" /><em class="glyphicon glyphicon-upload"></em>&nbsp;
+              Upload Image </label>
+            <br>
+            <br>
+            <progressbar class="progress-striped active" value="dynamic" type="{{type}}"></progressbar>
+          </div>
+        </div>
+        <!-- /field -->
+      </div>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label for="RegOpenDate" class="col-lg-6 control-label">Registration Opens:</label>
+          <div class="col-lg-6">
+            <p class="input-group">
+              <input type="text"name="RegOpenDate"  class="form-control" datepicker-popup="{{vm.format}}" ng-model="vm.list.dateBeginReg" is-open="vm.regOpenOpen" datepicker-options="vm.dateOptions" date-disabled="disabled(date, mode)" close-text="Close" />
+              <span class="input-group-btn">
+              <button class="btn btn-default" ng-click="vm.open($event, 'regOpenOpen')"><i class="glyphicon glyphicon-calendar"></i></button>
+              </span> </p>
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="RegCloseDate" class="col-lg-6 control-label">Registration Closes:</label>
+          <div class="col-lg-6">
+            <p class="input-group">
+              <input type="text"name="RegCloseDate"  class="form-control" datepicker-popup="{{vm.format}}" ng-model="vm.list.dateEndReg" is-open="vm.regCloseOpen" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close" />
+              <span class="input-group-btn">
+              <button class="btn btn-default" ng-click="vm.open($event, 'regCloseOpen')"><i class="glyphicon glyphicon-calendar"></i></button>
+              </span> </p>
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="Capacity" class="col-lg-6 control-label">Capacity:</label>
+          <div class="col-lg-6">
+            <input type="number" class="form-control" name="Capacity" ng-model="vm.list.capacity" min="1" required />
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="CurrentFee" class="col-lg-6 control-label">Current Fee:</label>
+          <div class="col-lg-6">
+            <div class="input-group"> <span class="input-group-addon">$</span>
+              <input type="number" step="any" class="form-control" name="CurrentFee" ng-model="vm.list.currentFee" placeholder="0.00" min="1" required>
+            </div>
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="MinAge" class="col-lg-6 control-label">Minimum Age:</label>
+          <div class="col-lg-6">
+            <input type="text" class="form-control" name="MinAge" ng-model="vm.list.minAge" />
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="MaxAge" class="col-lg-6 control-label">Maximum Age:</label>
+          <div class="col-lg-6">
+            <input type="text" class="form-control" name="MaxAge" ng-model="vm.list.maxAge" />
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="MaxRunTime" class="col-lg-6 control-label">Max Run Time:</label>
+          <div class="col-lg-6">
+              <input type="text" class="form-control" name="MaxRunTime" ng-model="vm.list.maxRunTime" />
+            <!-- <div ng-model="mytime" ng-change="changed()" style="display:inline-block;">
+              <timepicker hour-step="hstep" minute-step="mstep" show-meridian="false" ng-model="vm.list.maxRunTime"></timepicker>
+            </div> -->
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="ListingType" class="col-lg-6 control-label">Listing Type:</label>
+            <div class="col-lg-6">
+                <select class="form-control" name="ListingType" ng-model="vm.list.eventureListType" ng-options="t.text as t.text for t in vm.listTypes">
+                    <option value="">Please Select</option>
+                </select>
+                <!-- <select class="form-control" name="ListingType" ng-model="vm.list.eventureListType">
+                         <option value="0">Please Select</option>
+                         <option value="1">Regular Reg</option>
+                         <option value="2">Team Reg - Sponsored</option>
+                         <option value="3">Team Reg - Suggested Pay</option>
+                         <option value="4">Team Reg - Individual Pay</option>
+                     </select>-->
+            </div>
+        </div>
+        <!-- /field -->
+        
+        <div class="form-group">
+          <label for="" class="col-lg-6 control-label">Display Waiver:</label>
+          <div class="col-lg-6">
+            <div class="btn-group">
+              <button type="button" class="btn btn-default" ng-model="vm.list.isWaiverDisplayed" btn-radio="true">Yes</button>
+              <button type="button" class="btn btn-default" ng-model="vm.list.isWaiverDisplayed" btn-radio="false">No</button>
+            </div>
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="" class="col-lg-6 control-label">Active Listing:</label>
+          <div class="col-lg-6">
+            <div class="btn-group">
+              <button type="button" class="btn btn-default" ng-model="vm.list.active" btn-radio="true">Yes</button>
+              <button type="button" class="btn btn-default" ng-model="vm.list.active" btn-radio="false">No</button>
+            </div>
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group">
+          <label for="" class="col-lg-6 control-label">Bundle:</label>
+          <div class="col-lg-6">
+            <div class="btn-group">
+              <button type="button" class="btn btn-default" ng-model="vm.list.isBundle" btn-radio="true">Yes</button>
+              <button type="button" class="btn btn-default" ng-model="vm.list.isBundle" btn-radio="false">No</button>
+            </div>
+          </div>
+        </div>
+        <!-- /field -->
+
+        <div class="form-group" ng-show="vm.list.isBundle === true">
+          <label for="bundlelist" class="col-lg-6 control-label">Bundled Lists:</label>
+          <div class="col-lg-6">
+            <select id="bundlelist"
+                    kendo-multi-select="vm.multiSelect" k-options="vm.bundledListOptions"
+                    ng-model="vm.selectedLists">
+            </select>
+          </div>
+        </div>
+        <!-- /field -->
+
+      </div>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <a class="btn btn-success btn-lg pull-right" ng-click="vm.saveAndNav()"><em class="glyphicon glyphicon-circle-arrow-right"></em>&nbsp;Next</a>
+    </div>
+  </div>
+</section>

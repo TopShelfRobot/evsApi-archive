@@ -1,0 +1,13 @@
+<section data-ng-controller="resourcecenter as vm">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Your Resources</h1>
+            <p class="text-muted">Select a resource to manage their information and associated items.</p>
+            <div id="resourcegrid" kendo-grid="vm.resourcegrid" k-options="vm.resourceGridOptions"></div>
+        </div>
+    </div>
+</section>
+
+<script type="text/x-kendo-template" id="template">
+    <div kendo-grid="vm.detailgrid" k-options="vm.detailGridOptions(dataItem)"></div>
+</script>

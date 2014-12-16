@@ -88,7 +88,6 @@ namespace evs.API.Controllers
                     Text = x.Text,
                     Value = int.Parse(x.Value)
                 });
-
             return amountTypes;
         }
 
@@ -284,7 +283,7 @@ namespace evs.API.Controllers
             if (isValidCoupon)
             {
                 couponDto.Message = "valid";
-                if (coupons.FirstOrDefault().DiscountType == 0)  //$ off
+                if (coupons.FirstOrDefault().AmountType == AmountType.Dollars)  //$ off
                 {
                     couponDto.Amount = coupons.FirstOrDefault().Amount * -1;   //this could be off if there are two 
                     couponDto.CouponId = coupons.FirstOrDefault().Id;

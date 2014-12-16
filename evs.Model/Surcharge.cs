@@ -30,7 +30,7 @@ namespace evs.Model
         public string Code { get; set; }
         public bool Active { get; set; }
         public decimal Amount { get; set; }
-        public Int32 DiscountType { get; set; }  //this is being converted to amountType
+        //public Int32 DiscountType { get; set; }  //this is being converted to amountType
         public AmountType AmountType { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }

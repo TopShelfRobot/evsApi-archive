@@ -39,7 +39,8 @@ namespace evs.API.Controllers
 
         //[HttpPost("create")]
         [Route("Post")]
-        public HttpResponseMessage CreateOrder(JObject orderBundle)
+        [HttpPost]
+        public HttpResponseMessage CreateOrder([FromUri] JObject orderBundle)
         {
             //TransactionStatus transactionStatus;
            // var results = new StudentValidation().Validate(studentViewModel);

@@ -1,0 +1,82 @@
+<section ng-controller="sendemail as vm">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Send Participant Email</h1>
+            <p class="text-muted">Send important notifications to your participants.</p>
+            <br>
+            <div class=" text-center">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default" ng-model="vm.emailType" btn-radio="'event'">Send to Event Participants</button>
+                    <button type="button" class="btn btn-default" ng-model="vm.emailType" btn-radio="'listing'">Send to Listing Participants</button>
+                    <button type="button" class="btn btn-default" ng-model="vm.emailType" btn-radio="'all'">Send to All Participants</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <form class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group" ng-if="vm.emailType === 'event'">
+                    <label for="EmailTypeEvent" class="col-sm-4 control-label">Event:</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="eventuredropdown" ng-model="" ng-options="e.id as e.name for e in vm.eventures">
+                            <option value="">-- Please Select --</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- /field -->
+
+                <div class="form-group" ng-if="vm.emailType === 'listing'">
+                    <label for="EmailTypeListing" class="col-sm-4 control-label">Event List:</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="listdropdown" ng-model="" ng-options="l.id as l.name for l in vm.listings">
+                            <option value="">-- Please Select --</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- /field -->
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="EmailCC" class="col-sm-4 control-label">CC:</label>
+                    <div class="col-sm-8 col-lg-8">
+                        <input type="text" ng-model="" class="form-control">
+                    </div>
+                </div>
+                <!-- /field -->
+                <div class="form-group">
+                    <label for="EmailBCC" class="col-sm-4 control-label">BCC:</label>
+                    <div class="col-sm-8 col-lg-8">
+                        <input type="text" ng-model="" class="form-control">
+                    </div>
+                </div>
+                <!-- /field -->
+            </div>
+            <div class="col-sm-6">
+
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label for="EmailSubject" class="col-sm-2 control-label">Subject:</label>
+                    <div class="col-sm-10">
+                        <input type="text" ng-model="" class="form-control">
+                    </div>
+                </div>
+                <!-- /field -->
+                <textarea kendo-editor ng-model=""></textarea>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-12">
+                <button class="btn btn-success pull-right hidden-xs"><i class="glyphicon glyphicon-send"></i>&nbsp;Send Email</button>
+                <button class="btn btn-success btn-block hidden-sm hidden-lg"><i class="glyphicon glyphicon-send"></i>&nbsp;Send Email</button>
+            </div>
+
+        </div>
+    </form>
+</section>

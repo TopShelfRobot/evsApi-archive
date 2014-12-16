@@ -1,0 +1,64 @@
+<section data-ng-controller="setbundle as vm">
+    <div class="row">
+        <div class="col-lg-12">
+            <button ng-click="vm.cancel()" class="btn btn-danger btn-xs pull-right"><i class="glyphicon glyphicon-ban-circle"></i>&nbsp;Cancel</button>
+        </div>
+    </div>
+    <div class="row">
+        <form class="form-horizontal">
+            <legend >Bundle Setup</legend>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="bundlelist" class="col-lg-6 control-label">Bundled Lists:</label>
+                        <div class="col-lg-6">
+                            <select id="bundlelist" 
+								kendo-multi-select="vm.multiSelect" k-options="vm.bundledListOptions"
+								ng-model="vm.selectedLists">
+							</select>
+                        </div>
+                    </div>
+                    <!-- /field -->
+
+                    <div class="form-group">
+                        <label class="col-lg-6 control-label" for="bundleamount">Discount Amount:</label>
+                        <div class="col-lg-6">
+                            <input id="bundleamount" type="number" class="form-control"  placeholder="0.00" ng-model="vm.bundle.amount" />
+                        </div>
+                    </div>
+                    <!-- /field -->
+
+                    <div class="form-group">
+                        <label class="col-lg-6 control-label" for="addonmodifier">Discount Type:</label>
+                        <div class="col-lg-6">
+                            <select class="form-control" id="addonmodifier" width="100" ng-model="vm.bundle.amountTypeId">
+                                <option value="0">$ Amount</option>
+                                <option value="1">Percent</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- /field -->
+
+                </div>
+                <div class="col-sm-6">
+
+                    <div class="form-group">
+                        <label for="" class="col-lg-6 control-label">Active Bundle:</label>
+                        <div class="col-lg-6">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default" ng-model="vm.bundle.active" btn-radio="true">Yes</button>
+                                <button type="button" class="btn btn-default" ng-model="vm.bundle.active" btn-radio="false">No</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /field -->
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <button class="btn btn-success pull-right" ng-click="vm.saveAndNav()"><em class="glyphicon glyphicon-save"></em>&nbsp;Save Bundle</button>
+        </div>
+    </div>
+</section>

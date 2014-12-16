@@ -1,0 +1,82 @@
+<section data-ng-controller="discounts as vm">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1>Coupons and Discount Rules</h1>
+      <p class="text-muted">Manage your coupons and discount rules.</p>
+      <br>
+      <tabset justified="true">
+        <tab heading="Coupons">
+        <br><br>
+          <div class="row">
+            <div class="col-lg-12">
+              <div id="coupongrid" kendo-grid="vm.coupongrid" k-options="vm.couponGridOptions"></div>
+            </div>
+          </div>
+        </tab>
+        <!-- end Coupons -->
+
+        <tab heading="Discount Rules">
+          <br><br>
+          <div class="row">
+            <div class="col-lg-6">
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label for="MultiPart" class="col-lg-6 control-label">Multi-Participant Discount:</label>
+                  <div class="col-lg-6">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-default" ng-model="vm.owner.isMultiParticipantDiscountCartRule" btn-radio="true">On</button>
+                      <button type="button" class="btn btn-default" ng-model="vm.owner.isMultiParticipantDiscountCartRule" btn-radio="false">Off</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <div class="col-lg-2"></div>
+              <form class="form-inline">
+                <div class="form-group">
+                  <label for="partdiscounttype">Discount Type</label>
+                  <select class="form-control" ng-model="vm.owner.MultiParticipantDiscountAmountType" id="partdiscounttype" ng-options="t.text as t.text for t in vm.amountTypes">
+                    <option value="">Please Select</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="sr-only" for="partvalue">Amount</label>
+                  <input type="number" step="any" class="form-control" ng-model="vm.owner.MultiParticipantDiscountAmount" id="partvalue" placeholder="0.00">
+                </div>
+              </form>
+            </div>
+            <div class="col-lg-6">
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label for="MultiReg" class="col-lg-6 control-label">Multi-Registration Discount:</label>
+                  <div class="col-lg-6">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-default" ng-model="vm.owner.isMultiRegistrationDiscountCartRule" btn-radio="true">On</button>
+                      <button type="button" class="btn btn-default" ng-model="vm.owner.isMultiRegistrationDiscountCartRule" btn-radio="false">Off</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <div class="col-lg-2"></div>
+              <form class="form-inline">
+                <div class="form-group">
+                  <label for="regdiscounttype">Discount Type</label>
+                  <select class="form-control" id="regdiscounttype" ng-model="vm.owner.MultiRegistrationDiscountAmountType" ng-options="t.text as t.text for t in vm.amountTypes">
+                    <option value="">Please Select</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="sr-only" for="regvalue">Amount</label>
+                  <input type="number" step="any" class="form-control" ng-model="vm.owner.MultiRegistrationDiscountAmount" id="regvalue" placeholder="0.00">
+                </div>
+              </form>
+            </div>
+          </div>
+        </tab>
+      </tabset>
+    </div>
+  </div>
+</section>
+
+<script type="text/x-kendo-template" id="template">
+  <div kendo-grid="vm.detailgrid" k-options="vm.detailGridOptions(dataItem)"></div>
+</script>

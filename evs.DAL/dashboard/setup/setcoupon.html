@@ -1,0 +1,143 @@
+<section data-ng-controller="setcoupon as vm">
+  <div class="row">
+    <div class="col-lg-12">
+      <button ng-click="vm.cancel()" class="btn btn-danger btn-xs pull-right"><i class="glyphicon glyphicon-ban-circle"></i>&nbsp;Cancel</button>
+    </div>
+  </div>
+  <div class="row">
+
+    <form class="form-horizontal">
+      <legend >Coupon Setup</legend>
+      <div class="col-lg-12 text-center">
+          <div class="btn-group">
+            <button type="button" class="btn btn-primary" ng-model="vm.coupon.couponType" btn-radio="'owner'">Inclusive</button>
+            <button type="button" class="btn btn-primary" ng-model="vm.coupon.couponType" btn-radio="'event'">Event</button>
+            <button type="button" class="btn btn-primary" ng-model="vm.coupon.couponType" btn-radio="'listing'">Listing</button>
+          </div>
+        <hr>
+      </div>
+      <div class="row">
+      <!-- End Coupon Type -->
+        <div class="col-sm-6">
+          <div class="form-group" ng-show="vm.coupon.couponType === 'event'">
+            <label for="couponcode" class="col-lg-6 control-label">Event:</label>
+            <div class="col-lg-6">
+              <select class="form-control" id="eventuredropdown" ng-model="vm.coupon.couponTypeLinkId" ng-options="e.id as e.name for e in vm.eventures">
+                  <option value="">-- Please Select --</option>
+              </select>
+            </div>
+          </div>
+          <!-- /field -->
+
+          <div class="form-group" ng-show="vm.coupon.couponType === 'listing'">
+            <label for="couponcode" class="col-lg-6 control-label">Event List:</label>
+            <div class="col-lg-6">
+              <select class="form-control" id="listdropdown" ng-model="vm.coupon.couponTypeLinkId" ng-options="l.id as l.name for l in vm.listings">
+                  <option value="">-- Please Select --</option>
+              </select>
+            </div>
+          </div>
+          <!-- /field -->
+
+          <div class="form-group">
+            <label for="couponcode" class="col-lg-6 control-label">Coupon Code:</label>
+            <div class="col-lg-6">
+              <input id="couponcode" class="input-small form-control" placeholder="" ng-model="vm.coupon.code" />
+            </div>
+          </div>
+          <!-- /field -->
+
+          <div class="form-group">
+            <label class="col-lg-6 control-label" for="couponvalue">Coupon Value:</label>
+            <div class="col-lg-6">
+                <input id="couponvalue" type="number" value="0" min="0" max="10000" step="1" class="form-control" width="100" placeholder="0.00" ng-model="vm.coupon.amount" />
+            </div>
+          </div>
+          <!-- /field -->
+
+          <div class="form-group">
+            <label class="col-lg-6 control-label" for="couponmodifier">Coupon Type</label>
+            <div class="col-lg-6">
+              <select class="form-control" id="couponmodifier" width="100" ng-model="vm.coupon.discountType">
+                <option value="0">$ OFF</option>
+                <option value="1">% Off</option>
+              </select>
+            </div>
+          </div>
+          <!-- /field -->
+
+          <div class="form-group">
+            <label for="quantity" class="col-lg-6 control-label">Quantity:</label>
+            <div class="col-lg-6">
+              <input type="number" id="quantity" class="input-small form-control" placeholder="" ng-model="vm.coupon.capacity">
+            </div>
+          </div>
+          <!-- /field -->
+
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label for="startdate" class="col-lg-6 control-label">Start Date:</label>
+            <div class="col-lg-6">
+              <p class="input-group">
+                <input type="text" name="DateStart"  class="form-control" datepicker-popup="{{vm.format}}" ng-model="vm.coupon.dateStart" is-open="vm.startOpen" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close" />
+                <span class="input-group-btn">
+                <button class="btn btn-default" ng-click="vm.open($event, 'startOpen')"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span> </p>
+            </div>
+          </div>
+          <!-- /field -->
+
+          <div class="form-group">
+            <label for="enddate" class="col-lg-6 control-label">End Date:</label>
+            <div class="col-lg-6">
+              <p class="input-group">
+                <input type="text" name="DateEnd"  class="form-control" datepicker-popup="{{vm.format}}" ng-model="vm.coupon.dateEnd" is-open="vm.closeOpen" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close" />
+                <span class="input-group-btn">
+                <button class="btn btn-default" ng-click="vm.open($event, 'closeOpen')"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span> </p>
+            </div>
+          </div>
+          <!-- /field -->
+
+          <div class="form-group">
+            <label for="usage" class="col-lg-6 control-label">Usage:</label>
+            <div class="col-lg-6">
+              <select class="form-control" ng-model="vm.coupon.usage">
+                <option value="0">Single Use</option>
+                <option value="1">Unlimited Use</option>
+              </select>
+            </div>
+          </div>
+          <!-- /field -->
+
+          <div class="form-group">
+            <label for="" class="col-lg-6 control-label">Only Owned Events:</label>
+            <div class="col-lg-6">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default" ng-model="vm.coupon.isOnlyForOwned" btn-radio="true">Yes</button>
+                <button type="button" class="btn btn-default" ng-model="vm.coupon.isOnlyForOwned" btn-radio="false">No</button>
+              </div>
+            </div>
+          </div>
+          <!-- /field -->
+
+          <div class="form-group">
+            <label for="" class="col-lg-6 control-label">Active Coupon:</label>
+            <div class="col-lg-6">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default" ng-model="vm.coupon.active" btn-radio="true">Yes</button>
+                <button type="button" class="btn btn-default" ng-model="vm.coupon.active" btn-radio="false">No</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <button class="btn btn-success pull-right" ng-click="vm.saveAndNav()"><em class="glyphicon glyphicon-save"></em>&nbsp;Save Coupon</button>
+    </div>
+  </div>
+</section>

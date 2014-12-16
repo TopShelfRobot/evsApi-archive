@@ -1,0 +1,57 @@
+<section data-ng-controller="setresource as vm">
+    <div class="row">
+        <div class="col-lg-12">
+            <button ng-click="vm.cancel()" class="btn btn-danger btn-xs pull-right"><i class="glyphicon glyphicon-ban-circle"></i>&nbsp;Cancel</button>
+        </div>
+    </div>
+    <div class="row">
+        <form class="form-horizontal">
+            <legend>Resource Setup</legend>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="Name" class="col-lg-6 control-label">Name:</label>
+                    <div class="col-lg-6">
+                        <input type="text" class="form-control" name="Name" data-ng-model="vm.resource.name" />
+                    </div>
+                </div>
+                <!-- /field -->
+                <div class="form-group">
+                    <label for="emailAddress" class="col-lg-6 control-label">Email Address:</label>
+                    <div class="col-lg-6">
+                        <input type="text" class="form-control" name="emailAddress" data-ng-model="vm.resource.email" />
+                    </div>
+                </div>
+                <!-- /field -->
+            </div>
+
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="Phone" class="col-lg-6 control-label">Phone Number:</label>
+                    <div class="col-lg-6">
+                        <input type="text" class="form-control" name="Phone" data-ng-model="vm.resource.phone" />
+                    </div>
+                </div>
+                <!-- /field -->
+
+                <div class="form-group">
+                    <label for="Type" class="col-lg-6 control-label">Type:</label>
+                    <div class="col-lg-6">
+                       <select name="Type" class="form-control" data-ng-model="vm.resource.resourceType">
+                        <option data-ng-selected="Contractor">Contractor</option>
+                        <option data-ng-selected="Employee">Employee</option>
+                        <option data-ng-selected="Vendor">Vendor</option>
+                        <option data-ng-selected="Client">Client</option>
+                        <option data-ng-selected="Service">Service</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- /field -->
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <button class="btn btn-success pull-right" ng-click="vm.saveAndNav()"><em class="glyphicon glyphicon-save"></em>&nbsp;Save Resource</button>
+        </div>
+    </div>
+</section>

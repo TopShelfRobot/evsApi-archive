@@ -1,0 +1,14 @@
+<section data-ng-controller="volunteercenter as vm">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1>Registered Volunteers</h1>
+      <p class="text-muted">Manage each volunteer and their jobs.</p>
+      <div id="partgrid" kendo-grid="vm.volunteergrid" k-options="vm.volunteerGridOptions"></div>
+    </div>
+  </div>
+</section>
+
+
+<script type="text/x-kendo-template" id="template">
+  <div kendo-grid="vm.detailgrid" k-options="vm.detailGridOptions(dataItem)"></div>
+</script>

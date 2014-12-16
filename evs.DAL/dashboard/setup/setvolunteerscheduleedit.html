@@ -1,0 +1,48 @@
+<section data-ng-controller="setvolunteerschedule as vm">
+    <div class="row">
+      <div class="col-lg-12">
+        <button ng-click="vm.cancel()" class="btn btn-danger btn-xs pull-right"><i class="glyphicon glyphicon-ban-circle"></i>&nbsp;Cancel</button>
+      </div>
+    </div>
+    <div class="row">
+      <form class="form-horizontal">
+        <legend >Edit Volunteer Schedule</legend>
+        <div class="col-sm-6">
+
+            <div class="form-group">
+                <label for="Job" class="col-3 col-sm-3 col-lg-3 control-label">Volunteer Job:</label>
+                <div class="col-9 col-sm-9 col-lg-9">
+                    <select name="Job" class="form-control" ng-model="vm.volunteerschedule.jobId" ng-options="s.id as s.name for s in vm.volunteerschedule">
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label for="" class="col-lg-6 control-label">Active Schedule:</label>
+                <div class="col-lg-6">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" ng-model="vm.volunteerschedule.active" btn-radio="true">Yes</button>
+                        <button type="button" class="btn btn-default" ng-model="vm.volunteerschedule.active" btn-radio="false">No</button>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="form-group">
+                <label for="Shift" class="col-3 col-sm-3 col-lg-3 control-label">Job Shift:</label>
+                <div class="col-9 col-sm-9 col-lg-9">
+                    <select name="Shift" class="form-control" data-bind="options: filteredShifts, optionsText: function (filteredShifts) { return moment(filteredShifts.timeBegin()).format('h:mm a') + ' - ' + moment(filteredShifts.timeEnd()).format('h:mm a') }, optionsValue: 'id', value: shiftId">
+                    </select>
+                </div>
+            </div>-->
+
+        </div>
+      </form>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 clearfix">
+        <button class="btn btn-success pull-right" ng-click="vm.saveAndNav()"><em class="glyphicon glyphicon-save"></em>&nbsp;Save Changes</button>
+      </div>
+    </div>
+</section>

@@ -23,7 +23,6 @@ namespace evs.DAL
         public DbSet<EventureListBundle> EventureListsBundles { get; set; }
         //public DbSet<EventureListType> EventureListTypes { get; set; }
 
-
         public DbSet<Registration> Registrations { get; set; }
         public DbSet<EventureOrder> Orders { get; set; }
        
