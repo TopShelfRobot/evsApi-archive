@@ -15,6 +15,7 @@ namespace evs.API.Controllers
 {
     //[Authorize]
     //[InitializeSimpleMembership]
+     [RoutePrefix("api/payment")]
     public class PaymentController : ApiController
     {
         private evsContext db = new evsContext();
@@ -549,6 +550,7 @@ namespace evs.API.Controllers
         [AllowAnonymous]
         [AcceptVerbs("OPTIONS")]
         //[System.Web.Mvc.ValidateAntiForgeryToken]
+        [Route("PostTeamPayment")]
         public HttpResponseMessage PostTeamPayment(JObject saveBundle)       //for the team member payment
         {
             try
@@ -800,6 +802,12 @@ namespace evs.API.Controllers
 
         }
     }
+
+
+
+
+
+
 }
 
 //[HttpPost]

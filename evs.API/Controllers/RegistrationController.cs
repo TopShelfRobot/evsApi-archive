@@ -62,6 +62,42 @@ namespace evs.API.Controllers
                }).ToList();
         }
 
+        [HttpGet]
+        //[Authorize]
+        public object getDiscountRulesByOwnerId(int ownerId)
+        {
+            return _contextProvider.Context.Owners
+               .Where(o => o.Id == ownerId)
+               .Select(o => new
+               {
+                   o.IsDuplicateOrderAllowed,
+                   o.IsAddSingleFeeForAllRegs,
+                   o.AddSingleFeeForAllRegsPercent,
+                   o.AddSingleFeeType,
+                   o.AddSingleFeeForAllRegsFlat,
+                   o.EventureName,
+                   o.ListingName,
+                   o.GroupName,
+                   o.ParticipantButtonText,
+                   o.ListStatement,
+                   o.TermsText,
+                   o.RefundsText,
+                   o.StripePublishableKey,
+                   o.Name,
+                   o.StripeCheckoutButtonText,
+                   o.StripeOrderDescription,
+
+                   o.IsMultiParticipantDiscountCartRule,
+                   o.IsMultiRegistrationDiscountCartRule,
+
+                   o.MultiParticipantDiscountAmount,
+                   o.MultiParticipantDiscountAmountType,
+                   o.MultiRegistrationDiscountAmount,
+                   o.MultiRegistrationDiscountAmountType
+               }).ToList();
+        }
+
+
 
         [HttpGet]
         public IEnumerable<Participant> ParticipantsByHouseId(int houseId)
