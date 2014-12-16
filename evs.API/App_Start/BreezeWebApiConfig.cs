@@ -15,7 +15,7 @@ namespace evs.API.App_Start {
     public static void RegisterBreezePreStart() {
       GlobalConfiguration.Configuration.Routes.MapHttpRoute(
           name: "BreezeApi",
-          routeTemplate: "api/{controller}/{action}"
+          routeTemplate: "bdc/{controller}/{action}"
       );
     }
   }
