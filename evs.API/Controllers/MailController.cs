@@ -216,6 +216,126 @@ namespace evs.API.Controllers
 
         }
 
+        [Route("SendTeamPlayerInviteMail/{id}")]
+        public HttpResponseMessage SendTeamPlayerInviteMail(int id)
+        {
+            //needs to be a send amazon email
+            //Type : confirm, reset password
+            // to, cc, bc, sender, reply, subject, text
+            try
+            {
+                var teamMember = db.TeamMembers.Where(m => m.Id == id).Select(m => new
+                {
+                    m.TeamMemberGuid,
+                    m.Email,
+                    m.Name,
+                    m.Team.Coach.FirstName,
+                    m.Team.Coach.LastName,
+                    m.Team.Registration.EventureList.DisplayName,
+                    m.Team.TeamGuid,
+                    teamName = m.Team.Name,
+                    m.Team.Owner.Url,
+                    m.Team.Owner.SendImageHtml,
+                    m.Team.Owner.SendMailEmailAddress,
+                    m.Team.Owner.SendConfirmTeamInviteEmailSubject
+                }).SingleOrDefault();
+
+                if (teamMember == null)
+                {
+                    throw new Exception("Could not find TeamMember from id: " + id.ToString());
+                }
+
+                var addresses = new List<string>();
+                var mode = ConfigurationManager.AppSettings["MailMode"];
+                var emailText = string.Empty;
+                var subject = string.Empty;
+                var sender = string.Empty;
+                var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
+                var bcc = new List<string>();
+                //this is actually bbc
+                //an amazon issue?
+
+                if (mode == "TEST")
+                {
+                    addresses.Add("boone@firstegg.com");
+                    subject = "TEST: Eventure Sports Confirmation";
+                    sender = "boone@eventuresports.com";
+                    emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>";
+                }
+                else
+                {
+                    addresses.Add(teamMember.Email);
+                    subject = teamMember.SendConfirmTeamInviteEmailSubject;
+                    sender = teamMember.SendMailEmailAddress;
+                    ccs.Add("boone@eventuresports.com");
+                    //ccs.Add("podaniel@firstegg.com");
+                    ccs.Add(sender);
+                    emailText = teamMember.SendImageHtml;
+                }
+
+                string url = teamMember.Url + "/#/team/" + teamMember.TeamGuid.ToString().ToUpper() + "/member/" +
+                             teamMember.TeamMemberGuid.ToString().ToUpper() + "/payment";
+                emailText = emailText + "Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
+                emailText = emailText + "Dear " + teamMember.Name + ",<BR><BR>You have been invited by " + teamMember.FirstName + ' ' + teamMember.LastName + " to join team " + teamMember.teamName + " in the " + teamMember.DisplayName;
+                emailText = emailText + " league. <BR> Please click on the following link: " + url;
+
+                //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
+
+                //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
+
+
+
+                //ccs and bcc seem to be reversed
+                MailService _mailService = new MailService();
+                var y = _mailService.SendSingleEmail(teamMember.Email, subject, emailText);
+
+                return new HttpResponseMessage(HttpStatusCode.OK);
+
+                //if (mail.ErrorException == null)
+                //{
+                //    if (Request != null)
+                //        return Request.CreateResponse(HttpStatusCode.OK);
+                //    else
+                //        return new HttpResponseMessage(HttpStatusCode.OK);
+                //}
+                //else
+                //{
+                //    var log = new EventureLog();
+                //    log.Message = "orderId: " + id + "_email failed" + mail.ErrorException;
+                //    log.Caller = "Mail Api_SendConfirmMail";
+                //    log.Status = "Error";
+                //    log.LogDate = System.DateTime.Now.ToLocalTime();
+                //    db.EventureLogs.Add(log);
+                //    db.SaveChanges();
+                //    if (Request != null)
+                //        return Request.CreateResponse(HttpStatusCode.OK); //change this ??  //mjb
+                //    else
+                //    {
+                //        return new HttpResponseMessage(HttpStatusCode.OK);
+                //    }
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                var logE = new EventureLog();
+                logE.Message = "orderId: " + id + "_Error Handler: " + ex.Message;
+                logE.Caller = "Mail Api_SendConfirmMail";
+                logE.Status = "ERROR";
+                logE.LogDate = System.DateTime.Now.ToLocalTime();
+                db.EventureLogs.Add(logE);
+                db.SaveChanges();
+
+                if (Request != null)
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                }
+            }
+        }
+
+
 
 
 

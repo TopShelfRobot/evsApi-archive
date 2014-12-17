@@ -475,7 +475,7 @@ namespace evs.API.Controllers
                          teamMemberId = m.Id,
                          teamId = m.Team.Id
                      }).ToList();
-        }
+        }     //this will only be used on member payment receipt??
 
         [HttpGet]
         public object GetTeamMemberPaymentInfoByPaymentId(Int32 id)    //this will only be used on member payment receipt
@@ -492,7 +492,7 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public object GetNotPaidTeamMemberCountByTeamGuid(Guid id)
+        public object GetNotPaidTeamMemberCountByTeamGuid(Guid id)     //this will only be used on member payment receipt??
         {
             var allTeamCount = _contextProvider.Context.TeamMembers.Count(t => t.Team.TeamGuid == id && t.Active);
 
@@ -502,7 +502,7 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public object GetTeamMemberPaymentSumByTeamGuid(Guid id)
+        public object GetTeamMemberPaymentSumByTeamGuid(Guid id)    //this will only be used on member payment receipt??
         {
             return _contextProvider.Context.TeamMembers
                                 .Where(t => t.Team.TeamGuid == id && t.Active)

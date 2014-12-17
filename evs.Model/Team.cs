@@ -6,6 +6,12 @@ namespace evs.Model
 {
     public class Team
     {
+        public Team() 
+        {
+            this.TeamMembers = new List<TeamMember>();
+            this.TeamMemberPayments = new List<TeamMemberPayment>();   //think i need to get rid of this
+        }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Int32 Id { get; set; }
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -34,13 +40,18 @@ namespace evs.Model
 
     public class TeamMember
     {
+        public TeamMember() 
+        {
+            this.TeamMemberPayments = new List<TeamMemberPayment>();   
+        }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Int32 Id { get; set; }
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid TeamMemberGuid { get; set; }
         public Int32? ParticipantId { get; set; }
         public Int32 TeamId { get; set; }
-        public Int32? StockAnswerSetId { get; set; }
+        //public Int32? StockAnswerSetId { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public Boolean Active { get; set; }
@@ -69,6 +80,8 @@ namespace evs.Model
 
         //navigation
         public virtual TeamMember TeamMember { get; set; }
+        public virtual Team Team { get; set; }
+        public virtual EventureOrder EventureOrder { get; set; }
         //public Team Team { get; set; }
     }
 

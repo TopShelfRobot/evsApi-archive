@@ -15,7 +15,7 @@ namespace evs.API.Controllers
 {
     //[Authorize]
     //[InitializeSimpleMembership]
-     [RoutePrefix("api/payment")]
+    [RoutePrefix("api/payment")]
     public class PaymentController : ApiController
     {
         private evsContext db = new evsContext();
@@ -38,7 +38,7 @@ namespace evs.API.Controllers
 
                 //Int32 teamId = 0;
                 //string teamMemberGuid = string.Empty;    // = 0;
-               // Int32 paymentId = 0;
+                // Int32 paymentId = 0;
 
                 //public static EventureOrder populateOrderFromBundle(JObject saveBundle)
                 var order = new EventureOrder
@@ -80,7 +80,7 @@ namespace evs.API.Controllers
                 dynamic bundle = saveBundle;
                 foreach (var regBundle in bundle.regs)
                 {
-                   
+
                     var registration = new Registration
                         {
                             EventureListId = regBundle.eventureListId,
@@ -95,7 +95,7 @@ namespace evs.API.Controllers
                         };
                     var eventureListTypeId = regBundle.eventureListTypeId;
                     db.Registrations.Add(registration);
-                   
+
                     foreach (var answerBundle in regBundle.answers)
                     {
                         var answer = new Answer
@@ -115,7 +115,7 @@ namespace evs.API.Controllers
                     //    registration.GroupId = regBundle.groupId;   //this could be null
                     //if (regBundle.group2Id != "")
                     //    registration.Group2Id = regBundle.group2Id;   //this could be null
-                   
+
 
                     if (eventureListTypeId != 1)
                     {
@@ -143,7 +143,7 @@ namespace evs.API.Controllers
                         db.TeamMembers.Add(teamCoach);
                         db.SaveChanges();
                         //mjbteamMemberGuid = teamCoach.TeamMemberGuid.ToString().ToUpper();
-                            //this is returned to app in response
+                        //this is returned to app in response
 
                         var payment = new TeamMemberPayment();
                         //{
@@ -157,7 +157,7 @@ namespace evs.API.Controllers
                         //paymentId = payment.Id; //this is returned to app in response
 
                         foreach (dynamic teamBundle in regBundle.teamMembers)
-                            //this is not nessessary now because only 1 reg in team
+                        //this is not nessessary now because only 1 reg in team
                         {
                             var teamMember = new TeamMember();
                             teamMember.Name = teamBundle.name;
@@ -207,7 +207,7 @@ namespace evs.API.Controllers
                 if (order.LocalApplicationFee < 0)
                     order.LocalApplicationFee = 0;
 
-              // create customer
+                // create customer
                 var customerOptions = new StripeCustomerCreateOptions
                 {
                     Email = partEmail,
@@ -221,7 +221,7 @@ namespace evs.API.Controllers
                 var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
                 var stripeChargeOption = new StripeChargeCreateOptions()
                                                     {
-                                                        Amount= Convert.ToInt32(order.Amount * 100),
+                                                        Amount = Convert.ToInt32(order.Amount * 100),
                                                         Currency = "usd",
                                                         CustomerId = customer.Id,
                                                         Description = owner.Name,
@@ -548,7 +548,7 @@ namespace evs.API.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [AcceptVerbs("OPTIONS")]
+        //[AcceptVerbs("OPTIONS")]
         //[System.Web.Mvc.ValidateAntiForgeryToken]
         [Route("PostTeamPayment")]
         public HttpResponseMessage PostTeamPayment(JObject saveBundle)       //for the team member payment
@@ -786,6 +786,346 @@ namespace evs.API.Controllers
             }
         }
 
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        //[AcceptVerbs("OPTIONS")]
+        //[System.Web.Mvc.ValidateAntiForgeryToken]
+        [Route("PostTeam")]
+        public HttpResponseMessage PostTeam(JObject saveBundle)
+        {
+            try
+            {
+                decimal totalFees = 0;
+                //Int32 teamId = 0;
+                //string teamMemberGuid;
+
+                var order = new EventureOrder
+                {
+                    DateCreated = DateTime.Now,
+                    HouseId = (Int32)saveBundle["orderHouseId"],
+                    Amount = (Decimal)saveBundle["orderAmount"],
+                    Token = (string)saveBundle["stripeToken"],
+                    OwnerId = (Int32)saveBundle["ownerId"],
+                    Status = "Init",
+                    Voided = false
+                };
+                //db.Orders.Add(order);
+
+                var custDesc = string.Empty;
+                var partEmail = string.Empty;
+                var partName = string.Empty;
+                var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
+                if (part != null)
+                {
+                    custDesc = part.FirstName + " " + part.LastName + "_ord" + order.Id;
+                    partEmail = part.Email;
+                    partName = part.FirstName + " " + part.LastName;
+                }
+                else
+                {
+                    throw new Exception("couldn't find that houseId");
+                }
+
+                dynamic bundle = saveBundle;
+                foreach (dynamic regBundle in bundle.regs) //this is not nessessary now because only 1 reg in team
+                {
+
+                    var registration = new Registration
+                    {
+                        EventureListId = regBundle.eventureListId,
+                        ParticipantId = regBundle.partId,
+                        ListAmount = regBundle.fee,
+                        Quantity = regBundle.quantity,
+                        EventureOrder = order,
+                        //EventureOrderId = order.Id, //mjb1 this one seems ok
+                        DateCreated = DateTime.Now,
+                        TotalAmount = Convert.ToDecimal(regBundle.fee),
+                        Type = "reg"
+                    };
+
+
+                    var team = new Team
+                    {
+                        Name = regBundle.teamName, // (string)saveBundle["teamName"];
+                        //RegistrationId = registration.Id,
+                        Registration = registration,
+                        CoachId = order.HouseId,
+                        OwnerId = order.OwnerId,
+                        IsPaidInFull = false,
+                        DateCreated = DateTime.Now,
+                        Active = true
+                    };
+                    //db.Teams.Add(team);
+                    //db.SaveChanges();
+                    //teamId = team.Id;      //this sucks
+
+                    //add coach to teamMember
+                    var teamCoach = new TeamMember
+                    {
+                        Name = partName,
+                        Email = partEmail,
+                        //TeamId = team.Id,
+                        Team = team,
+                        ParticipantId = order.HouseId,
+                        DateCreated = DateTime.Now,
+                        Active = true
+                    };
+                    //db.TeamMembers.Add(teamCoach);
+                    //db.SaveChanges();
+                    //teamMemberGuid = teamCoach.TeamMemberGuid.ToString().ToUpper();     //this is returned to app in response
+                   
+                    var payment = new TeamMemberPayment
+                    {
+                        //payment.TeamId = team.Id;
+                        Team = team,
+                        Amount = order.Amount,
+                        TeamMemberId = teamCoach.Id,
+                        EventureOrder = order,
+                        DateCreated = DateTime.Now,
+                        Active = true
+                    };
+                    //db.TeamMemberPayments.Add(payment);
+                    team.TeamMemberPayments.Add(payment);
+
+                    //db.SaveChanges();
+                    //paymentId = payment.Id;     //this is returned to app in response
+
+                    foreach (dynamic teamBundle in regBundle.teamMembers)
+                    //this is not nessessary now because only 1 reg in team
+                    {
+                        var teamMember = new TeamMember
+                        {
+                            Name = teamBundle.name,
+                            Email = teamBundle.email,
+                            //teamMember.TeamId = team.Id;
+                            Team = team,
+                            Active = true,
+                            DateCreated = DateTime.Now
+                            //db.TeamMembers.Add(teamMember);
+                        };
+                        //team.TeamMembers.Add(teamMember);
+                        db.TeamMembers.Add(teamMember);
+                    }
+
+                    //}
+                    //populate surcharge
+                    if (bundle.charges != null)  //if no surcharges skip this
+                    {
+                        foreach (dynamic surchargeBundle in bundle.charges)
+                        {
+                            var surcharge = new Surcharge
+                            {
+                                Amount = surchargeBundle.amount,
+                                EventureListId = surchargeBundle.listId,
+                                ChargeType = surchargeBundle.chargeType,
+                                Description = surchargeBundle.desc,
+                                ParticipantId = surchargeBundle.partId,
+                                EventureOrderId = order.Id,
+                                DateCreated = DateTime.Now,
+                                CouponId = surchargeBundle.couponId
+                            };
+                            totalFees = totalFees + Convert.ToDecimal(surchargeBundle.amount);
+                            //db.Surcharges.Add(surcharge);
+                            order.Surcharges.Add(surcharge);
+                        }
+                    }
+                }
+
+                Owner owner = db.Owners.Where(o => o.Id == order.OwnerId).SingleOrDefault();
+                if (owner == null)
+                {
+                    throw new Exception("Owner Setup is Not Configured Correctly");
+                }
+
+                //calulate
+                order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
+                order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
+                order.LocalApplicationFee = order.LocalFeeInCents - order.CardProcessorFeeInCents;
+
+                if (order.LocalApplicationFee < 0)
+                    order.LocalApplicationFee = 0;
+
+                // create customer
+                var customerOptions = new StripeCustomerCreateOptions
+                {
+                    Email = partEmail,
+                    Description = custDesc,
+                    TokenId = order.Token,
+                };
+
+                var stripeCustomerService = new StripeCustomerService(owner.AccessToken);
+                var customer = stripeCustomerService.Create(customerOptions);
+
+                var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
+                var stripeChargeOption = new StripeChargeCreateOptions()
+                {
+                    Amount = Convert.ToInt32(order.Amount * 100),
+                    Currency = "usd",
+                    CustomerId = customer.Id,
+                    Description = owner.Name,
+                    ApplicationFee = order.LocalApplicationFee
+                };
+                var stripeCharge = stripeChargeService.Create(stripeChargeOption);
+
+                if (string.IsNullOrEmpty(stripeCharge.FailureCode))
+                {
+                    //    order.AuthorizationCode = stripeCharge.Id;
+                    //    //stripeCharge.
+                    //    order.CardNumber = stripeCharge.StripeCard.Last4;
+                    //    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
+                    //    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
+                    //    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
+                    //    //order.CardId = stripeCharge.StripeCard.;
+                    //    order.CardName = stripeCharge.StripeCard.Name;
+                    //    order.CardOrigin = stripeCharge.StripeCard.Country;
+                    //    order.CardType = stripeCharge.StripeCard.Type;
+                    //    order.Voided = false;
+                    //    order.Status = "Complete";
+                    //    order.PaymentType = PaymentType.credit;
+                    //    //db.Orders.Add(order);
+                    //    db.SaveChanges();
+
+                   
+
+                    //    //return Request.CreateResponse(HttpStatusCode.OK, stripeCharge);
+
+                    //    var resp = Request.CreateResponse(HttpStatusCode.OK);
+                    //    //order.Id.ToString()  we are using teamGuid for demo because we already have 
+                    //    //                     a getbyteamguid
+                    //    resp.Content = new StringContent(paymentId.ToString(), Encoding.UTF8, "text/plain");
+                    //    return resp;
+
+
+                    /////////////////////////////////////////////////////////////
+
+                    //orderService.CompleteOrder(stripeCharge)
+                    order.AuthorizationCode = stripeCharge.Id;
+                    //stripeCharge.
+                    order.CardNumber = stripeCharge.StripeCard.Last4;
+                    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
+                    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
+                    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
+                    //order.CardId = stripeCharge.StripeCard.;
+                    order.CardName = stripeCharge.StripeCard.Name;
+                    order.CardOrigin = stripeCharge.StripeCard.Country;
+                    //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
+                    order.Voided = false;
+                    order.Status = "Complete";
+                    //mjb fix order.PaymentType = "credit";
+                    //db.Orders.Add(order);
+                    //db.SaveChanges();
+
+                    //not good return reason
+                    //OrderService _orderService = new OrderService();
+                    //var x = _orderService.CreateOrder(order);
+
+                    db.Orders.Add(order);
+                    db.SaveChanges();
+
+                    var onlyRegId = 0;
+
+                    foreach(var reg in order.Registrations)
+                    {
+                        onlyRegId = reg.Id; ;
+                    }
+
+
+                    foreach(var member in db.TeamMembers.Where(m => m.Team.RegistrationId == onlyRegId))
+                        {
+                        //if member.partId is null
+                        if (member.ParticipantId == null)
+                        {
+                            HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);
+                            //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
+                        }
+                    }
+
+                    //foreach (var member in db.TeamMembers.Where(m => m.TeamId == teamId))
+                    //{
+                    //    //if member.partId is null
+                    //    if (member.ParticipantId == null)
+                    //    {
+                    //        HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);
+                    //        //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
+                    //    }
+                    //}
+
+
+                    //call mail
+                    //HttpResponseMessage result = new MailController().SendConfirmMail(order.Id);
+
+                    //db.TeamMembers.Where(m => m.re)
+                    //foreach (var reg in order.Registrations)
+                    //{
+
+                    //    foreach(var team in reg.te)
+                    //    //if member.partId is null
+                    //    //if (member.ParticipantId == null)
+                    //    //{
+                    //        HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(reg.               //(member.Id);
+                    //        //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
+                    //    //}
+                    //}
+
+                    var resp = Request.CreateResponse(HttpStatusCode.OK);
+                    //resp.Content = new StringContent();
+                    resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
+                    return resp;
+
+                }
+                else
+                {
+                    order.Status = stripeCharge.FailureMessage;
+                    db.SaveChanges();
+                    return Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
+                }
+
+
+                //}
+            }
+            catch (Exception ex)
+            {
+                //send quick email
+                //HttpResponseMessage result = new MailController().SendInfoMessage("boone.mike@gmail.com", "Error Handler_Payment_Post: " + ex.Message + "\n\n" + ex.InnerException);
+
+                //regular log
+                var logE = new EventureLog
+                {
+                    Message = "Error Handler: " + ex.Message + "\n\n" + ex.InnerException + " -- bundle: " + saveBundle,
+                    Caller = "Payment_PostTeam",
+                    Status = "ERROR",
+                    LogDate = System.DateTime.Now.ToLocalTime()
+                };
+                db.EventureLogs.Add(logE);
+                db.SaveChanges();
+
+                var returnMessage = "There was error with your transaction, please try again.";
+
+                if (ex.Source == "Stripe.net")
+                    returnMessage = ex.Message;
+
+                //if (Request != null)
+                //    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, returnMessage);
+                ////return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                //else
+                //{
+                //    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                //    //return new HttpResponseMessage(HttpStatusCode.InternalServerError,);
+                //}
+
+                //return Request.CreateErrorResponse(HttpStatusCode.InternalServerError);  //, returnMessage);   //this is temp
+                //var resp = new HttpResponseMessage(HttpStatusCode.InternalServerError, returnMessage);
+                //return resp;
+
+                //var x = ex.InnerException;
+                var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, returnMessage);
+                return badResponse; 
+
+            }
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [AcceptVerbs("OPTIONS")]
@@ -797,18 +1137,19 @@ namespace evs.API.Controllers
             var resp = new HttpResponseMessage(HttpStatusCode.OK);
             //resp.Headers.Add("Access-Control-Allow-Origin", "*");
             //resp.Headers.Add("Access-Control-Allow-Methods", "POST");
-
             return resp;
 
         }
+
+
+
+
     }
 
 
 
-
-
-
 }
+
 
 //[HttpPost]
 // [AllowAnonymous]

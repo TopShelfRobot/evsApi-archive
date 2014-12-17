@@ -108,6 +108,57 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
+        public object GetTeamMemberPaymentInfoByPaymentId(Int32 id)            {
+            return _contextProvider.Context.TeamMemberPayments
+                     .Where(p => p.EventureOrderId == id)
+                     .Select(p => new
+                     {
+                         p.Amount,
+                         p.TeamMember.Name,
+                         teamname = p.TeamMember.Team.Name,
+                         ListName = p.TeamMember.Team.Registration.EventureList.Name
+                     }).ToList();
+        }
+
+        [HttpGet]
+        public object GetTeamMemberPaymentInfoByTeamMemberGuid(Guid id)
+        {
+            return _contextProvider.Context.TeamMembers
+                     .Where(t => t.TeamMemberGuid == id && t.Active)
+                     .Select(m => new
+                     {
+                         ListName = m.Team.Registration.EventureList.DisplayName,
+                         m.Team.Registration.EventureList.EventureListType,
+                         m.Team.Registration.EventureList.CurrentFee,
+                         RegAmount = m.Team.Registration.ListAmount,   //totalAmount??
+                         userPaid = (decimal?)m.TeamMemberPayments.Sum(p => p.Amount) ?? 0,     //this is temp;  if they make multiple payments reciept will be wrong
+                         m.Id,
+                         m.Team.Name,
+                         teamMemberId = m.Id,
+                         teamId = m.Team.Id
+                     }).ToList();
+        }     //this will only be used on member payment receipt??
+
+        [HttpGet]
+        public object GetNotPaidTeamMemberCountByTeamGuid(Guid id)
+        {
+            var allTeamCount = _contextProvider.Context.TeamMembers.Count(t => t.Team.TeamGuid == id && t.Active);
+
+            var paidTeamCount = _contextProvider.Context.TeamMembers.Count(t => t.Team.TeamGuid == id && t.Active && t.TeamMemberPayments.Count > 0);
+
+            return allTeamCount - paidTeamCount;
+        }
+
+        [HttpGet]
+        public object GetTeamMemberPaymentSumByTeamGuid(Guid id)
+        {
+            return _contextProvider.Context.TeamMembers
+                                .Where(t => t.Team.TeamGuid == id && t.Active)
+                                .Sum(t => (decimal?)t.TeamMemberPayments.Sum(p => (decimal?)p.Amount) ?? 0);
+        }
+
+
+        [HttpGet]
         public IEnumerable<Participant> ParticipantsByHouseId(int houseId)
         {
             return _db.Participants

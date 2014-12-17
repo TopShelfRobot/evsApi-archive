@@ -13,7 +13,6 @@ namespace evs.Service
 {
     public class MailService
     {
-        //D:\source\evs30Api\evs.Service\OrderService.cs
         public MailService()  //ModelStateDictionary modelState, IOrderRepository repository
         {
             // _modelState = modelState;
@@ -22,7 +21,6 @@ namespace evs.Service
 
         public bool SendResetPassword(string email, string subject, string body)
         {
-
             var myMessage = new SendGridMessage();
 
             // Add the message properties.
@@ -39,15 +37,12 @@ namespace evs.Service
             //};
 
             myMessage.AddTo(recipients);
-
             myMessage.Subject = subject;
-
+            myMessage.Html = body;
             //Add the HTML and Text bodies
             //myMessage.Html = "<p>Hello World!</p>";
             //myMessage.Text = "Hello World plain text!";
-
-            myMessage.Html = body;
-
+         
 
             // Create network credentials to access your SendGrid account.
             var username = "boone10";
@@ -78,7 +73,43 @@ namespace evs.Service
         }
 
 
+        public bool SendSingleEmail(string email, string subject, string body)
+        {
 
+            var myMessage = new SendGridMessage();
+
+            myMessage.From = new MailAddress("boone.mike@gmail.com");
+            List<String> recipients = new List<String>();
+
+            recipients.Add(email);
+            //{
+            //    //@"Jeff Smith <jeff@example.com>",
+            //    //@"Anna Lidman <anna@example.com>",
+            //    @"Mike Boone <boone@firstegg.com>"
+            //};
+
+            myMessage.AddTo(recipients);
+            myMessage.Subject = subject;
+            myMessage.Html = body;
+
+            // Create network credentials to access your SendGrid account.
+            var username = "boone10";
+            var pswd = "fr33_b33r";
+
+            // Create credentials, specifying your user name and password.
+            var credentials = new NetworkCredential(username, pswd);
+            var transportWeb = new Web(credentials);
+
+            try
+            {
+                transportWeb.Deliver(myMessage);
+            }
+            catch(Exception ex)
+            {
+                var test = ex.Message;
+            }
+            return true;
+        }
 
 
 
