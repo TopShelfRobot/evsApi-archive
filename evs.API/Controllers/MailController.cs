@@ -273,7 +273,7 @@ namespace evs.API.Controllers
                     emailText = teamMember.SendImageHtml;
                 }
 
-                string url = teamMember.Url + "/#/team/" + teamMember.TeamGuid.ToString().ToUpper() + "/member/" +
+                string url = teamMember.Url + "#/team/" + teamMember.TeamGuid.ToString().ToUpper() + "/member/" +
                              teamMember.TeamMemberGuid.ToString().ToUpper() + "/payment";
                 emailText = emailText + "Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
                 emailText = emailText + "Dear " + teamMember.Name + ",<BR><BR>You have been invited by " + teamMember.FirstName + ' ' + teamMember.LastName + " to join team " + teamMember.teamName + " in the " + teamMember.DisplayName;
