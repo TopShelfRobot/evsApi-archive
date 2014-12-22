@@ -193,6 +193,7 @@ namespace evs.API.Controllers
 
                 //db.SaveChanges();
 
+
                 Owner owner = db.Owners.Where(o => o.Id == 1).SingleOrDefault();
                 if (owner == null)
                 {
@@ -876,7 +877,7 @@ namespace evs.API.Controllers
                     //db.TeamMembers.Add(teamCoach);
                     //db.SaveChanges();
                     //teamMemberGuid = teamCoach.TeamMemberGuid.ToString().ToUpper();     //this is returned to app in response
-                   
+
                     //var payment = new TeamMemberPayment
                     //{
                     //    //payment.TeamId = team.Id;
@@ -940,101 +941,172 @@ namespace evs.API.Controllers
                     throw new Exception("Owner Setup is Not Configured Correctly");
                 }
 
-                //calulate
-                order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
-                order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
-                order.LocalApplicationFee = order.LocalFeeInCents - order.CardProcessorFeeInCents;
+               
 
-                if (order.LocalApplicationFee < 0)
-                    order.LocalApplicationFee = 0;
 
-                // create customer
-                var customerOptions = new StripeCustomerCreateOptions
+                if (order.Amount > 0)
                 {
-                    Email = partEmail,
-                    Description = custDesc,
-                    TokenId = order.Token,
-                };
 
-                var stripeCustomerService = new StripeCustomerService(owner.AccessToken);
-                var customer = stripeCustomerService.Create(customerOptions);
 
-                var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
-                var stripeChargeOption = new StripeChargeCreateOptions()
+                    //calulate
+                    order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
+                    order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
+                    order.LocalApplicationFee = order.LocalFeeInCents - order.CardProcessorFeeInCents;
+
+                    if (order.LocalApplicationFee < 0)
+                        order.LocalApplicationFee = 0;
+
+                    // create customer
+                    var customerOptions = new StripeCustomerCreateOptions
+                    {
+                        Email = partEmail,
+                        Description = custDesc,
+                        TokenId = order.Token,
+                    };
+
+                    var stripeCustomerService = new StripeCustomerService(owner.AccessToken);
+                    var customer = stripeCustomerService.Create(customerOptions);
+
+                    var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
+                    var stripeChargeOption = new StripeChargeCreateOptions()
+                    {
+                        Amount = Convert.ToInt32(order.Amount * 100),
+                        Currency = "usd",
+                        CustomerId = customer.Id,
+                        Description = owner.Name,
+                        ApplicationFee = order.LocalApplicationFee
+                    };
+                    var stripeCharge = stripeChargeService.Create(stripeChargeOption);
+
+                    if (string.IsNullOrEmpty(stripeCharge.FailureCode))
+                    {
+                        //    order.AuthorizationCode = stripeCharge.Id;
+                        //    //stripeCharge.
+                        //    order.CardNumber = stripeCharge.StripeCard.Last4;
+                        //    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
+                        //    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
+                        //    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
+                        //    //order.CardId = stripeCharge.StripeCard.;
+                        //    order.CardName = stripeCharge.StripeCard.Name;
+                        //    order.CardOrigin = stripeCharge.StripeCard.Country;
+                        //    order.CardType = stripeCharge.StripeCard.Type;
+                        //    order.Voided = false;
+                        //    order.Status = "Complete";
+                        //    order.PaymentType = PaymentType.credit;
+                        //    //db.Orders.Add(order);
+                        //    db.SaveChanges();
+
+
+
+                        //    //return Request.CreateResponse(HttpStatusCode.OK, stripeCharge);
+
+                        //    var resp = Request.CreateResponse(HttpStatusCode.OK);
+                        //    //order.Id.ToString()  we are using teamGuid for demo because we already have 
+                        //    //                     a getbyteamguid
+                        //    resp.Content = new StringContent(paymentId.ToString(), Encoding.UTF8, "text/plain");
+                        //    return resp;
+
+
+                        /////////////////////////////////////////////////////////////
+
+                        //orderService.CompleteOrder(stripeCharge)
+                        order.AuthorizationCode = stripeCharge.Id;
+                        //stripeCharge.
+                        order.CardNumber = stripeCharge.StripeCard.Last4;
+                        order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
+                        order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
+                        order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
+                        //order.CardId = stripeCharge.StripeCard.;
+                        order.CardName = stripeCharge.StripeCard.Name;
+                        order.CardOrigin = stripeCharge.StripeCard.Country;
+                        //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
+                        order.Voided = false;
+                        order.Status = "Complete";
+                        //mjb fix order.PaymentType = "credit";
+                        //db.Orders.Add(order);
+                        //db.SaveChanges();
+
+                        //not good return reason
+                        //OrderService _orderService = new OrderService();
+                        //var x = _orderService.CreateOrder(order);
+
+                        db.Orders.Add(order);
+                        db.SaveChanges();
+
+                        var onlyRegId = 0;
+                        foreach (var reg in order.Registrations)
+                        {
+                            onlyRegId = reg.Id; ;
+                        }
+
+
+                        foreach (var member in db.TeamMembers.Where(m => m.Team.RegistrationId == onlyRegId))
+                        {
+                            //if member.partId is null
+                            if (member.ParticipantId == null)
+                            {
+                                HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);
+                                //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
+                            }
+                        }
+
+                        //foreach (var member in db.TeamMembers.Where(m => m.TeamId == teamId))
+                        //{
+                        //    //if member.partId is null
+                        //    if (member.ParticipantId == null)
+                        //    {
+                        //        HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);
+                        //        //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
+                        //    }
+                        //}
+
+
+                        //call mail
+                        //HttpResponseMessage result = new MailController().SendConfirmMail(order.Id);
+
+                        //db.TeamMembers.Where(m => m.re)
+                        //foreach (var reg in order.Registrations)
+                        //{
+
+                        //    foreach(var team in reg.te)
+                        //    //if member.partId is null
+                        //    //if (member.ParticipantId == null)
+                        //    //{
+                        //        HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(reg.               //(member.Id);
+                        //        //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
+                        //    //}
+                        //}
+
+                        var resp = Request.CreateResponse(HttpStatusCode.OK);
+                        //resp.Content = new StringContent();
+                        resp.Content = new StringContent(onlyRegId.ToString(), Encoding.UTF8, "text/plain");
+                        return resp;
+
+                    }
+                    else
+                    {
+                        order.Status = stripeCharge.FailureMessage;
+                        db.SaveChanges();
+                        return Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
+                    }
+
+                }
+                else
                 {
-                    Amount = Convert.ToInt32(order.Amount * 100),
-                    Currency = "usd",
-                    CustomerId = customer.Id,
-                    Description = owner.Name,
-                    ApplicationFee = order.LocalApplicationFee
-                };
-                var stripeCharge = stripeChargeService.Create(stripeChargeOption);
-
-                if (string.IsNullOrEmpty(stripeCharge.FailureCode))
-                {
-                    //    order.AuthorizationCode = stripeCharge.Id;
-                    //    //stripeCharge.
-                    //    order.CardNumber = stripeCharge.StripeCard.Last4;
-                    //    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
-                    //    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
-                    //    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
-                    //    //order.CardId = stripeCharge.StripeCard.;
-                    //    order.CardName = stripeCharge.StripeCard.Name;
-                    //    order.CardOrigin = stripeCharge.StripeCard.Country;
-                    //    order.CardType = stripeCharge.StripeCard.Type;
-                    //    order.Voided = false;
-                    //    order.Status = "Complete";
-                    //    order.PaymentType = PaymentType.credit;
-                    //    //db.Orders.Add(order);
-                    //    db.SaveChanges();
-
-                   
-
-                    //    //return Request.CreateResponse(HttpStatusCode.OK, stripeCharge);
-
-                    //    var resp = Request.CreateResponse(HttpStatusCode.OK);
-                    //    //order.Id.ToString()  we are using teamGuid for demo because we already have 
-                    //    //                     a getbyteamguid
-                    //    resp.Content = new StringContent(paymentId.ToString(), Encoding.UTF8, "text/plain");
-                    //    return resp;
-
-
-                    /////////////////////////////////////////////////////////////
-
-                    //orderService.CompleteOrder(stripeCharge)
-                    order.AuthorizationCode = stripeCharge.Id;
-                    //stripeCharge.
-                    order.CardNumber = stripeCharge.StripeCard.Last4;
-                    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
-                    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
-                    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
-                    //order.CardId = stripeCharge.StripeCard.;
-                    order.CardName = stripeCharge.StripeCard.Name;
-                    order.CardOrigin = stripeCharge.StripeCard.Country;
-                    //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
                     order.Voided = false;
                     order.Status = "Complete";
                     //mjb fix order.PaymentType = "credit";
                     //db.Orders.Add(order);
-                    //db.SaveChanges();
-
-                    //not good return reason
-                    //OrderService _orderService = new OrderService();
-                    //var x = _orderService.CreateOrder(order);
-
-                    db.Orders.Add(order);
                     db.SaveChanges();
 
                     var onlyRegId = 0;
-
-                    foreach(var reg in order.Registrations)
+                    foreach (var reg in order.Registrations)
                     {
                         onlyRegId = reg.Id; ;
                     }
 
-
-                    foreach(var member in db.TeamMembers.Where(m => m.Team.RegistrationId == onlyRegId))
-                        {
+                    foreach (var member in db.TeamMembers.Where(m => m.Team.RegistrationId == onlyRegId))
+                    {
                         //if member.partId is null
                         if (member.ParticipantId == null)
                         {
@@ -1043,44 +1115,13 @@ namespace evs.API.Controllers
                         }
                     }
 
-                    //foreach (var member in db.TeamMembers.Where(m => m.TeamId == teamId))
-                    //{
-                    //    //if member.partId is null
-                    //    if (member.ParticipantId == null)
-                    //    {
-                    //        HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);
-                    //        //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
-                    //    }
-                    //}
+                    HttpResponseMessage confirmResult = new MailController().SendConfirmMail(order.Id);
 
-
-                    //call mail
-                    //HttpResponseMessage result = new MailController().SendConfirmMail(order.Id);
-
-                    //db.TeamMembers.Where(m => m.re)
-                    //foreach (var reg in order.Registrations)
-                    //{
-
-                    //    foreach(var team in reg.te)
-                    //    //if member.partId is null
-                    //    //if (member.ParticipantId == null)
-                    //    //{
-                    //        HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(reg.               //(member.Id);
-                    //        //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
-                    //    //}
-                    //}
-
+                    //return Request.CreateResponse(HttpStatusCode.OK, stripeCharge);
                     var resp = Request.CreateResponse(HttpStatusCode.OK);
                     //resp.Content = new StringContent();
                     resp.Content = new StringContent(onlyRegId.ToString(), Encoding.UTF8, "text/plain");
                     return resp;
-
-                }
-                else
-                {
-                    order.Status = stripeCharge.FailureMessage;
-                    db.SaveChanges();
-                    return Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
                 }
 
 
@@ -1122,7 +1163,7 @@ namespace evs.API.Controllers
 
                 //var x = ex.InnerException;
                 var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, returnMessage);
-                return badResponse; 
+                return badResponse;
 
             }
         }
