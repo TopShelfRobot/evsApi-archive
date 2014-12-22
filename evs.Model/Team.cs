@@ -56,6 +56,7 @@ namespace evs.Model
         public string Email { get; set; }
         public Boolean Active { get; set; }
         public DateTime DateCreated { get; set; }
+        public string Position { get; set; }
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }

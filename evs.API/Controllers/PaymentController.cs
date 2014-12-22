@@ -876,18 +876,18 @@ namespace evs.API.Controllers
                     //db.SaveChanges();
                     //teamMemberGuid = teamCoach.TeamMemberGuid.ToString().ToUpper();     //this is returned to app in response
                    
-                    var payment = new TeamMemberPayment
-                    {
-                        //payment.TeamId = team.Id;
-                        Team = team,
-                        Amount = order.Amount,
-                        TeamMemberId = teamCoach.Id,
-                        EventureOrder = order,
-                        DateCreated = DateTime.Now,
-                        Active = true
-                    };
-                    //db.TeamMemberPayments.Add(payment);
-                    team.TeamMemberPayments.Add(payment);
+                    //var payment = new TeamMemberPayment
+                    //{
+                    //    //payment.TeamId = team.Id;
+                    //    Team = team,
+                    //    Amount = order.Amount,
+                    //    TeamMemberId = teamCoach.Id,
+                    //    EventureOrder = order,
+                    //    DateCreated = DateTime.Now,
+                    //    Active = true
+                    //};
+                    ////db.TeamMemberPayments.Add(payment);
+                    //team.TeamMemberPayments.Add(payment);
 
                     //db.SaveChanges();
                     //paymentId = payment.Id;     //this is returned to app in response

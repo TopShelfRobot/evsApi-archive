@@ -354,6 +354,7 @@ namespace evs.API.Controllers
                     t.Id,
                     t.TeamId,
                     t.Email,
+                    t.ParticipantId,
                     Balance = t.Team.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
                     Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
                     EventureOrderId = t.Team.Registration.EventureOrder.Id
