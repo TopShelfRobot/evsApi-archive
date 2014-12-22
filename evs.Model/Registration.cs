@@ -28,6 +28,7 @@ namespace evs.Model
         public Boolean Redeemed { get; set; }
         public Int32? ConvRegId { get; set; }
         public Int32? StockAnswerSetId { get; set; }
+       
 
         public DateTime DateCreated { get; set; }
         //public DateTime DateModified { get; set; }

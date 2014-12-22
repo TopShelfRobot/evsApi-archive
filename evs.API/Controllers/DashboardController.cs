@@ -478,16 +478,15 @@ namespace evs.API.Controllers
         }     //this will only be used on member payment receipt??
 
         [HttpGet]
-        public object GetTeamMemberPaymentInfoByPaymentId(Int32 id)    //this will only be used on member payment receipt
+        public object GetTeamInfoByRegistrationId(Int32 id)    //this will only be used on member payment receipt
         {
-            return _contextProvider.Context.TeamMemberPayments
-                     .Where(p => p.Id == id)
-                     .Select(p => new
+            return _contextProvider.Context.Teams
+                     .Where(t => t.RegistrationId == id)
+                     .Select(t => new
                      {
-                         p.Amount,
-                         p.TeamMember.Name,
-                         teamname = p.TeamMember.Team.Name,
-                         ListName = p.TeamMember.Team.Registration.EventureList.Name
+                         t.Registration.EventureOrder.Amount,  
+                         teamName = t.Name,
+                         ListName = t.Registration.EventureList.Name
                      }).ToList();
         }
 

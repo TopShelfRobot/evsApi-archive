@@ -872,6 +872,7 @@ namespace evs.API.Controllers
                         DateCreated = DateTime.Now,
                         Active = true
                     };
+                    team.TeamMembers.Add(teamCoach);
                     //db.TeamMembers.Add(teamCoach);
                     //db.SaveChanges();
                     //teamMemberGuid = teamCoach.TeamMemberGuid.ToString().ToUpper();     //this is returned to app in response
@@ -1071,7 +1072,7 @@ namespace evs.API.Controllers
 
                     var resp = Request.CreateResponse(HttpStatusCode.OK);
                     //resp.Content = new StringContent();
-                    resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
+                    resp.Content = new StringContent(onlyRegId.ToString(), Encoding.UTF8, "text/plain");
                     return resp;
 
                 }
