@@ -210,6 +210,18 @@ namespace evs.API.Controllers
             return _contextProvider.Context.Question;
         }
 
+        [HttpGet]
+        public IQueryable<Team> Teams()
+        {
+            return _contextProvider.Context.Teams;
+        }
+
+        [HttpGet]
+        public IQueryable<TeamMember> TeamMembers()
+        {
+            return _contextProvider.Context.TeamMembers;
+        }
+
         [HttpPost]
         public SaveResult SaveChanges(JObject saveBundle)
         {
