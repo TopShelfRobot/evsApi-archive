@@ -114,9 +114,6 @@ namespace evs.API.Controllers
                     OrderService _orderService = new OrderService();
                     var x = _orderService.CreateOrder(order);
 
-                    db.Orders.Add(order);
-                    db.SaveChanges();
-
                     var resp = Request.CreateResponse(HttpStatusCode.OK);
                     //resp.Content = new StringContent();
                     resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
