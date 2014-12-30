@@ -105,10 +105,18 @@ namespace evs.API.Controllers
             var x = new List<DtoEventuresByYear>();
 
             var eps = new List<EventPartial>();
-            eps.Add(new EventPartial(1, "2015 Louisville Marathone"));
-            eps.Add(new EventPartial(2, "2015 Bluegrass Festival"));
-            eps.Add(new EventPartial(3, "2015 Lexington Half Marathon"));
+            eps.Add(new EventPartial(1, "2015 Runathon"));
+            eps.Add(new EventPartial(2, "2015 Pure Tap 5K"));
+            eps.Add(new EventPartial(3, "2015 Great Pumpkin 5K"));
+            eps.Add(new EventPartial(4, "2015 Urban Bourban"));
             x.Add(new DtoEventuresByYear(2015, eps));
+
+            var eps1 = new List<EventPartial>();
+            eps1.Add(new EventPartial(1, "2014 Runathon"));
+            eps1.Add(new EventPartial(2, "2014 Pure Tap 5K"));
+            eps1.Add(new EventPartial(3, "2014 Great Pumpkin 5K"));
+            eps1.Add(new EventPartial(4, "2014 Urban Bourban"));
+            x.Add(new DtoEventuresByYear(2014, eps1));
 
             //var eps1 = new List<EventPartial>();
             //eps.Add(new EventPartial(5, "2011 big event"));

@@ -98,13 +98,24 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<EventureOrder> OrderById(Int32 id)
+        public object OrderById(Int32 id)
         {
-            return _contextProvider.Context.Orders
-                                             .Include("Registrations")
-                                             .Include("Registrations.Participant")
-                                             .Include("Surcharges")
-                                             .Where(o => (o.Id == id));
+            //return _contextProvider.Context.Orders
+            //                                 .Include("Registrations")
+            //                                 .Include("Registrations.Participant")
+            //                                 .Include("Surcharges")
+            //                                 .Where(o => (o.Id == id));
+
+            return _contextProvider.Context.Registrations
+                        .Where(r => (r.EventureOrderId == id))
+                        .Select(r => new
+                        {
+                            r.EventureOrder.Amount,
+                            r.EventureList.DisplayName,
+                            groupName = r.EventureGroup.Name ?? " ",
+                            participant = r.Participant.FirstName + " " + r.Participant.LastName
+                        }).ToList();
+
         }
 
         [HttpGet]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace evs.Model
 {
@@ -34,6 +35,10 @@ namespace evs.Model
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
+
+
+        [ForeignKey("GroupId")]
+        public virtual EventureGroup EventureGroup { get; set; }
 
 
         public string Type { get; set; }
