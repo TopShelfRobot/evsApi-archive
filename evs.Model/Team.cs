@@ -28,6 +28,8 @@ namespace evs.Model
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
+        public string Divison { get; set; }
+        public string TimeFinish { get; set; }
 
         //navigation
         public ICollection<TeamMember> TeamMembers { get; set; }
