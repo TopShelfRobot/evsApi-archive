@@ -109,7 +109,8 @@ namespace evs.Model
         Standard = 1,
         TeamSponsored,
         TeamSuggest,
-        TeamIndividual
+        TeamIndividual,
+        Lottery
     }
 
 }

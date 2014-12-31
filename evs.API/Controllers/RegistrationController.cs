@@ -58,7 +58,9 @@ namespace evs.API.Controllers
                    o.StripePublishableKey,
                    o.Name,
                    o.StripeCheckoutButtonText,
-                   o.StripeOrderDescription
+                   o.StripeOrderDescription, 
+                   o.ConfirmButtonText, 
+                   o.RegisterButtonText
                }).ToList();
         }
 
