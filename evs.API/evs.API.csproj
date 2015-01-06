@@ -302,6 +302,7 @@
     <Compile Include="AuthRepository.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AnalyticController.cs" />
+    <Compile Include="Controllers\CouponController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\PaymentController.cs" />

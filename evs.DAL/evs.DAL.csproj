@@ -82,10 +82,6 @@
       <DependentUpon>evs.edmx</DependentUpon>
     </Compile>
     <Compile Include="evsContext.cs" />
-    <Compile Include="Migrations\201501061627314_InitialSchema.cs" />
-    <Compile Include="Migrations\201501061627314_InitialSchema.Designer.cs">
-      <DependentUpon>201501061627314_InitialSchema.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -120,11 +116,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201501061627314_InitialSchema.resx">
-      <DependentUpon>201501061627314_InitialSchema.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
