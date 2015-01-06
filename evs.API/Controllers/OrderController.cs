@@ -32,7 +32,7 @@ namespace evs.API.Controllers
 
         //public OrderController()
         //{
-            
+
         //}
 
         readonly evsContext db = new evsContext();
@@ -43,7 +43,7 @@ namespace evs.API.Controllers
         public HttpResponseMessage CreateOrder(JObject orderBundle)
         {
             //TransactionStatus transactionStatus;
-           // var results = new StudentValidation().Validate(studentViewModel);
+            // var results = new StudentValidation().Validate(studentViewModel);
 
             //if (!results.IsValid)
             //{
@@ -79,17 +79,48 @@ namespace evs.API.Controllers
                     throw new Exception("Owner Setup is Not Configured Correctly");
                 }
 
+
+                //var custDesc = string.Empty;
+                //var partEmail = string.Empty;
+                //var partName = string.Empty;
+                var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
+                if (part != null)
+                {
+                    //custDesc = part.FirstName + " " + part.LastName + "_ord" + order.Id;
+                    //partEmail = part.Email;
+                    //partName = part.FirstName + " " + part.LastName;
+                }
+                else
+                {
+                    throw new Exception("couldn't find that houseId");
+                }
+
+
+
+                //if (order.Amount > 0)
+                //{
+
+
+                //calulate
+                order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
+                order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
+                order.LocalApplicationFee = order.LocalFeeInCents - order.CardProcessorFeeInCents;
+
+                if (order.LocalApplicationFee < 0)
+                    order.LocalApplicationFee = 0;
+                //}
+
                 //create stripe service,customer, charge
                 //charge card
                 //var stripeService = new Stripe.
-                
+
                 //if good
                 //record charege
                 //create order
                 StripeService stripeService = new StripeService();
 
                 //tring customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee
-                var stripeCharge = stripeService.CreateCharge("boone@email.com", "booney", order.Token, owner.AccessToken, owner.Name, order.Amount, 200);
+                var stripeCharge = stripeService.CreateCharge(part.Email, part.FirstName + " " + part.LastName, order.Token, owner.AccessToken, owner.Name, order.Amount, order.LocalApplicationFee);
 
                 if (string.IsNullOrEmpty(stripeCharge.FailureCode))
                 {
@@ -109,7 +140,7 @@ namespace evs.API.Controllers
                     //mjb fix order.PaymentType = "credit";
                     //db.Orders.Add(order);
                     //db.SaveChanges();
-                    
+
                     //not good return reason
                     OrderService _orderService = new OrderService();
                     var x = _orderService.CreateOrder(order);
@@ -125,18 +156,18 @@ namespace evs.API.Controllers
                     //db.SaveChanges();
                     //return 
                     var badResponse = Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
-                    return badResponse; 
+                    return badResponse;
                 }
             }
             catch (Exception ex)
             {
                 var x = ex.InnerException;
                 var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, x.ToString());
-                return badResponse; 
+                return badResponse;
 
             }
 
-            
+
             //if (transactionStatus.Status == false)
             //{
             //    var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, JsonConvert.SerializeObject(studentViewModel));
@@ -196,10 +227,10 @@ namespace evs.API.Controllers
                 }
             }
             //db.Orders.Add(order);
-            
+
             foreach (var regBundle in bundle.regs)
             {
-                
+
 
                 Registration registration = new Registration
                     {
@@ -214,11 +245,11 @@ namespace evs.API.Controllers
                         Type = "reg",
                         Redeemed = true
                     };
-               // order.
+                // order.
 
                 var eventureListTypeId = regBundle.eventureListTypeId;
                 order.Registrations.Add(registration);
-                
+
                 foreach (var answerBundle in regBundle.answers)
                 {
                     var answer = new Answer

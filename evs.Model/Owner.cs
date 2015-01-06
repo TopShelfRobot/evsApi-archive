@@ -68,6 +68,11 @@ namespace evs.Model
         public string RegisterButtonText { get; set; }
         public string ConfirmButtonText { get; set; }
 
+         public bool IsRegistrationOnProfile { get; set; }
+         public bool IsTeamRegistrationOnProfile { get; set; }
+         public bool IsParticipantOnProfile { get; set; }
+         public bool IsCaptainOnProfile { get; set; }
+
         public string FacebookAppId { get; set; }
         public string FacebookAppSecretId { get; set; }
     }

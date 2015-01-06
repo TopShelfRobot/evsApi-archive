@@ -95,7 +95,12 @@ namespace evs.API.Controllers
                    o.MultiParticipantDiscountAmount,
                    o.MultiParticipantDiscountAmountType,
                    o.MultiRegistrationDiscountAmount,
-                   o.MultiRegistrationDiscountAmountType
+                   o.MultiRegistrationDiscountAmountType,
+
+                   o.IsRegistrationOnProfile,
+                   o.IsTeamRegistrationOnProfile,
+                   o.IsParticipantOnProfile,
+                   o.IsCaptainOnProfile
                }).ToList();
         }
 
