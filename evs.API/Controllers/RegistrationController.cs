@@ -120,7 +120,8 @@ namespace evs.API.Controllers
                             r.EventureOrder.Amount,
                             r.EventureList.DisplayName,
                             groupName = r.EventureGroup.Name ?? " ",
-                            participant = r.Participant.FirstName + " " + r.Participant.LastName
+                            participant = r.Participant.FirstName + " " + r.Participant.LastName,
+                            orderDate = r.EventureOrder.DateCreated
                         }).ToList();
 
         }

@@ -443,10 +443,6 @@ namespace evs30Api.Controllers
                 //}
                 ////only for testing
                 //TempData["Message"] = resetLink;
-
-
-
-
             }
             else
             {

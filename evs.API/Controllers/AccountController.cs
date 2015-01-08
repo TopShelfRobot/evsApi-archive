@@ -20,6 +20,7 @@ using evs.API.Results;
 using System.Web.Routing;
 //using System.Net.Http.
 using evs.Service;
+using System.Configuration;
 
 namespace evs.API.Controllers
 {
@@ -460,6 +461,7 @@ namespace evs.API.Controllers
         [HttpPost]
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
+        [Route("ForgotPassword")]
         public async Task<IHttpActionResult> ForgotPassword(ForgotPasswordViewModel model)    //(ForgotPasswordViewModel model)
         {
             //if (!ModelState.IsValid)
@@ -483,10 +485,18 @@ namespace evs.API.Controllers
 
             //var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
             //string callbackUrl = this.Url.Link("ResetPassword", new { userId = user.Id, code = code });   //, protocol: Request.Url.Scheme
-            var callbackUrl = "http://localhost:65468/#/resetpassword?userId=" + code;
+            //var callbackUrl = "http://localhost:65468/#/resetpassword?userId=" + code;
+            var callbackUrl = ConfigurationManager.AppSettings["resetPasswordLink"] + "/#/resetpassword?userId=" + code;
+
+            //ConfigurationManager.AppSettings["resetPasswordLink"];
+
             //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>")
             //await _repo.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
-            _mailService.SendResetPassword(user.UserName, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
+            //mjb _mailService.SendResetPassword(user.UserName, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
+
+            HttpResponseMessage result = new MailController().SendResetPassword(user.UserName, callbackUrl);
+
+
 
             //ViewBag.Link = callbackUrl;
             //return View("ForgotPasswordConfirmation");

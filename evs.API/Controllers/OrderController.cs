@@ -9,6 +9,7 @@ using System.Web.Http;
 using evs.Model;
 using evs.Service;
 using evs.DAL;
+using System.Configuration;
 
 namespace evs.API.Controllers
 {
@@ -144,6 +145,14 @@ namespace evs.API.Controllers
                     //not good return reason
                     OrderService _orderService = new OrderService();
                     var x = _orderService.CreateOrder(order);
+
+                    HttpResponseMessage result;
+
+                    if (ConfigurationManager.AppSettings["CustomName"] == "bourbonchase")
+                        result = new MailController().SendBourbonLotteryConfirm(order.Id);
+                    else
+                        result = new MailController().SendConfirmMail(order.Id);
+                    //HttpResponseMessage result = new MailController().SendTestEmail();
 
                     var resp = Request.CreateResponse(HttpStatusCode.OK);
                     //resp.Content = new StringContent();

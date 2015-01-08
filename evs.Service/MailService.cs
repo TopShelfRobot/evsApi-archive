@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+//using System.Net.Mail;
+//using Amazon.SimpleEmail.Model;
+
 using System;
 using System.Net;
 using System.Net.Mail;
@@ -22,7 +25,7 @@ namespace evs.Service
         {
             // _modelState = modelState;
             //_repository = repository;
-            
+
         }
 
         public bool SendResetPassword(string email, string subject, string body)
@@ -48,7 +51,7 @@ namespace evs.Service
             //Add the HTML and Text bodies
             //myMessage.Html = "<p>Hello World!</p>";
             //myMessage.Text = "Hello World plain text!";
-         
+
 
             // Create network credentials to access your SendGrid account.
             var username = "boone10";
@@ -73,12 +76,10 @@ namespace evs.Service
             // Send the email.
             transportWeb.Deliver(myMessage);
 
-
-
             return true;
         }
 
- public bool SendConfirmEmail(string email, string subject, string body)
+        public bool SendConfirmEmail(string email, string subject, string body)
         {
             var myMessage = new SendGridMessage();
 
@@ -101,7 +102,7 @@ namespace evs.Service
             //Add the HTML and Text bodies
             //myMessage.Html = "<p>Hello World!</p>";
             //myMessage.Text = "Hello World plain text!";
-         
+
 
             // Create network credentials to access your SendGrid account.
             var username = "boone10";
@@ -131,7 +132,7 @@ namespace evs.Service
             return true;
         }
 
-
+       
         //private string BuildConfirmMail(int id)
         //{
         //    //needs to be a send amazon email
@@ -259,11 +260,11 @@ namespace evs.Service
             {
                 transportWeb.Deliver(myMessage);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var test = ex.Message;
             }
-            
+
             return true;
         }
 
