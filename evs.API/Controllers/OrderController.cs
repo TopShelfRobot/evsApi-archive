@@ -155,24 +155,14 @@ namespace evs.API.Controllers
                 };
 
                 place = 5;
-                //var stripeCustomerService = new StripeCustomerService(owner.AccessToken);
-                //var customer = stripeCustomerService.Create(customerOptions);
-
-                //var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
-                //var stripeChargeOption = new StripeChargeCreateOptions()
-                //{
-                //    AmountInCents = Convert.ToInt32(order.Amount * 100),
-                //    Currency = "usd",
-                //    CustomerId = customer.Id,
-                //    Description = owner.Name,
-                //    ApplicationFeeInCents = order.LocalApplicationFee
-                //};
+                
                 var stripeCharge = stripeChargeService.Create(stripeChargeOption);
 
                 place = 6;
 
 
-                if (string.IsNullOrEmpty(stripeCharge.FailureCode))
+                //if (string.IsNullOrEmpty(stripeCharge.FailureCode))
+                if (place == 9)
                 {
                     //orderService.CompleteOrder(stripeCharge)
                     order.AuthorizationCode = stripeCharge.Id;
@@ -228,13 +218,10 @@ namespace evs.API.Controllers
                     logE.DateCreated = System.DateTime.Now.ToLocalTime();
                     db.EventureLogs.Add(logE);
                     db.SaveChanges();
-
-
+                    
                     var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
-                    //resp.Content = new StringContent();
                     badResp.Content = new StringContent(stripeCharge.FailureMessage, Encoding.UTF8, "text/plain");
                     return badResp;
-
                 }
             }
             catch (Exception ex)
