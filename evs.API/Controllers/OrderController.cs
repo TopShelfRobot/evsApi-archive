@@ -161,8 +161,7 @@ namespace evs.API.Controllers
                 place = 6;
 
 
-                //if (string.IsNullOrEmpty(stripeCharge.FailureCode))
-                if (place == 9)
+                if (string.IsNullOrEmpty(stripeCharge.FailureCode))
                 {
                     //orderService.CompleteOrder(stripeCharge)
                     order.AuthorizationCode = stripeCharge.Id;
@@ -239,11 +238,18 @@ namespace evs.API.Controllers
                 //var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, x.ToString());
                 //return badResponse;
 
+                string message = ex.Message;
+                string returnMessage = string.Empty;
+
+                if (message.Substring(0, 4) == "Your")
+                    returnMessage = ex.Message;
+                else
+                    returnMessage = "There was problem processing your order.  Please Try again.";
+
                 var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
                 //resp.Content = new StringContent();
-                badResp.Content = new StringContent("There was a problem with your order.  Please try again", Encoding.UTF8, "text/plain");
+                badResp.Content = new StringContent(returnMessage, Encoding.UTF8, "text/plain");
                 return badResp;
-
             }
 
 

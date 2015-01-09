@@ -224,6 +224,7 @@ namespace evs.API.Controllers
                            o.Id,
                            o.DateCreated,
                            r.EventureList.DisplayName,
+                           r.EventureGroup.Name,
                            p.FirstName,
                            p.LastName,
                            r.Quantity,
@@ -246,7 +247,7 @@ namespace evs.API.Controllers
             //string carriageReturn = "<BR>";
             string orderNum = string.Empty;
             string houseEmail = string.Empty;
-            string lineItems = "<TABLE cellpadding=\"8\" cellspacingBono=\"8\"><tr><td>Events</td><td>Listings</td><td>Participants</td><td>Quantity</td><td>Price</td></tr>";
+            string lineItems = "<TABLE cellpadding=\"8\" cellspacingBono=\"8\"><tr><td>Events</td><td>Division</td><td>Participants</td><td>Quantity</td><td>Price</td></tr>";
             int numReg = 0;
             decimal orderAmount = 0;
 
@@ -255,7 +256,7 @@ namespace evs.API.Controllers
                 houseName = reg.houseFirst + " " + reg.houseLast;
                 orderNum = Convert.ToString(reg.Id);
 
-                lineItems = lineItems + "<TR><TD>" + reg.DisplayHeading + "</TD><TD>" + reg.DisplayName + "</TD><TD>" +
+                lineItems = lineItems + "<TR><TD>" + reg.DisplayHeading + "</TD><TD>" + reg.Name + "</TD><TD>" +
                             reg.FirstName + " " + reg.LastName + "</TD><TD Align=\"right\">" + reg.Quantity + "</TD><TD Align=\"right\">" + reg.ListAmount + "</TD></TR>";
                 numReg = numReg + reg.regQuantity;
                 orderAmount = orderAmount + (reg.ListAmount * reg.Quantity);
