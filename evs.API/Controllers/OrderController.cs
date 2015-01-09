@@ -103,10 +103,6 @@ namespace evs.API.Controllers
 
 
 
-                //if (order.Amount > 0)
-                //{
-
-
                 place = 2;
 
                 //calulate
@@ -129,15 +125,15 @@ namespace evs.API.Controllers
 
                 //tring customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee
                 //var stripeCharge = stripeService.CreateCharge(part.Email, part.FirstName + " " + part.LastName, order.Token, owner.AccessToken, owner.Name, order.Amount, order.LocalApplicationFee);
-        //         public StripeCharge CreateCharge(string customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee )
-        //{
+                //         public StripeCharge CreateCharge(string customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee )
+                //{
 
                 place = 3;
 
                 var customerOptions = new StripeCustomerCreateOptions
                 {
                     Email = part.Email, //Email,
-                    Description =  part.FirstName + " " + part.LastName,
+                    Description = part.FirstName + " " + part.LastName,
                     TokenId = order.Token,
                 };
 
@@ -148,7 +144,7 @@ namespace evs.API.Controllers
 
                 //int err = place / (place - place);
 
-                var stripeChargeService = new StripeChargeService( owner.AccessToken); //The token returned from the above method
+                var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
                 var stripeChargeOption = new StripeChargeCreateOptions()
                 {
                     Amount = Convert.ToInt32(order.Amount * 100),
@@ -174,6 +170,7 @@ namespace evs.API.Controllers
                 var stripeCharge = stripeChargeService.Create(stripeChargeOption);
 
                 place = 6;
+
 
                 if (string.IsNullOrEmpty(stripeCharge.FailureCode))
                 {
@@ -220,14 +217,30 @@ namespace evs.API.Controllers
                     //order.Status = stripeCharge.FailureMessage;
                     //db.SaveChanges();
                     //return 
-                    var badResponse = Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);  //stripeCharge.FailureCode
-                    return badResponse;
+                    //var badResponse = Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);  //stripeCharge.FailureCode
+                    //return badResponse;
+
+                    var logE = new EventureLog();
+                    logE.Message = "Stripe Exception: " + stripeCharge.FailureMessage + " -- place: " + place + " -- bundle: " + orderBundle;
+                    logE.Caller = "Order_ERROR_stripe";
+                    logE.Status = "Warning";
+                    logE.LogDate = System.DateTime.Now.ToLocalTime();
+                    logE.DateCreated = System.DateTime.Now.ToLocalTime();
+                    db.EventureLogs.Add(logE);
+                    db.SaveChanges();
+
+
+                    var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
+                    //resp.Content = new StringContent();
+                    badResp.Content = new StringContent(stripeCharge.FailureMessage, Encoding.UTF8, "text/plain");
+                    return badResp;
+
                 }
             }
             catch (Exception ex)
             {
                 var logE = new EventureLog();
-                logE.Message = "Order exception: " + ex.Message + " -- place: "  +  place;
+                logE.Message = "Order exception: " + ex.Message + " -- place: " + place + " -- bundle: " + orderBundle;
                 logE.Caller = "Order_ERROR";
                 logE.Status = "ERROR";
                 logE.LogDate = System.DateTime.Now.ToLocalTime();
@@ -235,9 +248,15 @@ namespace evs.API.Controllers
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
 
-                var x = "there was an issue";
-                var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, x.ToString());
-                return badResponse;
+                //var x = "there was an issue";
+                //var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, x.ToString());
+                //return badResponse;
+
+                var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
+                //resp.Content = new StringContent();
+                badResp.Content = new StringContent("There was a problem with your order.  Please try again", Encoding.UTF8, "text/plain");
+                return badResp;
+
             }
 
 
@@ -255,6 +274,95 @@ namespace evs.API.Controllers
 
             //    return badResponse;
             //}
+        }
+
+        [Route("PostZero")]
+        [HttpPost]
+        public HttpResponseMessage CreateZeroAmountOrder(JObject orderBundle)
+        {
+            int place = 0;
+            try
+            {
+                //deserial obj
+                var order = BuildOrder(orderBundle);
+                //validate  //capacity and such
+                //calculate fees
+                place = 1;
+
+                Owner owner = db.Owners.Where(o => o.Id == 1).SingleOrDefault();
+                if (owner == null)
+                {
+                    throw new Exception("Owner Setup is Not Configured Correctly");
+                }
+
+                var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
+                if (part != null)
+                {
+                    //custDesc = part.FirstName + " " + part.LastName + "_ord" + order.Id;
+                    //partEmail = part.Email;
+                    //partName = part.FirstName + " " + part.LastName;
+                }
+                else
+                {
+                    throw new Exception("couldn't find that houseId");
+                }
+
+                place = 2;
+
+                ////orderService.CompleteOrder(stripeCharge)
+                //order.AuthorizationCode = stripeCharge.Id;
+                ////stripeCharge.
+                //order.CardNumber = stripeCharge.StripeCard.Last4;
+                //order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
+                //order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
+                //order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
+                ////order.CardId = stripeCharge.StripeCard.;
+                //order.CardName = stripeCharge.StripeCard.Name;
+                //order.CardOrigin = stripeCharge.StripeCard.Country;
+                //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
+                order.Voided = false;
+                order.Status = "Complete";
+                //mjb fix order.PaymentType = "credit";
+                //db.Orders.Add(order);
+                //db.SaveChanges();
+
+                place = 7;
+
+                //not good return reason
+                OrderService _orderService = new OrderService();
+                var x = _orderService.CreateOrder(order);
+
+                place = 8;
+
+                HttpResponseMessage result;
+
+                if (ConfigurationManager.AppSettings["CustomName"] == "bourbonchase")
+                    result = new MailController().SendBourbonLotteryConfirm(order.Id);
+                else
+                    result = new MailController().SendConfirmMail(order.Id);
+                //HttpResponseMessage result = new MailController().SendTestEmail();
+
+                var resp = Request.CreateResponse(HttpStatusCode.OK);
+                //resp.Content = new StringContent();
+                resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
+                return resp;
+            }
+            catch (Exception ex)
+            {
+                var logE = new EventureLog();
+                logE.Message = "Order exception: " + ex.Message + " -- place: " + place + " -- bundle: " + orderBundle;
+                logE.Caller = "OrderZERo_ERROR";
+                logE.Status = "ERROR";
+                logE.LogDate = System.DateTime.Now.ToLocalTime();
+                logE.DateCreated = System.DateTime.Now.ToLocalTime();
+                db.EventureLogs.Add(logE);
+                db.SaveChanges();
+
+                var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
+                //resp.Content = new StringContent();
+                badResp.Content = new StringContent("There was a problem with your order.  Please try again", Encoding.UTF8, "text/plain");
+                return badResp;
+            }
         }
 
 

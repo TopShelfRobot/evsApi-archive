@@ -303,9 +303,9 @@ namespace evs.API.Controllers
                 var owner = db.Owners.Where(o => o.Id == ownerId).SingleOrDefault();
                 subjectText = owner.SendConfirmEmailSubject;
                 sender = owner.SendMailEmailAddress;
-                ccs.Add("boone@eventuresports.com");
-                //ccs.Add("podaniel@firstegg.com");
-                //ccs.Add(sender);
+                bcc.Add("boone@eventuresports.com");
+                bcc.Add("podaniel@firstegg.com");
+                bcc.Add(sender);
                 emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>";
                 //emailText = owner.SendImageHtml;
             }
@@ -337,7 +337,7 @@ namespace evs.API.Controllers
             Destination destination = new Destination();
             destination.ToAddresses = addresses;
             //destination.CcAddresses = ccs;
-            //destination.BccAddresses = bcc;
+            destination.BccAddresses = bcc;
 
             Body body = new Body() { Html = new Content(emailText) };
             Content subject = new Content(subjectText);

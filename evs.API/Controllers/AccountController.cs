@@ -34,7 +34,15 @@ namespace evs.API.Controllers
         {
             _repo = new AuthRepository();
             _mailService = new MailService();
+ 
         }
+
+        //public AccountController(UserManager<ApplicationUser> userManager)
+        //{
+        //    UserManager = userManager;
+        //    var userValidator = UserManager.UserValidator as UserValidator<ApplicationUser>;
+        //    userValidator.AllowOnlyAlphanumericUserNames = false;
+        //}
 
         private IAuthenticationManager Authentication
         {
