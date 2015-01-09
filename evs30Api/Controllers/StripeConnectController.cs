@@ -14,6 +14,7 @@ namespace evs30Api.Controllers
 {
     //[Authorize]
     //[InitializeSimpleMembership]
+    [RoutePrefix("api/stripeConnect")]
     public class StripeConnectController : ApiController
     {
         private evsContext db = new evsContext();
@@ -33,6 +34,7 @@ namespace evs30Api.Controllers
         [HttpGet]
         //[AllowAnonymous]
         //[System.Web.Mvc.ValidateAntiForgeryToken]
+        [Route("StripeResponse")]
         public HttpResponseMessage StripeResponse()  //Int32 OwnerId
         {
             try

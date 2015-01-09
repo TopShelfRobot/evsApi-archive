@@ -124,7 +124,8 @@ namespace evs30Api.Controllers
                         Message = "Error Handler: " + ex.Message,
                         Caller = "Mail Api_SendPasswordReset",
                         Status = "ERROR",
-                        LogDate = System.DateTime.Now.ToLocalTime()
+                        LogDate = System.DateTime.Now.ToLocalTime(),
+                        DateCreated = System.DateTime.Now.ToLocalTime()
                     };
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
@@ -177,7 +178,8 @@ namespace evs30Api.Controllers
                     Message = "Error Handler: " + ex.Message,
                     Caller = "Mail Api_SendWelcomeEmail",
                     Status = "ERROR",
-                    LogDate = System.DateTime.Now.ToLocalTime()
+                    LogDate = System.DateTime.Now.ToLocalTime(),
+                    DateCreated = System.DateTime.Now.ToLocalTime()
                 };
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
@@ -234,7 +236,8 @@ namespace evs30Api.Controllers
                     Message = "Error Handler: " + ex.Message,
                     Caller = "Mail Api_SendWelcomeEmail",
                     Status = "ERROR",
-                    LogDate = System.DateTime.Now.ToLocalTime()
+                    LogDate = System.DateTime.Now.ToLocalTime(),
+                    DateCreated = System.DateTime.Now.ToLocalTime()
                 };
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
@@ -305,7 +308,8 @@ namespace evs30Api.Controllers
                     Message = "Error Handler: " + ex.Message,
                     Caller = "Mail Api_SendWelcomeEmail",
                     Status = "ERROR",
-                    LogDate = System.DateTime.Now.ToLocalTime()
+                    LogDate = System.DateTime.Now.ToLocalTime(),
+                    DateCreated = System.DateTime.Now.ToLocalTime()
                 };
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
@@ -354,7 +358,8 @@ namespace evs30Api.Controllers
                     Message = "Error Handler: " + ex.Message,
                     Caller = "Mail Api_SendInfoMessage",
                     Status = "ERROR",
-                    LogDate = System.DateTime.Now.ToLocalTime()
+                    LogDate = System.DateTime.Now.ToLocalTime(),
+                    DateCreated = System.DateTime.Now.ToLocalTime()
                 };
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
@@ -502,6 +507,7 @@ namespace evs30Api.Controllers
                     log.Caller = "Mail Api_SendConfirmMail";
                     log.Status = "Error";
                     log.LogDate = System.DateTime.Now.ToLocalTime();
+                    log.DateCreated = System.DateTime.Now.ToLocalTime();
                     db.EventureLogs.Add(log);
                     db.SaveChanges();
                     if (Request != null)
@@ -520,6 +526,7 @@ namespace evs30Api.Controllers
                 logE.Caller = "Mail Api_SendConfirmMail";
                 logE.Status = "ERROR";
                 logE.LogDate = System.DateTime.Now.ToLocalTime();
+                logE.DateCreated = System.DateTime.Now.ToLocalTime();
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
 

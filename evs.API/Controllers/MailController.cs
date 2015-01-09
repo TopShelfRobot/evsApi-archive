@@ -275,10 +275,6 @@ namespace evs.API.Controllers
 
             lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
             lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + "Total" + "</TD><TD></TD><TD Align=\"right\">" + orderAmount + "</TD></TR>";
-
-
-
-
             lineItems = lineItems + "</TABLE>";
 
             //string numOfRegs = Convert.ToString(numReg);
@@ -302,16 +298,15 @@ namespace evs.API.Controllers
             }
             else
             {
-
                 addresses.Add(houseEmail);
 
                 var owner = db.Owners.Where(o => o.Id == ownerId).SingleOrDefault();
                 subjectText = owner.SendConfirmEmailSubject;
                 sender = owner.SendMailEmailAddress;
                 ccs.Add("boone@eventuresports.com");
-                ccs.Add("podaniel@firstegg.com");
-                ccs.Add(sender);
-                emailText = "<img src=\"http://demo30.eventuresports.info/content/images/logo.png\"><br><br>";
+                //ccs.Add("podaniel@firstegg.com");
+                //ccs.Add(sender);
+                emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>";
                 //emailText = owner.SendImageHtml;
             }
             emailText = emailText + "Order Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
@@ -331,7 +326,7 @@ namespace evs.API.Controllers
             //addresses.Add(email);
             subjectText = "The Bourbon Chase - 2015 Lottery";
             sender = "mike@bourbonchase.com";
-            emailText = emailText + "<br><br> Thank you for submitting an application for this fall's The Bourbon Chase.  "
+            emailText = emailText + "<br><br> Thank you for submitting an application for this fall's Bourbon Chase.  "
             + "You will be notified of your team's status by February 2, 2015.  <p>We hope to see you on the course in October!</p>";
 
             emailText = emailText + "<BR>" + lineItems + "<br><br>Mike Kuntz<br>The Bourbon Chase";
@@ -374,9 +369,9 @@ namespace evs.API.Controllers
             var bcc = new List<string>();
             
             addresses.Add(email);
-            subjectText = "Sports Commission Reset Password";
-            sender = "boone.mike@gmail.com";
-            emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>" + callbackUrl;
+            subjectText = "Bourbon Chase Reset Password";
+            sender = "mike@bourbonchase.com";
+            emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>" + callbackUrl;
 
             //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
             var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
@@ -391,7 +386,7 @@ namespace evs.API.Controllers
             Message message = new Message(subject, body);
 
             //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
-            SendEmailRequest sendEmailRequest = new SendEmailRequest("boone.mike@gmail.com", destination, message);
+            SendEmailRequest sendEmailRequest = new SendEmailRequest("mike@bourbonchase.com", destination, message);
             ses.SendEmail(sendEmailRequest);
             //ccs and bcc seem to be reversed
 
@@ -525,6 +520,7 @@ namespace evs.API.Controllers
                 logE.Caller = "Mail Api_SendConfirmMail";
                 logE.Status = "ERROR";
                 logE.LogDate = System.DateTime.Now.ToLocalTime();
+                logE.DateCreated = System.DateTime.Now.ToLocalTime();
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
 

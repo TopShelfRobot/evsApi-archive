@@ -10,6 +10,7 @@ using evs.Model;
 using evs.Service;
 using evs.DAL;
 using System.Configuration;
+using Stripe;
 
 namespace evs.API.Controllers
 {
@@ -61,6 +62,8 @@ namespace evs.API.Controllers
 
             //transactionStatus = _studentService.CreateStudent(stundentBo);
 
+            int place = 0;
+
             try
             {
 
@@ -72,6 +75,8 @@ namespace evs.API.Controllers
                 //validate  //capacity and such
 
                 //calculate fees
+
+                place = 1;
 
 
                 Owner owner = db.Owners.Where(o => o.Id == 1).SingleOrDefault();
@@ -102,6 +107,8 @@ namespace evs.API.Controllers
                 //{
 
 
+                place = 2;
+
                 //calulate
                 order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
                 order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
@@ -118,10 +125,55 @@ namespace evs.API.Controllers
                 //if good
                 //record charege
                 //create order
-                StripeService stripeService = new StripeService();
+                //StripeService stripeService = new StripeService();
 
                 //tring customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee
-                var stripeCharge = stripeService.CreateCharge(part.Email, part.FirstName + " " + part.LastName, order.Token, owner.AccessToken, owner.Name, order.Amount, order.LocalApplicationFee);
+                //var stripeCharge = stripeService.CreateCharge(part.Email, part.FirstName + " " + part.LastName, order.Token, owner.AccessToken, owner.Name, order.Amount, order.LocalApplicationFee);
+        //         public StripeCharge CreateCharge(string customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee )
+        //{
+
+                place = 3;
+
+                var customerOptions = new StripeCustomerCreateOptions
+                {
+                    Email = part.Email, //Email,
+                    Description =  part.FirstName + " " + part.LastName,
+                    TokenId = order.Token,
+                };
+
+                var stripeCustomerService = new StripeCustomerService(owner.AccessToken);   //owner.AccessToken
+                var customer = stripeCustomerService.Create(customerOptions);
+
+                place = 4;
+
+                //int err = place / (place - place);
+
+                var stripeChargeService = new StripeChargeService( owner.AccessToken); //The token returned from the above method
+                var stripeChargeOption = new StripeChargeCreateOptions()
+                {
+                    Amount = Convert.ToInt32(order.Amount * 100),
+                    Currency = "usd",
+                    CustomerId = customer.Id,
+                    Description = owner.Name,
+                    ApplicationFee = order.LocalApplicationFee
+                };
+
+                place = 5;
+                //var stripeCustomerService = new StripeCustomerService(owner.AccessToken);
+                //var customer = stripeCustomerService.Create(customerOptions);
+
+                //var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
+                //var stripeChargeOption = new StripeChargeCreateOptions()
+                //{
+                //    AmountInCents = Convert.ToInt32(order.Amount * 100),
+                //    Currency = "usd",
+                //    CustomerId = customer.Id,
+                //    Description = owner.Name,
+                //    ApplicationFeeInCents = order.LocalApplicationFee
+                //};
+                var stripeCharge = stripeChargeService.Create(stripeChargeOption);
+
+                place = 6;
 
                 if (string.IsNullOrEmpty(stripeCharge.FailureCode))
                 {
@@ -142,9 +194,13 @@ namespace evs.API.Controllers
                     //db.Orders.Add(order);
                     //db.SaveChanges();
 
+                    place = 7;
+
                     //not good return reason
                     OrderService _orderService = new OrderService();
                     var x = _orderService.CreateOrder(order);
+
+                    place = 8;
 
                     HttpResponseMessage result;
 
@@ -164,16 +220,24 @@ namespace evs.API.Controllers
                     //order.Status = stripeCharge.FailureMessage;
                     //db.SaveChanges();
                     //return 
-                    var badResponse = Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
+                    var badResponse = Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);  //stripeCharge.FailureCode
                     return badResponse;
                 }
             }
             catch (Exception ex)
             {
-                var x = ex.InnerException;
+                var logE = new EventureLog();
+                logE.Message = "Order exception: " + ex.Message + " -- place: "  +  place;
+                logE.Caller = "Order_ERROR";
+                logE.Status = "ERROR";
+                logE.LogDate = System.DateTime.Now.ToLocalTime();
+                logE.DateCreated = System.DateTime.Now.ToLocalTime();
+                db.EventureLogs.Add(logE);
+                db.SaveChanges();
+
+                var x = "there was an issue";
                 var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, x.ToString());
                 return badResponse;
-
             }
 
 

@@ -293,7 +293,8 @@ namespace evs.API.Controllers
                         Message = "Error Handler: " + ex.Message + "\n\n" + ex.InnerException,
                         Caller = "Payment_Post",
                         Status = "ERROR",
-                        LogDate = System.DateTime.Now.ToLocalTime()
+                        LogDate = System.DateTime.Now.ToLocalTime(),
+                        DateCreated = System.DateTime.Now.ToLocalTime()
                     };
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
@@ -330,6 +331,7 @@ namespace evs.API.Controllers
             log.Caller = "Manual Payment";
             log.Status = "Info";
             log.LogDate = System.DateTime.Now.ToLocalTime();
+            log.DateCreated = System.DateTime.Now.ToLocalTime();
             db.EventureLogs.Add(log);
             db.SaveChanges();
 
@@ -533,7 +535,8 @@ namespace evs.API.Controllers
                     Message = "Error Handler: " + ex.Message + "\n\n" + ex.InnerException,
                     Caller = "Manual_Payment_Post",
                     Status = "ERROR",
-                    LogDate = System.DateTime.Now.ToLocalTime()
+                    LogDate = System.DateTime.Now.ToLocalTime(),
+                    DateCreated = System.DateTime.Now.ToLocalTime()
                 };
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
@@ -766,7 +769,8 @@ namespace evs.API.Controllers
                     Message = "Error Handler: " + ex.Message + "\n\n" + ex.InnerException,
                     Caller = "Payment_Post",
                     Status = "ERROR",
-                    LogDate = System.DateTime.Now.ToLocalTime()
+                    LogDate = System.DateTime.Now.ToLocalTime(),
+                    DateCreated = System.DateTime.Now.ToLocalTime()
                 };
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
@@ -1138,7 +1142,8 @@ namespace evs.API.Controllers
                     Message = "Error Handler: " + ex.Message + "\n\n" + ex.InnerException + " -- bundle: " + saveBundle,
                     Caller = "Payment_PostTeam",
                     Status = "ERROR",
-                    LogDate = System.DateTime.Now.ToLocalTime()
+                    LogDate = System.DateTime.Now.ToLocalTime(),
+                    DateCreated = System.DateTime.Now.ToLocalTime()
                 };
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();

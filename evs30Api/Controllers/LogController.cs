@@ -21,6 +21,7 @@ namespace evs30Api.Controllers
             log.Caller = "StripePayment";
             log.Status = "Info";
             log.LogDate = System.DateTime.Now.ToLocalTime();
+            log.DateCreated = System.DateTime.Now.ToLocalTime();
             db.EventureLogs.Add(log);
             db.SaveChanges();
         }
