@@ -292,19 +292,18 @@ namespace evs.API.Controllers
 
             if (mode == "TEST")
             {
-                addresses.Add("boone@firstegg.com");
+                addresses.Add("boone@eventuresports.com");
                 subjectText = "TEST: Eventure Sports Confirmation";
-                sender = "boone@eventuresports.com";
+                sender = "boone@firstegg.com";
                 emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>";
             }
             else
             {
                 addresses.Add(houseEmail);
-
                 var owner = db.Owners.Where(o => o.Id == ownerId).SingleOrDefault();
                 subjectText = owner.SendConfirmEmailSubject;
                 sender = owner.SendMailEmailAddress;
-                bcc.Add("boone@eventuresports.com");
+                bcc.Add("boone@firstegg.com");
                 bcc.Add("podaniel@firstegg.com");
                 bcc.Add(sender);
                 emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>";
