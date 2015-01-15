@@ -134,11 +134,11 @@ namespace evs.API.Controllers
                    var owner = db.Owners.Where(o => o.Id == ownerId).SingleOrDefault();
                    subjectText = owner.SendConfirmEmailSubject;
                     sender = owner.SendMailEmailAddress;
-                    ccs.Add("boone@eventuresports.com");
-                    ccs.Add("podaniel@firstegg.com");
-                    ccs.Add(sender);
+                    bcc.Add("boone@eventuresports.com");
+                    bcc.Add("podaniel@firstegg.com");
+                    bcc.Add(sender);
                     ////emailText = "<img src=\"https://reg.headfirstperformance.com/Content/images/logo.png\"><br><br>";
-                    //emailText = owner.SendImageHtml;
+                    emailText = owner.SendImageHtml;
                 }
                 emailText = emailText + "Order Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
                 emailText = emailText + "Dear " + houseName + ",<BR><BR>Thank you for purchasing your registration. This email serves as your receipt. Your confirmation number is " + orderNum + ". <BR><BR><BR>You have been charged for the following:";
@@ -358,7 +358,8 @@ namespace evs.API.Controllers
 
         }
 
-        public HttpResponseMessage SendResetPassword(string email, string callbackUrl)
+
+        public HttpResponseMessage SendResetPasswordBourbon(string email, string callbackUrl)
         {
             var addresses = new List<string>();
             //var mode = ConfigurationManager.AppSettings["MailMode"];
@@ -367,7 +368,7 @@ namespace evs.API.Controllers
             var sender = string.Empty;
             var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
             var bcc = new List<string>();
-            
+
             addresses.Add(email);
             subjectText = "Bourbon Chase Reset Password";
             sender = "mike@bourbonchase.com";
@@ -387,6 +388,48 @@ namespace evs.API.Controllers
 
             //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
             SendEmailRequest sendEmailRequest = new SendEmailRequest("mike@bourbonchase.com", destination, message);
+            ses.SendEmail(sendEmailRequest);
+            //ccs and bcc seem to be reversed
+
+            //if (mail.ErrorException == null)
+            //if ses.
+            //{
+            if (Request != null)
+                return Request.CreateResponse(HttpStatusCode.OK);
+            else
+                return new HttpResponseMessage(HttpStatusCode.OK);
+
+        }
+
+        public HttpResponseMessage SendResetPassword(string email, string callbackUrl)
+        {
+            var addresses = new List<string>();
+            //var mode = ConfigurationManager.AppSettings["MailMode"];
+            var emailText = string.Empty;
+            var subjectText = string.Empty;
+            var sender = string.Empty;
+            var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
+            var bcc = new List<string>();
+            
+            addresses.Add(email);
+            subjectText = "US Open Fatbike Beach Championships Reset Password";
+            sender = "shawn@bikecycleshop.com";
+            emailText = "<img src=\"https://triwilmington.eventuresports.com/content/images/logo.png\"><br><br>" + callbackUrl;
+
+            //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
+            var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
+
+            Destination destination = new Destination();
+            destination.ToAddresses = addresses;
+            //destination.CcAddresses = ccs;
+            //destination.BccAddresses = bcc;
+
+            Body body = new Body() { Html = new Content(emailText) };
+            Content subject = new Content(subjectText);
+            Message message = new Message(subject, body);
+
+            //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
+            SendEmailRequest sendEmailRequest = new SendEmailRequest("shawn@bikecycleshop.com", destination, message);
             ses.SendEmail(sendEmailRequest);
             //ccs and bcc seem to be reversed
 

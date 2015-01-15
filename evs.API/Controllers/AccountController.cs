@@ -21,6 +21,8 @@ using System.Web.Routing;
 //using System.Net.Http.
 using evs.Service;
 using System.Configuration;
+using System.Text;
+using evs.DAL;
 
 namespace evs.API.Controllers
 {
@@ -34,7 +36,7 @@ namespace evs.API.Controllers
         {
             _repo = new AuthRepository();
             _mailService = new MailService();
- 
+
         }
 
         //public AccountController(UserManager<ApplicationUser> userManager)
@@ -477,51 +479,76 @@ namespace evs.API.Controllers
             //    return BadRequest(ModelState);
             //}
 
-            IdentityUser user = await _repo.FindAsync(model.Email);
-
-            if (user == null)   // || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+            try
             {
-                // User not found.  Don't reveal that the user does not exist or is not confirmed?
+
+                IdentityUser user = await _repo.FindAsync(model.Email);
+
+                if (user == null)   // || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+                {
+                    // User not found.  Don't reveal that the user does not exist or is not confirmed?
+                    return Ok();
+                }
+
+                var code = await _repo.GeneratePasswordResetTokenAsync(user.Id);
+
+                code = System.Web.HttpUtility.UrlEncode(code);
+
+                //var code = System.Web.HttpUtility.urlEncode
+
+                //var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                //string callbackUrl = this.Url.Link("ResetPassword", new { userId = user.Id, code = code });   //, protocol: Request.Url.Scheme
+                //var callbackUrl = "http://localhost:65468/#/resetpassword?userId=" + code;
+                var callbackUrl = ConfigurationManager.AppSettings["resetPasswordLink"] + "/#/resetpassword?userId=" + code;
+
+                //ConfigurationManager.AppSettings["resetPasswordLink"];
+
+                //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>")
+                //await _repo.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
+                //mjb _mailService.SendResetPassword(user.UserName, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
+
+                HttpResponseMessage result = new MailController().SendResetPassword(user.UserName, callbackUrl);
+
+
+
+                //ViewBag.Link = callbackUrl;
+                //return View("ForgotPasswordConfirmation");
+                //IHttpActionResult errorResult = GetErrorResult(result);
+
+                //if (errorResult != null)
+                //{
+                //    return errorResult;
+                //}
+
+                //return Ok();
+                //}
+
+                // If we got this far, something failed, redisplay form
+                //return View(model);
+                //return Ok(accessTokenResponse);
                 return Ok();
+
             }
-
-            var code = await _repo.GeneratePasswordResetTokenAsync(user.Id);
-
-            code = System.Web.HttpUtility.UrlEncode(code);
-
-            //var code = System.Web.HttpUtility.urlEncode
-
-            //var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-            //string callbackUrl = this.Url.Link("ResetPassword", new { userId = user.Id, code = code });   //, protocol: Request.Url.Scheme
-            //var callbackUrl = "http://localhost:65468/#/resetpassword?userId=" + code;
-            var callbackUrl = ConfigurationManager.AppSettings["resetPasswordLink"] + "/#/resetpassword?userId=" + code;
-
-            //ConfigurationManager.AppSettings["resetPasswordLink"];
-
-            //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>")
-            //await _repo.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
-            //mjb _mailService.SendResetPassword(user.UserName, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
-
-            HttpResponseMessage result = new MailController().SendResetPassword(user.UserName, callbackUrl);
+            catch (Exception ex)
+            {
+                evsContext db = new evsContext();
+                var logE = new EventureLog();
+                logE.Message = "Order exception: " + ex.Message +  " -- bundle: ";
+                logE.Caller = "Order_ERROR";
+                logE.Status = "ERROR";
+                logE.LogDate = System.DateTime.Now.ToLocalTime();
+                logE.DateCreated = System.DateTime.Now.ToLocalTime();
+                db.EventureLogs.Add(logE);
+                db.SaveChanges();
 
 
+                //var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
+                //badResp.Content = new StringContent(ex.Message, Encoding.UTF8, "text/plain");
+                //return badResp;
 
-            //ViewBag.Link = callbackUrl;
-            //return View("ForgotPasswordConfirmation");
-            //IHttpActionResult errorResult = GetErrorResult(result);
+                return BadRequest(ex.Message);
 
-            //if (errorResult != null)
-            //{
-            //    return errorResult;
-            //}
-
-            //return Ok();
-            //}
-
-            // If we got this far, something failed, redisplay form
-            //return View(model);
-            //return Ok(accessTokenResponse);
-            return Ok();
+            }
         }
 
 
@@ -543,7 +570,7 @@ namespace evs.API.Controllers
                 // Don't reveal that the user does not exist
                 return Ok();
             }
-            
+
             var result = await _repo.ResetPasswordAsync(user.Id, model.Code, model.Password);
             if (result.Succeeded)
             {

@@ -62,6 +62,7 @@ namespace evs.Model
         public Int32 SortOrder { get; set; }
         public string WaiverText { get; set; }
         public Boolean IsWaiverDisplayed { get; set; }
+        
         //public Boolean IsGroupDisplayed { get; set; }
         public Boolean IsBundle { get; set; }
         public string MinAge { get; set; }
@@ -73,6 +74,8 @@ namespace evs.Model
         //public Int32 Type { get; set; }
         public DateTime DateCreated { get; set; }
         //public Int32? EventureListTypeId { get; set; }  //eventually won't be ?
+
+        public Boolean isGroupRequired { get; set; }
 
 
         // Navigation property 
