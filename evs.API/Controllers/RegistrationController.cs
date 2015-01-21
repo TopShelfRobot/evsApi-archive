@@ -139,6 +139,7 @@ namespace evs.API.Controllers
                      }).ToList();
         }
 
+        [Authorize]
         [HttpGet]
         public object GetTeamMemberPaymentInfoByTeamMemberGuid(Guid id)
         {

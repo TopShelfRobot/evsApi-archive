@@ -74,8 +74,8 @@ namespace evs.Model
         //public Int32 Type { get; set; }
         public DateTime DateCreated { get; set; }
         //public Int32? EventureListTypeId { get; set; }  //eventually won't be ?
-
-        public Boolean isGroupRequired { get; set; }
+        public string PaymentTerms { get; set; }
+        public Boolean IsGroupRequired { get; set; }
 
 
         // Navigation property 
