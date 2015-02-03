@@ -136,7 +136,7 @@ namespace evs.API.Controllers
                 sender = owner.SendMailEmailAddress;
                 bcc.Add("boone@firstegg.com");
                 bcc.Add("podaniel@firstegg.com");
-               // bcc.Add(sender);
+                bcc.Add(sender);
                 emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>";
                 //emailText = owner.SendImageHtml;
             }
@@ -323,6 +323,11 @@ namespace evs.API.Controllers
                 SendEmailRequest sendEmailRequest = new SendEmailRequest(sender, destination, message);
                 ses.SendEmail(sendEmailRequest);
                 //ccs and bcc seem to be reversed
+
+                string x = "test";
+                string y = "ytest";
+                string z = "my dod is " + x + "more shit" + y;
+
 
                 //if (mail.ErrorException == null)
                 //if ses.
@@ -564,7 +569,52 @@ namespace evs.API.Controllers
 
         }
 
-        public HttpResponseMessage SendResetPassword(string email, string callbackUrl)
+        public HttpResponseMessage SendResetPassword(string email, string resetCode)
+        {
+            ownerId = 1;   //this will become an argument when going multi-tenant
+
+            string body = System.IO.File.ReadAllText(HttpContext.Current.Server.MapPath("/Content/EmailTemplates/reset-password.html"));
+
+            var ownerInfo = db.Owners
+               .Where(o => o.Id == ownerId)
+               .Select(o => new
+               {
+                   o.Name,
+                   o.Url,
+                   o.StripeOrderDescription,
+                   o.ConfirmButtonText,
+                   o.RegisterButtonText,
+                   o.MainColor,
+                   o.HoverColor,
+                   o.HighlightColor,
+                   o.NavTextColor
+               });
+
+            //var part = db.Participants
+            //    .Where(p => p.email
+
+            Dictionary<string, string> replaceTokens = new Dictionary<string, string>();
+            replaceTokens.Add("COMPANYNAME", "EVentureYo");
+            replaceTokens.Add("URL", "http://demo30.eventuresports.infp");
+            replaceTokens.Add("NAME", "Mike Boone");
+            replaceTokens.Add("SUPPORTEMAIL", "help@eventuresports.com");
+            replaceTokens.Add("SUPPORTPHONE", "");
+            replaceTokens.Add("RESETPASSWORDURL", "");
+            //replaceTokens.Add("XX", "");
+
+            replaceTokens.Select(a => Body = Body.Replace(string.Concat("{{", a.Key, "}}"), a.Value)).ToList();
+
+            MailService _mailService = new MailService();
+            var x = _mailService.SendResetPassword("boone.mike@gmail.com", "testc butt", Body);
+
+            if (Request != null)
+                return Request.CreateResponse(HttpStatusCode.OK);
+            else
+                return new HttpResponseMessage(HttpStatusCode.OK);
+        
+        }
+
+        public HttpResponseMessage SendResetPassword_old(string email, string callbackUrl)
         {
             var addresses = new List<string>();
             //var mode = ConfigurationManager.AppSettings["MailMode"];
@@ -574,14 +624,11 @@ namespace evs.API.Controllers
             var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
             var bcc = new List<string>();
 
+            subjectText = "Trax Running Reset Password";
+            sender = "info@bg262.com";
+            emailText = "<img src=\"https://traxrunning.eventuresports.com/content/images/logo.png\"><br><br>Please click on the link below to reset your password.<br><br>" + callbackUrl;
+
             addresses.Add(email);
-            subjectText = "US Open Fatbike Beach Championships Reset Password";
-            sender = "shawn@bikecycleshop.com";
-            emailText = "<img src=\"https://triwilmington.eventuresports.com/content/images/logo.png\"><br><br>" + callbackUrl;
-
-            //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
-            var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
-
             Destination destination = new Destination();
             destination.ToAddresses = addresses;
             //destination.CcAddresses = ccs;
@@ -591,8 +638,10 @@ namespace evs.API.Controllers
             Content subject = new Content(subjectText);
             Message message = new Message(subject, body);
 
+            //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
+            var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
             //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
-            SendEmailRequest sendEmailRequest = new SendEmailRequest("shawn@bikecycleshop.com", destination, message);
+            SendEmailRequest sendEmailRequest = new SendEmailRequest(sender, destination, message);
             ses.SendEmail(sendEmailRequest);
             //ccs and bcc seem to be reversed
 
@@ -603,6 +652,33 @@ namespace evs.API.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK);
             else
                 return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        [Route("ForgotPassword")]
+        [HttpPost]
+        public HttpResponseMessage ForgotPassword(JObject jsonBundle)
+        {
+
+            string Body = System.IO.File.ReadAllText(HttpContext.Current.Server.MapPath("/Content/EmailTemplates/reset-password.html"));
+
+            Dictionary<string, string> replaceTokens = new Dictionary<string, string>();
+            replaceTokens.Add("COMPANYNAME", "EVentureYo");
+            replaceTokens.Add("URL", "http://demo30.eventuresports.infp");
+            replaceTokens.Add("NAME", "Mike Boone");
+            replaceTokens.Add("SUPPORTEMAIL", "help@eventuresports.com");
+            replaceTokens.Add("SUPPORTPHONE", "");
+            replaceTokens.Add("RESETPASSWORDURL", "");
+            //replaceTokens.Add("XX", "");
+
+            replaceTokens.Select(a => Body = Body.Replace(string.Concat("{{", a.Key, "}}"), a.Value)).ToList();
+            
+            MailService _mailService = new MailService();
+            var x = _mailService.SendResetPassword("boone.mike@gmail.com", "testc butt", Body);
+
+            if (Request != null)
+                return Request.CreateResponse(HttpStatusCode.OK);
+            else
+            return new HttpResponseMessage(HttpStatusCode.OK);
 
         }
 

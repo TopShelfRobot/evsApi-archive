@@ -60,7 +60,11 @@ namespace evs.API.Controllers
                    o.StripeCheckoutButtonText,
                    o.StripeOrderDescription, 
                    o.ConfirmButtonText, 
-                   o.RegisterButtonText
+                   o.RegisterButtonText,
+                   o.MainColor,
+                   o.HoverColor,
+                   o.HighlightColor,
+                   o.NavTextColor
                }).ToList();
         }
 

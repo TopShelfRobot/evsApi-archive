@@ -499,15 +499,15 @@ namespace evs.API.Controllers
                 //var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                 //string callbackUrl = this.Url.Link("ResetPassword", new { userId = user.Id, code = code });   //, protocol: Request.Url.Scheme
                 //var callbackUrl = "http://localhost:65468/#/resetpassword?userId=" + code;
-                var callbackUrl = ConfigurationManager.AppSettings["resetPasswordLink"] + "/#/resetpassword?userId=" + code;
-
+                //var callbackUrl = ConfigurationManager.AppSettings["resetPasswordLink"] + "/#/resetpassword?userId=" + code;
+                
                 //ConfigurationManager.AppSettings["resetPasswordLink"];
 
                 //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>")
                 //await _repo.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
                 //mjb _mailService.SendResetPassword(user.UserName, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
 
-                HttpResponseMessage result = new MailController().SendResetPassword(user.UserName, callbackUrl);
+                HttpResponseMessage result = new MailController().SendResetPassword(user.UserName, code;
 
 
 

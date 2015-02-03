@@ -75,6 +75,13 @@ namespace evs.Model
 
         public string FacebookAppId { get; set; }
         public string FacebookAppSecretId { get; set; }
+
+        public string MainColor { get; set; }
+        public string HoverColor { get; set; }
+        public string HighlightColor { get; set; }
+        public string NavTextColor { get; set; }
+
+
     }
 
     public class EventureClient
