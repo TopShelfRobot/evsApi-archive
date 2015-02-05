@@ -64,7 +64,8 @@ namespace evs.API.Controllers
                    o.MainColor,
                    o.HoverColor,
                    o.HighlightColor,
-                   o.NavTextColor
+                   o.NavTextColor,
+                   o.LogoImageName
                }).ToList();
         }
 

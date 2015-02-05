@@ -140,6 +140,14 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
+        public IEnumerable<Participant> ParticipantsByHouseId(int houseId)
+        {
+            return _db.Participants
+                        .Where(p => p.HouseId == houseId) //.Where(p => p.Hous)eId = 1);
+                        .OrderBy(p => (p.HouseId == p.Id) ? -1 : 1);   //this should cause the one that is houseID to top
+        }
+
+        [HttpGet]
         public DtoAccess GetOwnerInfo(string email, string ownerGuid)
         {
             //var rList = new List<DtoRevReg>();

@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PhotoManager.cs" />
     <Compile Include="IValidationDictionary.cs" />
     <Compile Include="MailBuilder.cs" />
     <Compile Include="MailService.cs" />

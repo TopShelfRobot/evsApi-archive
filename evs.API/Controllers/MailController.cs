@@ -571,7 +571,7 @@ namespace evs.API.Controllers
 
         public HttpResponseMessage SendResetPassword(string email, string resetCode)
         {
-            ownerId = 1;   //this will become an argument when going multi-tenant
+            var ownerId = 1;   //this will become an argument when going multi-tenant
 
             string body = System.IO.File.ReadAllText(HttpContext.Current.Server.MapPath("/Content/EmailTemplates/reset-password.html"));
 
@@ -602,10 +602,10 @@ namespace evs.API.Controllers
             replaceTokens.Add("RESETPASSWORDURL", "");
             //replaceTokens.Add("XX", "");
 
-            replaceTokens.Select(a => Body = Body.Replace(string.Concat("{{", a.Key, "}}"), a.Value)).ToList();
+            replaceTokens.Select(a => body = body.Replace(string.Concat("{{", a.Key, "}}"), a.Value)).ToList();
 
-            MailService _mailService = new MailService();
-            var x = _mailService.SendResetPassword("boone.mike@gmail.com", "testc butt", Body);
+            //MailService _mailService = new MailService();
+            //var x = _mailService.SendResetPassword("boone.mike@gmail.com", "testc butt", Body);
 
             if (Request != null)
                 return Request.CreateResponse(HttpStatusCode.OK);

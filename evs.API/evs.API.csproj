@@ -305,6 +305,7 @@
     <Compile Include="Controllers\AnalyticController.cs" />
     <Compile Include="Controllers\CouponController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\ImageController.cs" />
     <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\PaymentController.cs" />
     <Compile Include="Controllers\StripeConnectController.cs" />
@@ -329,6 +330,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\Images\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\evs.DAL\evs.DAL.csproj">

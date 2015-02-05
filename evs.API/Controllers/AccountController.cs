@@ -507,7 +507,7 @@ namespace evs.API.Controllers
                 //await _repo.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
                 //mjb _mailService.SendResetPassword(user.UserName, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
 
-                HttpResponseMessage result = new MailController().SendResetPassword(user.UserName, code;
+                HttpResponseMessage result = new MailController().SendResetPassword(user.UserName, code);
 
 
 
