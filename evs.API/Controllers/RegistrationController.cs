@@ -236,6 +236,12 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
+        public IQueryable<UserAgent> UserAgents()
+        {
+            return _contextProvider.Context.UserAgents;
+        }
+
+        [HttpGet]
         public IQueryable<Team> Teams()
         {
             return _contextProvider.Context.Teams;

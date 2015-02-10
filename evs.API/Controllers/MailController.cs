@@ -37,6 +37,14 @@ namespace evs.API.Controllers
 
             int id = (Int32)jsonBundle["orderId"];
 
+            //MailService _mailService = new MailService();
+            //var x = _mailService.SendResetPassword("boone.mike@gmail.com", "testc butt", Body);
+
+            var builder = new evs.Service.MailBuilder();
+
+            var theBody = builder.BuildResetPasswordBody(1);
+            //BuildResetPasswordBody
+
 
             var regs = from o in db.Orders
                        join r in db.Registrations
@@ -238,7 +246,7 @@ namespace evs.API.Controllers
                 //string carriageReturn = "<BR>";
                 string orderNum = string.Empty;
                 string houseEmail = string.Empty;
-                string lineItems = "<TABLE cellpadding=\"8\" cellspacingBono=\"8\"><tr><td>Events</td><td>Listings</td><td>Participants</td><td>Quantity</td><td>Price</td></tr>";
+                string lineItems = "<TABLE cellpadding=\"8\" cellspacing=\"8\"><tr><td>Events</td><td>Listings</td><td>Participants</td><td>Quantity</td><td>Price</td></tr>";
                 int numReg = 0;
                 decimal orderAmount = 0;
 
@@ -285,9 +293,9 @@ namespace evs.API.Controllers
 
                 if (mode == "TEST")
                 {
-                    addresses.Add("boone@eventuresports.com");
+                    addresses.Add("boone@firstegg.com");
                     subjectText = "TEST: Eventure Sports Confirmation";
-                    sender = "boone@eventuresports.com";
+                    sender = "boone@firstegg.com";
                     emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>";
                 }
                 else
@@ -324,9 +332,9 @@ namespace evs.API.Controllers
                 ses.SendEmail(sendEmailRequest);
                 //ccs and bcc seem to be reversed
 
-                string x = "test";
-                string y = "ytest";
-                string z = "my dod is " + x + "more shit" + y;
+                //string x = "test";
+                //string y = "ytest";
+                //string z = "my dod is " + x + "more shit" + y;
 
 
                 //if (mail.ErrorException == null)

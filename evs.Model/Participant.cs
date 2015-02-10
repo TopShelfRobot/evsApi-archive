@@ -41,13 +41,55 @@ namespace evs.Model
 
         public string Position { get; set; }
         public string ShirtSize { get; set; }
-  
+ 
+    }
 
-        //public ICollection<Registration> Registrations { get; set; }
-        //public Registration Registration { get; set; }
-        // public EventureList Listing { get; set; }
-        //public ICollection<Address> Addresses { get; set; }
-        //public EmergencyContact EmergencyContact { get; set; }
-        //public ICollection<Contact> Contacts { get; set; }
+     
+    public class UserAgent
+    {
+        public Int32 Id { get; set; }
+        public Int32 ParticipantId { get; set; }
+
+        [MaxLength(50)]
+        public string BrowserCodeName { get; set; }
+        
+        [MaxLength(50)]
+        public string BrowserName { get; set; }
+        
+        [MaxLength(150)]
+        public string BrowserVersion { get; set; }
+        public Boolean CookiesEnabled { get; set; }
+        
+        [MaxLength(25)]
+        public string Platform { get; set; }
+        
+        [MaxLength(250)]
+        public string Header { get; set; }
+        
+        [MaxLength(50)]
+        public string SystemLanguage { get; set; }
+        
+        [MaxLength(50)]
+        public string Ip { get; set; }
+       
+        [MaxLength(50)]
+        public string Hostname { get; set; }
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
+        
+        [MaxLength(50)]
+        public string City { get; set; }
+        
+        [MaxLength(50)]
+        public string Region { get; set; }
+        
+        [MaxLength(50)]
+        public string Country { get; set; }
+        
+        [MaxLength(50)]
+        public string Phone { get; set; }
+        
+        public Int32 OwnerId { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

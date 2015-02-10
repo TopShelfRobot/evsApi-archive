@@ -140,9 +140,25 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
+        public IEnumerable<Participant> ParticipantsByRegistrationId(int registrationId)
+        //public object ParticipantsByRegistrationId(int registrationId)
+        {
+            //return _contextProvider.Context.Participants
+            //            .Where(p => p.HouseId == houseId) //.Where(p => p.Hous)eId = 1);
+            //            .OrderBy(p => (p.HouseId == p.Id) ? -1 : 1);   //this should cause the one that is houseID to top
+
+            var houseId = _contextProvider.Context.Registrations.Where(r => r.Id == registrationId).Select(r => r.EventureOrder.HouseId).FirstOrDefault();
+
+            return _contextProvider.Context.Participants
+                        .Where(p => p.HouseId == houseId);
+                        //.Select(p => new { p.FirstName, p.LastName, p.Id });
+                        //.OrderBy(p => (p.HouseId == p.Id) ? -1 : 1);   //this should cause the one that is houseID to top 
+        }
+
+        [HttpGet]
         public IEnumerable<Participant> ParticipantsByHouseId(int houseId)
         {
-            return _db.Participants
+            return _contextProvider.Context.Participants
                         .Where(p => p.HouseId == houseId) //.Where(p => p.Hous)eId = 1);
                         .OrderBy(p => (p.HouseId == p.Id) ? -1 : 1);   //this should cause the one that is houseID to top
         }

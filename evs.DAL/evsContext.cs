@@ -76,7 +76,8 @@ namespace evs.DAL
         public DbSet<EventListCharge> EventListCharges { get; set; }
         //public DbSet<SurchargeType> SurchargeTypes { get; set; }
 
-
+        public DbSet<UserAgent> UserAgents { get; set; }
+        
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Client> Clients { get; set; }
 

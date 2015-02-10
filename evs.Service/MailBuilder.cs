@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace evs.Service
 {
-    class MailBuilder
+    public class MailBuilder
     {
 
          //readonly evsContext db = new evsContext();
@@ -19,12 +19,14 @@ namespace evs.Service
 
         }
 
-        //public string BuildResetPasswordBody(Int32 OwnerId)
-        //{
-        //   // string Body = System.IO.File.ReadAllText(Server.MapPath("/Content/EmailTemplates/reset-password.html"));
+        public string BuildResetPasswordBody(Int32 OwnerId)
+        {
+            string Body = System.IO.File.ReadAllText(System.Web.Hosting.HostingEnvironment.MapPath("/Content/EmailTemplates/reset-password.html"));
 
-        //    public static string appDataFolder = HttpContext.Current.Server.MapPath("~/App_Data/");
-        //    return "test";
-        //}
+            //var x = System.Web.
+
+            //public static string appDataFolder = HttpContext.Current.Server.MapPath("~/App_Data/");
+            return Body;
+        }
     }
 }
