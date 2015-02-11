@@ -6,12 +6,10 @@ using System.Net.Http;
 using System.Web.Http;
 using System.IO;
 using System.Reflection;
-//using System.Net.Mail;
 using System.Text;
 using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Newtonsoft.Json.Linq;
 
 using evs.DAL;
@@ -19,6 +17,7 @@ using evs.Model;
 using System.Web;
 using evs.Service;
 //using Amazon.S3;
+//using System.Net.Mail;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 
@@ -29,174 +28,6 @@ namespace evs.API.Controllers
     public class MailController : ApiController
     {
         readonly evsContext db = new evsContext();
-
-        [Route("ResendReceipt")]
-        [HttpPost]
-        public HttpResponseMessage ResendReceipt(JObject jsonBundle)
-        {
-
-            int id = (Int32)jsonBundle["orderId"];
-
-            //MailService _mailService = new MailService();
-            //var x = _mailService.SendResetPassword("boone.mike@gmail.com", "testc butt", Body);
-
-            var builder = new evs.Service.MailBuilder();
-
-            var theBody = builder.BuildResetPasswordBody(1);
-            //BuildResetPasswordBody
-
-
-            var regs = from o in db.Orders
-                       join r in db.Registrations
-                           on o.Id equals r.EventureOrderId
-                       join h in db.Participants
-                           on o.HouseId equals h.Id
-                       join p in db.Participants
-                          on r.ParticipantId equals p.Id
-                       join e in db.Eventures
-                            on r.EventureList.EventureId equals e.Id
-                       where o.Id == id
-                       select new
-                       {
-                           o.Id,
-                           o.DateCreated,
-                           r.EventureList.DisplayName,
-                           r.EventureGroup.Name,
-                           p.FirstName,
-                           p.LastName,
-                           r.Quantity,
-                           r.ListAmount,
-                           partEmail = p.Email,
-                           e.DisplayHeading,
-                           houseFirst = h.FirstName,
-                           houseLast = h.LastName,
-                           houseEmail = h.Email,
-                           regQuantity = r.Quantity,
-                           e.OwnerId
-                       };
-
-            //var fees = from s in db.Surcharges
-            //           where s.EventureOrderId == id
-            //           select new { s.Amount, s.Description };
-
-            Int32 ownerId = 0;
-            string houseName = string.Empty;
-            //string carriageReturn = "<BR>";
-            string orderDate = string.Empty;
-            string orderNum = string.Empty;
-            string houseEmail = string.Empty;
-            string lineItems = "<TABLE cellpadding=\"8\" cellspacingBono=\"8\"><tr><td>Events</td><td>Division</td><td>Participants</td><td>Quantity</td><td>Price</td></tr>";
-            int numReg = 0;
-            decimal orderAmount = 0;
-
-            foreach (var reg in regs)
-            {
-                houseName = reg.houseFirst + " " + reg.houseLast;
-                orderNum = Convert.ToString(reg.Id);
-
-                lineItems = lineItems + "<TR><TD>" + reg.DisplayHeading + "</TD><TD>" + reg.Name + "</TD><TD>" +
-                            reg.FirstName + " " + reg.LastName + "</TD><TD Align=\"right\">" + reg.Quantity + "</TD><TD Align=\"right\">" + reg.ListAmount + "</TD></TR>";
-                numReg = numReg + reg.regQuantity;
-                orderAmount = orderAmount + (reg.ListAmount * reg.Quantity);
-
-                //this is a little ugly but works
-                ownerId = reg.OwnerId;
-                houseEmail = reg.houseEmail;
-                orderDate = reg.DateCreated.ToString("M/d/yyyy");
-            }
-
-            lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
-
-            //foreach (var fee in fees)
-            //{
-            //    lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + fee.Description + "</TD><TD></TD><TD Align=\"right\">" + fee.Amount + "</TD></TR>";
-            //    orderAmount = orderAmount + fee.Amount;
-            //}
-
-            lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
-            lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + "Total" + "</TD><TD></TD><TD Align=\"right\">" + orderAmount + "</TD></TR>";
-            lineItems = lineItems + "</TABLE>";
-
-            //string numOfRegs = Convert.ToString(numReg);
-
-            var addresses = new List<string>();
-            var mode = ConfigurationManager.AppSettings["MailMode"];
-            var emailText = string.Empty;
-            var subjectText = string.Empty;
-            var sender = string.Empty;
-            var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
-            var bcc = new List<string>();
-            //this is actually bbc
-            //an amazon issue?
-
-            if (mode == "TEST")
-            {
-                addresses.Add("boone@eventuresports.com");
-                subjectText = "TEST: Eventure Sports Confirmation";
-                sender = "boone@firstegg.com";
-                emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>";
-            }
-            else
-            {
-                addresses.Add(houseEmail);
-                var owner = db.Owners.Where(o => o.Id == ownerId).SingleOrDefault();
-                subjectText = owner.SendConfirmEmailSubject;
-                sender = owner.SendMailEmailAddress;
-                bcc.Add("boone@firstegg.com");
-                bcc.Add("podaniel@firstegg.com");
-                bcc.Add(sender);
-                emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>";
-                //emailText = owner.SendImageHtml;
-            }
-            emailText = emailText + "Order Date: " + orderDate + "<BR>";
-            emailText = emailText + "Confirmation Number: " + orderNum + "<BR>";
-            //emailText = emailText + "Dear " + houseName + ",<BR><BR>Thank you for purchasing your registration. This email serves as your receipt. Your confirmation number is " + orderNum + ". <BR><BR><BR>You have been charged for the following:";
-
-
-
-            //var addresses = new List<string>();
-            ////var mode = ConfigurationManager.AppSettings["MailMode"];
-            //var emailText = string.Empty;
-            //var subjectText = string.Empty;
-            //var sender = string.Empty;
-            //var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
-            //var bcc = new List<string>();
-
-            //addresses.Add(email);
-            subjectText = "The Bourbon Chase - 2015 Lottery";
-            //sender = "mike@bourbonchase.com";
-            sender = "boone.mike@gmail.com";
-            emailText = emailText + "<br><br> Thank you for submitting an application for this fall's Bourbon Chase.  "
-            + "You will be notified of your team's status by February 2, 2015.  <p>We hope to see you on the course in October!</p>";
-
-            emailText = emailText + "<BR>" + lineItems + "<br><br>Mike Kuntz<br>The Bourbon Chase";
-
-            //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
-            var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
-
-            Destination destination = new Destination();
-            destination.ToAddresses = addresses;
-            //destination.CcAddresses = ccs;
-            destination.BccAddresses = bcc;
-
-            Body body = new Body() { Html = new Content(emailText) };
-            Content subject = new Content(subjectText);
-            Message message = new Message(subject, body);
-
-            //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
-            SendEmailRequest sendEmailRequest = new SendEmailRequest(sender, destination, message);
-            ses.SendEmail(sendEmailRequest);
-            //ccs and bcc seem to be reversed
-
-            //if (mail.ErrorException == null)
-            //if ses.
-            //{
-            if (Request != null)
-                return Request.CreateResponse(HttpStatusCode.OK);
-            else
-                return new HttpResponseMessage(HttpStatusCode.OK);
-
-        }
 
         [Route("SendConfirmMail")]
         [HttpPost]
@@ -382,326 +213,21 @@ namespace evs.API.Controllers
             }
         }
 
-        public HttpResponseMessage SendBourbonLotteryConfirm(Int32 id)
-        {
-
-            var regs = from o in db.Orders
-                       join r in db.Registrations
-                           on o.Id equals r.EventureOrderId
-                       join h in db.Participants
-                           on o.HouseId equals h.Id
-                       join p in db.Participants
-                          on r.ParticipantId equals p.Id
-                       join e in db.Eventures
-                            on r.EventureList.EventureId equals e.Id
-                       where o.Id == id
-                       select new
-                       {
-                           o.Id,
-                           o.DateCreated,
-                           r.EventureList.DisplayName,
-                           r.EventureGroup.Name,
-                           p.FirstName,
-                           p.LastName,
-                           r.Quantity,
-                           r.ListAmount,
-                           partEmail = p.Email,
-                           e.DisplayHeading,
-                           houseFirst = h.FirstName,
-                           houseLast = h.LastName,
-                           houseEmail = h.Email,
-                           regQuantity = r.Quantity,
-                           e.OwnerId
-                       };
-
-            //var fees = from s in db.Surcharges
-            //           where s.EventureOrderId == id
-            //           select new { s.Amount, s.Description };
-
-            Int32 ownerId = 0;
-            string houseName = string.Empty;
-            //string carriageReturn = "<BR>";
-            string orderNum = string.Empty;
-            string houseEmail = string.Empty;
-            string lineItems = "<TABLE cellpadding=\"8\" cellspacingBono=\"8\"><tr><td>Events</td><td>Division</td><td>Participants</td><td>Quantity</td><td>Price</td></tr>";
-            int numReg = 0;
-            decimal orderAmount = 0;
-
-            foreach (var reg in regs)
-            {
-                houseName = reg.houseFirst + " " + reg.houseLast;
-                orderNum = Convert.ToString(reg.Id);
-
-                lineItems = lineItems + "<TR><TD>" + reg.DisplayHeading + "</TD><TD>" + reg.Name + "</TD><TD>" +
-                            reg.FirstName + " " + reg.LastName + "</TD><TD Align=\"right\">" + reg.Quantity + "</TD><TD Align=\"right\">" + reg.ListAmount + "</TD></TR>";
-                numReg = numReg + reg.regQuantity;
-                orderAmount = orderAmount + (reg.ListAmount * reg.Quantity);
-
-                //this is a little ugly but works
-                ownerId = reg.OwnerId;
-                houseEmail = reg.houseEmail;
-            }
-
-            lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
-
-            //foreach (var fee in fees)
-            //{
-            //    lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + fee.Description + "</TD><TD></TD><TD Align=\"right\">" + fee.Amount + "</TD></TR>";
-            //    orderAmount = orderAmount + fee.Amount;
-            //}
-
-            lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
-            lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + "Total" + "</TD><TD></TD><TD Align=\"right\">" + orderAmount + "</TD></TR>";
-            lineItems = lineItems + "</TABLE>";
-
-            //string numOfRegs = Convert.ToString(numReg);
-
-            var addresses = new List<string>();
-            var mode = ConfigurationManager.AppSettings["MailMode"];
-            var emailText = string.Empty;
-            var subjectText = string.Empty;
-            var sender = string.Empty;
-            var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
-            var bcc = new List<string>();
-            //this is actually bbc
-            //an amazon issue?
-
-            if (mode == "TEST")
-            {
-                addresses.Add("boone@eventuresports.com");
-                subjectText = "TEST: Eventure Sports Confirmation";
-                sender = "boone@firstegg.com";
-                emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>";
-            }
-            else
-            {
-                addresses.Add(houseEmail);
-                var owner = db.Owners.Where(o => o.Id == ownerId).SingleOrDefault();
-                subjectText = owner.SendConfirmEmailSubject;
-                sender = owner.SendMailEmailAddress;
-                bcc.Add("boone@firstegg.com");
-                bcc.Add("podaniel@firstegg.com");
-                bcc.Add(sender);
-                emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>";
-                //emailText = owner.SendImageHtml;
-            }
-            emailText = emailText + "Order Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
-            emailText = emailText + "Confirmation Number: " + orderNum + "<BR>";
-            //emailText = emailText + "Dear " + houseName + ",<BR><BR>Thank you for purchasing your registration. This email serves as your receipt. Your confirmation number is " + orderNum + ". <BR><BR><BR>You have been charged for the following:";
-
-
-
-            //var addresses = new List<string>();
-            ////var mode = ConfigurationManager.AppSettings["MailMode"];
-            //var emailText = string.Empty;
-            //var subjectText = string.Empty;
-            //var sender = string.Empty;
-            //var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
-            //var bcc = new List<string>();
-
-            //addresses.Add(email);
-            subjectText = "The Bourbon Chase - 2015 Lottery";
-            sender = "mike@bourbonchase.com";
-            emailText = emailText + "<br><br> Thank you for submitting an application for this fall's Bourbon Chase.  "
-            + "You will be notified of your team's status by February 2, 2015.  <p>We hope to see you on the course in October!</p>";
-
-            emailText = emailText + "<BR>" + lineItems + "<br><br>Mike Kuntz<br>The Bourbon Chase";
-
-            //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
-            var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
-
-            Destination destination = new Destination();
-            destination.ToAddresses = addresses;
-            //destination.CcAddresses = ccs;
-            destination.BccAddresses = bcc;
-
-            Body body = new Body() { Html = new Content(emailText) };
-            Content subject = new Content(subjectText);
-            Message message = new Message(subject, body);
-
-            //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
-            SendEmailRequest sendEmailRequest = new SendEmailRequest(sender, destination, message);
-            ses.SendEmail(sendEmailRequest);
-            //ccs and bcc seem to be reversed
-
-            //if (mail.ErrorException == null)
-            //if ses.
-            //{
-            if (Request != null)
-                return Request.CreateResponse(HttpStatusCode.OK);
-            else
-                return new HttpResponseMessage(HttpStatusCode.OK);
-
-        }
-
-
-        public HttpResponseMessage SendResetPasswordBourbon(string email, string callbackUrl)
-        {
-            var addresses = new List<string>();
-            //var mode = ConfigurationManager.AppSettings["MailMode"];
-            var emailText = string.Empty;
-            var subjectText = string.Empty;
-            var sender = string.Empty;
-            var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
-            var bcc = new List<string>();
-
-            addresses.Add(email);
-            subjectText = "Bourbon Chase Reset Password";
-            sender = "mike@bourbonchase.com";
-            emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>" + callbackUrl;
-
-            //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
-            var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
-
-            Destination destination = new Destination();
-            destination.ToAddresses = addresses;
-            //destination.CcAddresses = ccs;
-            //destination.BccAddresses = bcc;
-
-            Body body = new Body() { Html = new Content(emailText) };
-            Content subject = new Content(subjectText);
-            Message message = new Message(subject, body);
-
-            //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
-            SendEmailRequest sendEmailRequest = new SendEmailRequest("mike@bourbonchase.com", destination, message);
-            ses.SendEmail(sendEmailRequest);
-            //ccs and bcc seem to be reversed
-
-            //if (mail.ErrorException == null)
-            //if ses.
-            //{
-            if (Request != null)
-                return Request.CreateResponse(HttpStatusCode.OK);
-            else
-                return new HttpResponseMessage(HttpStatusCode.OK);
-
-        }
-
         public HttpResponseMessage SendResetPassword(string email, string resetCode)
         {
             var ownerId = 1;   //this will become an argument when going multi-tenant
 
-            string body = System.IO.File.ReadAllText(HttpContext.Current.Server.MapPath("/Content/EmailTemplates/reset-password.html"));
+            var _mailService = new MailService();
+            //var _mailBuilder = new MailBuilder();
 
-            var ownerInfo = db.Owners
-               .Where(o => o.Id == ownerId)
-               .Select(o => new
-               {
-                   o.Name,
-                   o.Url,
-                   o.StripeOrderDescription,
-                   o.ConfirmButtonText,
-                   o.RegisterButtonText,
-                   o.MainColor,
-                   o.HoverColor,
-                   o.HighlightColor,
-                   o.NavTextColor
-               });
-
-            //var part = db.Participants
-            //    .Where(p => p.email
-
-            Dictionary<string, string> replaceTokens = new Dictionary<string, string>();
-            replaceTokens.Add("COMPANYNAME", "EVentureYo");
-            replaceTokens.Add("URL", "http://demo30.eventuresports.infp");
-            replaceTokens.Add("NAME", "Mike Boone");
-            replaceTokens.Add("SUPPORTEMAIL", "help@eventuresports.com");
-            replaceTokens.Add("SUPPORTPHONE", "");
-            replaceTokens.Add("RESETPASSWORDURL", "");
-            //replaceTokens.Add("XX", "");
-
-            replaceTokens.Select(a => body = body.Replace(string.Concat("{{", a.Key, "}}"), a.Value)).ToList();
-
-            //MailService _mailService = new MailService();
-            //var x = _mailService.SendResetPassword("boone.mike@gmail.com", "testc butt", Body);
+            var success = _mailService.SendResetPassword(email, resetCode, ownerId, false);
 
             if (Request != null)
                 return Request.CreateResponse(HttpStatusCode.OK);
             else
                 return new HttpResponseMessage(HttpStatusCode.OK);
-        
         }
 
-        public HttpResponseMessage SendResetPassword_old(string email, string callbackUrl)
-        {
-            var addresses = new List<string>();
-            //var mode = ConfigurationManager.AppSettings["MailMode"];
-            var emailText = string.Empty;
-            var subjectText = string.Empty;
-            var sender = string.Empty;
-            var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
-            var bcc = new List<string>();
-
-            subjectText = "Trax Running Reset Password";
-            sender = "info@bg262.com";
-            emailText = "<img src=\"https://traxrunning.eventuresports.com/content/images/logo.png\"><br><br>Please click on the link below to reset your password.<br><br>" + callbackUrl;
-
-            addresses.Add(email);
-            Destination destination = new Destination();
-            destination.ToAddresses = addresses;
-            //destination.CcAddresses = ccs;
-            //destination.BccAddresses = bcc;
-
-            Body body = new Body() { Html = new Content(emailText) };
-            Content subject = new Content(subjectText);
-            Message message = new Message(subject, body);
-
-            //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
-            var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
-            //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
-            SendEmailRequest sendEmailRequest = new SendEmailRequest(sender, destination, message);
-            ses.SendEmail(sendEmailRequest);
-            //ccs and bcc seem to be reversed
-
-            //if (mail.ErrorException == null)
-            //if ses.
-            //{
-            if (Request != null)
-                return Request.CreateResponse(HttpStatusCode.OK);
-            else
-                return new HttpResponseMessage(HttpStatusCode.OK);
-        }
-
-        [Route("ForgotPassword")]
-        [HttpPost]
-        public HttpResponseMessage ForgotPassword(JObject jsonBundle)
-        {
-
-            string Body = System.IO.File.ReadAllText(HttpContext.Current.Server.MapPath("/Content/EmailTemplates/reset-password.html"));
-
-            Dictionary<string, string> replaceTokens = new Dictionary<string, string>();
-            replaceTokens.Add("COMPANYNAME", "EVentureYo");
-            replaceTokens.Add("URL", "http://demo30.eventuresports.infp");
-            replaceTokens.Add("NAME", "Mike Boone");
-            replaceTokens.Add("SUPPORTEMAIL", "help@eventuresports.com");
-            replaceTokens.Add("SUPPORTPHONE", "");
-            replaceTokens.Add("RESETPASSWORDURL", "");
-            //replaceTokens.Add("XX", "");
-
-            replaceTokens.Select(a => Body = Body.Replace(string.Concat("{{", a.Key, "}}"), a.Value)).ToList();
-            
-            MailService _mailService = new MailService();
-            var x = _mailService.SendResetPassword("boone.mike@gmail.com", "testc butt", Body);
-
-            if (Request != null)
-                return Request.CreateResponse(HttpStatusCode.OK);
-            else
-            return new HttpResponseMessage(HttpStatusCode.OK);
-
-        }
-
-
-        [HttpPost]
-        [AllowAnonymous]
-        [AcceptVerbs("OPTIONS")]
-        [System.Web.Mvc.ValidateAntiForgeryToken]
-        public HttpResponseMessage SendResetPasswordEmail(int id)
-        {
-            MailService _mailService = new MailService();
-            var x = _mailService.SendResetPassword("id", "b", "c");
-
-            return new HttpResponseMessage(HttpStatusCode.OK);
-        }
 
         [Route("SendTeamPlayerInviteMail/{id}")]
         public HttpResponseMessage SendTeamPlayerInviteMail(int id)
@@ -774,7 +300,7 @@ namespace evs.API.Controllers
 
                 //ccs and bcc seem to be reversed
                 MailService _mailService = new MailService();
-                var y = _mailService.SendSingleEmail(teamMember.Email, subject, emailText);
+                //mjb var y = _mailService.SendSingleEmail(teamMember.Email, subject, emailText);
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
 
@@ -824,25 +350,206 @@ namespace evs.API.Controllers
         }
 
 
-        public HttpResponseMessage SendTestEmail()
-        {
-            List<string> addresses = new List<string>();
-            addresses.Add("boone.mike@gmail.com");
-            addresses.Add("boone@firstegg.com");
 
-            //AmazonSimpleEmailServiceConfig amazonConfiguration = new AmazonSimpleEmailServiceConfig();
-            AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
-            Destination destination = new Destination();
-            destination.ToAddresses = addresses;
-            Body body = new Body() { Html = new Content("this is the testr body") };
-            Content subject = new Content("test subkect");
-            Message message = new Message(subject, body);
-            SendEmailRequest sendEmailRequest = new SendEmailRequest("boone.mike@gmail.com", destination, message);
-            client.SendEmail(sendEmailRequest);
-
-            return new HttpResponseMessage(HttpStatusCode.OK);
-        }
 
     }
 
 }
+
+
+
+//public HttpResponseMessage SendBourbonLotteryConfirm(Int32 id)
+//       {
+
+//           var regs = from o in db.Orders
+//                      join r in db.Registrations
+//                          on o.Id equals r.EventureOrderId
+//                      join h in db.Participants
+//                          on o.HouseId equals h.Id
+//                      join p in db.Participants
+//                         on r.ParticipantId equals p.Id
+//                      join e in db.Eventures
+//                           on r.EventureList.EventureId equals e.Id
+//                      where o.Id == id
+//                      select new
+//                      {
+//                          o.Id,
+//                          o.DateCreated,
+//                          r.EventureList.DisplayName,
+//                          r.EventureGroup.Name,
+//                          p.FirstName,
+//                          p.LastName,
+//                          r.Quantity,
+//                          r.ListAmount,
+//                          partEmail = p.Email,
+//                          e.DisplayHeading,
+//                          houseFirst = h.FirstName,
+//                          houseLast = h.LastName,
+//                          houseEmail = h.Email,
+//                          regQuantity = r.Quantity,
+//                          e.OwnerId
+//                      };
+
+//           //var fees = from s in db.Surcharges
+//           //           where s.EventureOrderId == id
+//           //           select new { s.Amount, s.Description };
+
+//           Int32 ownerId = 0;
+//           string houseName = string.Empty;
+//           //string carriageReturn = "<BR>";
+//           string orderNum = string.Empty;
+//           string houseEmail = string.Empty;
+//           string lineItems = "<TABLE cellpadding=\"8\" cellspacingBono=\"8\"><tr><td>Events</td><td>Division</td><td>Participants</td><td>Quantity</td><td>Price</td></tr>";
+//           int numReg = 0;
+//           decimal orderAmount = 0;
+
+//           foreach (var reg in regs)
+//           {
+//               houseName = reg.houseFirst + " " + reg.houseLast;
+//               orderNum = Convert.ToString(reg.Id);
+
+//               lineItems = lineItems + "<TR><TD>" + reg.DisplayHeading + "</TD><TD>" + reg.Name + "</TD><TD>" +
+//                           reg.FirstName + " " + reg.LastName + "</TD><TD Align=\"right\">" + reg.Quantity + "</TD><TD Align=\"right\">" + reg.ListAmount + "</TD></TR>";
+//               numReg = numReg + reg.regQuantity;
+//               orderAmount = orderAmount + (reg.ListAmount * reg.Quantity);
+
+//               //this is a little ugly but works
+//               ownerId = reg.OwnerId;
+//               houseEmail = reg.houseEmail;
+//           }
+
+//           lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
+
+//           //foreach (var fee in fees)
+//           //{
+//           //    lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + fee.Description + "</TD><TD></TD><TD Align=\"right\">" + fee.Amount + "</TD></TR>";
+//           //    orderAmount = orderAmount + fee.Amount;
+//           //}
+
+//           lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
+//           lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + "Total" + "</TD><TD></TD><TD Align=\"right\">" + orderAmount + "</TD></TR>";
+//           lineItems = lineItems + "</TABLE>";
+
+//           //string numOfRegs = Convert.ToString(numReg);
+
+//           var addresses = new List<string>();
+//           var mode = ConfigurationManager.AppSettings["MailMode"];
+//           var emailText = string.Empty;
+//           var subjectText = string.Empty;
+//           var sender = string.Empty;
+//           var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
+//           var bcc = new List<string>();
+//           //this is actually bbc
+//           //an amazon issue?
+
+//           if (mode == "TEST")
+//           {
+//               addresses.Add("boone@eventuresports.com");
+//               subjectText = "TEST: Eventure Sports Confirmation";
+//               sender = "boone@firstegg.com";
+//               emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>";
+//           }
+//           else
+//           {
+//               addresses.Add(houseEmail);
+//               var owner = db.Owners.Where(o => o.Id == ownerId).SingleOrDefault();
+//               subjectText = owner.SendConfirmEmailSubject;
+//               sender = owner.SendMailEmailAddress;
+//               bcc.Add("boone@firstegg.com");
+//               bcc.Add("podaniel@firstegg.com");
+//               bcc.Add(sender);
+//               emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>";
+//               //emailText = owner.SendImageHtml;
+//           }
+//           emailText = emailText + "Order Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
+//           emailText = emailText + "Confirmation Number: " + orderNum + "<BR>";
+//           //emailText = emailText + "Dear " + houseName + ",<BR><BR>Thank you for purchasing your registration. This email serves as your receipt. Your confirmation number is " + orderNum + ". <BR><BR><BR>You have been charged for the following:";
+
+
+
+//           //var addresses = new List<string>();
+//           ////var mode = ConfigurationManager.AppSettings["MailMode"];
+//           //var emailText = string.Empty;
+//           //var subjectText = string.Empty;
+//           //var sender = string.Empty;
+//           //var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
+//           //var bcc = new List<string>();
+
+//           //addresses.Add(email);
+//           subjectText = "The Bourbon Chase - 2015 Lottery";
+//           sender = "mike@bourbonchase.com";
+//           emailText = emailText + "<br><br> Thank you for submitting an application for this fall's Bourbon Chase.  "
+//           + "You will be notified of your team's status by February 2, 2015.  <p>We hope to see you on the course in October!</p>";
+
+//           emailText = emailText + "<BR>" + lineItems + "<br><br>Mike Kuntz<br>The Bourbon Chase";
+
+//           //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
+//           var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
+
+//           Destination destination = new Destination();
+//           destination.ToAddresses = addresses;
+//           //destination.CcAddresses = ccs;
+//           destination.BccAddresses = bcc;
+
+//           Body body = new Body() { Html = new Content(emailText) };
+//           Content subject = new Content(subjectText);
+//           Message message = new Message(subject, body);
+
+//           //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
+//           SendEmailRequest sendEmailRequest = new SendEmailRequest(sender, destination, message);
+//           ses.SendEmail(sendEmailRequest);
+//           //ccs and bcc seem to be reversed
+
+//           //if (mail.ErrorException == null)
+//           //if ses.
+//           //{
+//           if (Request != null)
+//               return Request.CreateResponse(HttpStatusCode.OK);
+//           else
+//               return new HttpResponseMessage(HttpStatusCode.OK);
+
+//       }
+
+
+
+//public HttpResponseMessage SendResetPasswordBourbon(string email, string callbackUrl)
+//       {
+//           var addresses = new List<string>();
+//           //var mode = ConfigurationManager.AppSettings["MailMode"];
+//           var emailText = string.Empty;
+//           var subjectText = string.Empty;
+//           var sender = string.Empty;
+//           var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
+//           var bcc = new List<string>();
+
+//           addresses.Add(email);
+//           subjectText = "Bourbon Chase Reset Password";
+//           sender = "mike@bourbonchase.com";
+//           emailText = "<img src=\"https://bourbonchase.eventuresports.com/content/images/logo.png\"><br><br>" + callbackUrl;
+
+//           //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
+//           var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
+
+//           Destination destination = new Destination();
+//           destination.ToAddresses = addresses;
+//           //destination.CcAddresses = ccs;
+//           //destination.BccAddresses = bcc;
+
+//           Body body = new Body() { Html = new Content(emailText) };
+//           Content subject = new Content(subjectText);
+//           Message message = new Message(subject, body);
+
+//           //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
+//           SendEmailRequest sendEmailRequest = new SendEmailRequest("mike@bourbonchase.com", destination, message);
+//           ses.SendEmail(sendEmailRequest);
+//           //ccs and bcc seem to be reversed
+
+//           //if (mail.ErrorException == null)
+//           //if ses.
+//           //{
+//           if (Request != null)
+//               return Request.CreateResponse(HttpStatusCode.OK);
+//           else
+//               return new HttpResponseMessage(HttpStatusCode.OK);
+
+//       }

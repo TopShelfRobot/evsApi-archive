@@ -191,7 +191,8 @@ namespace evs.API.Controllers
                     HttpResponseMessage result;
 
                     if (ConfigurationManager.AppSettings["CustomName"] == "bourbonchase")
-                        result = new MailController().SendBourbonLotteryConfirm(order.Id);
+                        //result = new MailController().SendBourbonLotteryConfirm(order.Id);
+                        result = new MailController().SendConfirmMail(order.Id);   //change back to bourbon chase??
                     else
                         result = new MailController().SendConfirmMail(order.Id);
                     //HttpResponseMessage result = new MailController().SendTestEmail();
@@ -329,9 +330,9 @@ namespace evs.API.Controllers
 
                 HttpResponseMessage result;
 
-                if (ConfigurationManager.AppSettings["CustomName"] == "bourbonchase")
-                    result = new MailController().SendBourbonLotteryConfirm(order.Id);
-                else
+                //if (ConfigurationManager.AppSettings["CustomName"] == "bourbonchase")
+                //    result = new MailController().SendBourbonLotteryConfirm(order.Id);
+                //else
                     result = new MailController().SendConfirmMail(order.Id);
                 //HttpResponseMessage result = new MailController().SendTestEmail();
 

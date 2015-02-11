@@ -107,13 +107,6 @@ namespace evs.Model
     //    public Int32 OwnerId { get; set; }  
     //}
 
-    public enum EventureListType
-    {
-        Standard = 1,
-        TeamSponsored,
-        TeamSuggest,
-        TeamIndividual,
-        Lottery
-    }
+   
 
 }

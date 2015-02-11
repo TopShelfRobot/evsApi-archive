@@ -101,23 +101,6 @@ namespace evs.Model
     }
 
 
-    public enum SurchargeType
-    {
-        Coupon = 1,
-        //CouponEvent,
-        //CouponList
-        Discount,
-        //DiscountEvent,
-        //DiscountList,
-        //FeeList,
-        //FeeEvent,
-        OnlineFee
-    }
-
-    public enum AmountType
-    {
-        Dollars = 0,
-        Percent
-    }
+   
 
 }

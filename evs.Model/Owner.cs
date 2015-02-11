@@ -25,7 +25,7 @@ namespace evs.Model
         public Int32 CardProcessorFeeFlatPerChargeInCents { get; set; }
         public decimal LocalFeePercentOfCharge { get; set; }
         public Int32 LocalFeeFlatPerChargeInCents { get; set; }   //fix this in 3.0 (perper)  //done
-        
+
         //stripe
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
@@ -33,7 +33,7 @@ namespace evs.Model
         public string StripeUserId { get; set; }
         public Boolean? Livemode { get; set; }
         public string Scope { get; set; }
-        
+
         //cart rules
         public Boolean IsMultiRegistrationDiscountCartRule { get; set; }
         public decimal MultiRegistrationDiscountAmount { get; set; }
@@ -68,10 +68,10 @@ namespace evs.Model
         public string RegisterButtonText { get; set; }
         public string ConfirmButtonText { get; set; }
 
-         public bool IsRegistrationOnProfile { get; set; }
-         public bool IsTeamRegistrationOnProfile { get; set; }
-         public bool IsParticipantOnProfile { get; set; }
-         public bool IsCaptainOnProfile { get; set; }
+        public bool IsRegistrationOnProfile { get; set; }
+        public bool IsTeamRegistrationOnProfile { get; set; }
+        public bool IsParticipantOnProfile { get; set; }
+        public bool IsCaptainOnProfile { get; set; }
 
         public string FacebookAppId { get; set; }
         public string FacebookAppSecretId { get; set; }
@@ -81,7 +81,8 @@ namespace evs.Model
         public string HighlightColor { get; set; }
         public string NavTextColor { get; set; }
 
-
+        public string SupportPhone { get; set; }
+        public string SupportEmail { get; set; }
     }
 
     //public class PhotoViewModel

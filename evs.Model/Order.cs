@@ -57,17 +57,5 @@ namespace evs.Model
         public ICollection<Surcharge> Surcharges { get; set; } 
     }
 
-    public enum PaymentType
-    {
-        credit = 0,
-        cash = 1,
-        giftCertificate = 2,
-        check = 3
-    }
-    public enum OrderType
-    {
-        online = 0,
-        manual
-    }
-
+   
 }
