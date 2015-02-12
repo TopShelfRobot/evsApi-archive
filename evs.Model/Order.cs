@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 //using System.ComponentModel.DataAnnotations.Schema;
 //using System.Linq;
 //using System.Text;
@@ -47,11 +48,11 @@ namespace evs.Model
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
-        
-          
 
-    //[ForeignKey("HouseId")]
-        //public virtual Participant House { get; set; }
+        public virtual Owner Owner { get; set; }
+
+        [ForeignKey("HouseId")]
+        public virtual Participant House { get; set; }
 
         public ICollection<Registration> Registrations { get; set; }
         public ICollection<Surcharge> Surcharges { get; set; } 

@@ -88,6 +88,9 @@ namespace evs.Model
         
         [MaxLength(50)]
         public string Phone { get; set; }
+
+        [MaxLength(15)]
+        public string LoginAction { get; set; }
         
         public Int32 OwnerId { get; set; }
         public DateTime DateCreated { get; set; }

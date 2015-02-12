@@ -4,21 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
-
 //using System.Net.Mail;
 //using SendGrid;
-
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
-using evs.Model;
-using evs.DAL;
+using evs.Model;  //just here for enums
+using evs.DAL;  //get rid of this
 
 
 namespace evs.Service
 {
     public class MailService
     {
-
         readonly evsContext db = new evsContext();
 
         public MailService()  //ModelStateDictionary modelState, IOrderRepository repository
@@ -28,23 +25,38 @@ namespace evs.Service
 
         }
 
-        public Boolean SendResetPassword(string email, string resetCode, Int32 ownerId, Boolean resend)
+        public Boolean SendConfirmEmail(Int32 orderId, Boolean isResend)
+        {
+            var _mailBuilder = new MailBuilder();
+            var ownerId = 1;    //fix this
+            
+            List<string> addresses = new List<string>();
+            addresses.Add("boone.mike@gmail.com");    //getEmailFromOrderId
+
+            List<string> bcc= new List<string>(); 
+            bcc = _mailBuilder.getEventureBcc();
+
+            var subject = _mailBuilder.GetSubject(MailType.OrderConfirm, ownerId);
+            var sender = _mailBuilder.GetSender(ownerId);
+
+            return SendEmail(_mailBuilder.BuildConfirmEmailBody(orderId), subject, sender, addresses, bcc);
+        }
+
+        public Boolean SendResetPassword(string email, string resetCode, Int32 ownerId)
         {
             var _mailBuilder = new MailBuilder();
             
             List<string> addresses = new List<string>();
             addresses.Add(email);
+
             List<string> bcc= new List<string>();
-            //if !resend
-            //    //bcc = _mailBuilder.getEventureBcc()
+            //bcc = _mailBuilder.getEventureBcc();
 
-            var subject = _mailBuilder.GetSubject(MailType.OrderConfirm);
-            var sender = _mailBuilder.GetSender();
+            var subject = _mailBuilder.GetSubject(MailType.ResetPassword, ownerId);
+            var sender = _mailBuilder.GetSender(ownerId);
 
-            return  SendEmail(_mailBuilder.BuildResetPasswordBody(ownerId, resetCode), subject, sender, addresses, bcc);
+            return SendEmail(_mailBuilder.BuildResetPasswordBody(ownerId, resetCode), subject, sender, addresses, bcc);
         }
-
-
 
         private Boolean SendEmail(string messageBody, string messageSubject, string sender, List<string> mailTo, List<string> bcc)
         {

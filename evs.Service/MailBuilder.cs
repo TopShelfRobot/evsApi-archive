@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 using evs.DAL;
 using evs.Model;
 
@@ -19,23 +20,118 @@ namespace evs.Service
             //_repository = repository;
         }
 
-
-
-
-        public string GetSender()
+        public string GetSender(Int32 ownerId)
         {
-            return "boone.mike@gmail.com";
+            string sender = string.Empty;
+            var ownerInfo = db.Owners
+              .Where(o => o.Id == ownerId)
+              .Select(o => new
+              {
+                  o.SendMailEmailAddress
+              }).FirstOrDefault();
+
+           sender = ownerInfo.SendMailEmailAddress;
+
+            if (string.IsNullOrEmpty(sender))
+                sender = "boone@firstegg.com";
+            
+            return sender;
         }
 
-        public string GetSubject(MailType emailType)
+        public string GetSubject(MailType emailType, Int32 ownerId)
         {
+            var ownerInfo = db.Owners
+             .Where(o => o.Id == ownerId)
+             .Select(o => new
+             {
+                 o.SendConfirmEmailSubject,
+                 o.Name,
+                 //o.SendConfirmTeamEmailSubject,
+                 o.SendConfirmTeamInviteEmailSubject
+             }).FirstOrDefault();
 
-            return "important stuff";
+
+            var subject = string.Empty;
+            switch (emailType)
+            {
+                case MailType.OrderConfirm:
+                    subject = ownerInfo.SendConfirmEmailSubject;
+                    break;
+                case MailType.TeamPlayerInvite:
+                    subject = ownerInfo.SendConfirmTeamInviteEmailSubject;
+                    break;
+                case MailType.ResetPassword:
+                    subject = ownerInfo.Name + " Password Assistance";
+                    break;
+                //case MailType.OrderConfirm:
+                //    subject = ownerInfo.SendConfirmEmailSubject;
+                //    break;
+                //default:
+                //    Console.WriteLine("Default case");
+                //    break;
+            }
+
+            if (subject.Length == 0)
+                subject = "Thank You for your registration.";
+            return subject;
+        }
+
+        public List<string> getEventureBcc()
+        {
+            List<string> bcc = new List<string>();
+            bcc.Add(ConfigurationManager.AppSettings["AdminBcc"]);
+            bcc.Add(ConfigurationManager.AppSettings["DevBcc"]);
+
+            return bcc;
+        }
+
+        public string BuildConfirmEmailBody(Int32 orderId)
+        {
+            string body = System.IO.File.ReadAllText(System.Web.Hosting.HostingEnvironment.MapPath("/Content/EmailTemplates/order-confirmation.min.html"));
+
+            //move this call to respository
+
+            var orderInfo = db.Orders
+                .Where(o => o.Id == orderId)
+                .Select(o => new
+               {
+                   o.Id,
+                   o.DateCreated,
+                   o.House.FirstName,
+                   o.House.LastName,
+                    o.Owner.MainColor,
+                    o.Owner.Name,
+                    o.Owner.GroupName,
+                    o.Owner.ListingName,
+                    o.Owner.Url,
+                    o.Owner.LogoImageName,
+                    o.Owner.SupportPhone,
+                    o.Owner.SupportEmail
+               }).FirstOrDefault();
+
+            Dictionary<string, string> replaceTokens = new Dictionary<string, string>();
+            replaceTokens.Add("COMPANYNAME", orderInfo.Name);    
+            replaceTokens.Add("ORDERDATE", orderInfo.DateCreated.ToString("MMMM dd, yyyy"));
+            replaceTokens.Add("ORDERNUMBER", orderId.ToString());
+            replaceTokens.Add("GROUPNAME", orderInfo.GroupName);
+            replaceTokens.Add("LISTINGNAME", orderInfo.ListingName);
+            replaceTokens.Add("PARTNAME", orderInfo.FirstName + " " + orderInfo.LastName);
+
+            replaceTokens.Add("IMAGEURL", orderInfo.Url + "/Content/images/" + orderInfo.LogoImageName);
+            replaceTokens.Add("SUPPORTEMAIL", orderInfo.SupportEmail);
+            replaceTokens.Add("SUPPORTPHONE", " " + orderInfo.SupportPhone);  //added " " because the minification removes it
+            replaceTokens.Add("MAINCOLOR", orderInfo.MainColor);
+
+            replaceTokens.Add("TABLEBODY", BuildOrderSummaryTable(orderId));
+
+            replaceTokens.Select(a => body = body.Replace(string.Concat("{{", a.Key, "}}"), a.Value)).ToList();
+
+            return body;
         }
 
         public string BuildResetPasswordBody(Int32 ownerId, string resetCode)
         {
-            string body = System.IO.File.ReadAllText(System.Web.Hosting.HostingEnvironment.MapPath("/Content/EmailTemplates/reset-password.html"));
+            string body = System.IO.File.ReadAllText(System.Web.Hosting.HostingEnvironment.MapPath("/Content/EmailTemplates/reset-password.min.html"));
 
             //move this call to respository
             var ownerInfo = db.Owners
@@ -46,6 +142,7 @@ namespace evs.Service
                   o.Url,
                   o.SupportEmail,
                   o.SupportPhone,
+                  o.MainColor,
                   o.LogoImageName
               }).FirstOrDefault();
 
@@ -56,7 +153,8 @@ namespace evs.Service
             replaceTokens.Add("SUPPORTEMAIL", ownerInfo.SupportEmail);
             replaceTokens.Add("SUPPORTPHONE", ownerInfo.SupportPhone);
             replaceTokens.Add("RESETPASSWORDURL", ownerInfo.Url + "#/resetpassword?userId=" + resetCode);
-        
+            replaceTokens.Add("MAINCOLOR", ownerInfo.MainColor);
+
             replaceTokens.Select(a => body = body.Replace(string.Concat("{{", a.Key, "}}"), a.Value)).ToList();
 
             return body;
@@ -64,7 +162,7 @@ namespace evs.Service
 
         private string BuildOrderSummaryTable(int orderId)
         {
-           try
+            try
             {
                 var regs = from o in db.Orders
                            join r in db.Registrations
@@ -78,66 +176,49 @@ namespace evs.Service
                            where o.Id == orderId
                            select new
                            {
-                               o.Id,
-                               o.DateCreated,
+                               //o.Id,
+                               //o.DateCreated,
                                r.EventureList.DisplayName,
                                p.FirstName,
                                p.LastName,
                                r.Quantity,
+                               regGroup = r.EventureGroup.Name,   //|| ""
                                r.ListAmount,
-                               partEmail = p.Email,
                                e.DisplayHeading,
-                               houseFirst = h.FirstName,
-                               houseLast = h.LastName,
-                               houseEmail = h.Email,
                                regQuantity = r.Quantity,
-                               e.OwnerId
                            };
 
                 var fees = from s in db.Surcharges
                            where s.EventureOrderId == orderId
                            select new { s.Amount, s.Description };
 
-                string emailText = string.Empty;
-                Int32 ownerId = 0;
-                string houseName = string.Empty;
-                //string carriageReturn = "<BR>";
-                string orderNum = string.Empty;
-                string houseEmail = string.Empty;
-                string lineItems = "<TABLE cellpadding=\"8\" cellspacingBono=\"8\"><tr><td>Events</td><td>Listings</td><td>Participants</td><td>Quantity</td><td>Price</td></tr>";
+               
+                string summaryTable = "<tbody>";
                 int numReg = 0;
                 decimal orderAmount = 0;
 
                 foreach (var reg in regs)
                 {
-                    houseName = reg.houseFirst + " " + reg.houseLast;
-                    orderNum = Convert.ToString(reg.Id);
-
-                    lineItems = lineItems + "<TR><TD>" + reg.DisplayHeading + "</TD><TD>" + reg.DisplayName + "</TD><TD>" +
-                                reg.FirstName + " " + reg.LastName + "</TD><TD Align=\"right\">" + reg.Quantity + "</TD><TD Align=\"right\">" + reg.ListAmount + "</TD></TR>";
+                    summaryTable = summaryTable + "<TR><TD>" + reg.DisplayName + "</TD><TD>" + reg.FirstName + " " + reg.LastName + "</TD><TD>" +
+                                reg.regGroup + "</TD><TD Align=\"center\">" + reg.Quantity + "</TD><TD Align=\"center\">" + reg.ListAmount + "</TD></TR>";
                     numReg = numReg + reg.regQuantity;
                     orderAmount = orderAmount + (reg.ListAmount * reg.Quantity);
                 }
 
-                lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
+                summaryTable = summaryTable + "<TR><TD></TD><TD></TD><TD>&nbsp;</TD><TD></TD><TD></TD></TR>";
 
                 foreach (var fee in fees)
                 {
-                    lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + fee.Description + "</TD><TD></TD><TD Align=\"right\">" + fee.Amount + "</TD></TR>";
+                    summaryTable = summaryTable + "<TR><TD></TD><TD></TD><TD Align=\"center\">" + fee.Description + "</TD><TD></TD><TD Align=\"center\">" + fee.Amount + "</TD></TR>";
                     orderAmount = orderAmount + fee.Amount;
                 }
 
-                lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
-                lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + "Total" + "</TD><TD></TD><TD Align=\"right\">" + orderAmount + "</TD></TR>";
+                summaryTable = summaryTable + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
+                summaryTable = summaryTable + "<TR><TD></TD><TD></TD><TD Align=\"center\">" + "Total" + "</TD><TD></TD><TD Align=\"center\">" + orderAmount + "</TD></TR>";
 
-                lineItems = lineItems + "</TABLE>";
+                summaryTable = summaryTable + "</tbody>";
 
-
-                emailText = emailText + "Order Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
-                emailText = emailText + "Dear " + houseName + ",<BR><BR>Thank you for purchasing your registration. This email serves as your receipt. Your confirmation number is " + orderNum + ". <BR><BR><BR>You have been charged for the following:";
-                emailText = emailText + "<BR>" + lineItems;
-
-                return emailText;
+                return summaryTable;
 
             }
             catch (Exception ex)

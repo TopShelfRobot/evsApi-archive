@@ -8,21 +8,20 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Web.Routing;
+using System.Text;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Linq;
-using evs.Model;
-using evs.API.Results;
-//using System.Web.Mvc;
-using System.Web.Routing;
-//using System.Net.Http.
 using evs.Service;
-using System.Configuration;
-using System.Text;
-using evs.DAL;
+
+using evs.Model;  //user model
+using evs.API.Results;  //ChallengeResult
+using evs.DAL;   //this is only for the current dirty error handling
 
 namespace evs.API.Controllers
 {

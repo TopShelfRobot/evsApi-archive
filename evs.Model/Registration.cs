@@ -40,6 +40,8 @@ namespace evs.Model
         [ForeignKey("GroupId")]
         public virtual EventureGroup EventureGroup { get; set; }
 
+        
+
 
         public string Type { get; set; }
 

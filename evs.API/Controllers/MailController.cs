@@ -33,166 +33,15 @@ namespace evs.API.Controllers
         [HttpPost]
         public HttpResponseMessage SendConfirmMail(int id)
         {
-            //needs to be a send amazon email
-            //Type : confirm, reset password
-            // to, cc, bc, sender, reply, subject, text
-
             try
             {
-                var regs = from o in db.Orders
-                           join r in db.Registrations
-                               on o.Id equals r.EventureOrderId
-                           join h in db.Participants
-                               on o.HouseId equals h.Id
-                           join p in db.Participants
-                              on r.ParticipantId equals p.Id
-                           join e in db.Eventures
-                                on r.EventureList.EventureId equals e.Id
-                           where o.Id == id
-                           select new
-                           {
-                               o.Id,
-                               o.DateCreated,
-                               r.EventureList.DisplayName,
-                               p.FirstName,
-                               p.LastName,
-                               r.Quantity,
-                               r.ListAmount,
-                               partEmail = p.Email,
-                               e.DisplayHeading,
-                               houseFirst = h.FirstName,
-                               houseLast = h.LastName,
-                               houseEmail = h.Email,
-                               regQuantity = r.Quantity,
-                               e.OwnerId
-                           };
+                var _mailService = new MailService();
+                var success = _mailService.SendConfirmEmail(id, false);
 
-                var fees = from s in db.Surcharges
-                           where s.EventureOrderId == id
-                           select new { s.Amount, s.Description };
-
-                Int32 ownerId = 0;
-                string houseName = string.Empty;
-                string orderDate = string.Empty;
-                //string carriageReturn = "<BR>";
-                string orderNum = string.Empty;
-                string houseEmail = string.Empty;
-                string lineItems = "<TABLE cellpadding=\"8\" cellspacing=\"8\"><tr><td>Events</td><td>Listings</td><td>Participants</td><td>Quantity</td><td>Price</td></tr>";
-                int numReg = 0;
-                decimal orderAmount = 0;
-
-                foreach (var reg in regs)
-                {
-                    houseName = reg.houseFirst + " " + reg.houseLast;
-                    orderNum = Convert.ToString(reg.Id);
-
-                    lineItems = lineItems + "<TR><TD>" + reg.DisplayHeading + "</TD><TD>" + reg.DisplayName + "</TD><TD>" +
-                                reg.FirstName + " " + reg.LastName + "</TD><TD Align=\"right\">" + reg.Quantity + "</TD><TD Align=\"right\">" + reg.ListAmount + "</TD></TR>";
-                    numReg = numReg + reg.regQuantity;
-                    orderAmount = orderAmount + (reg.ListAmount * reg.Quantity);
-
-                    //this is a little ugly but works
-                    ownerId = reg.OwnerId;
-                    houseEmail = reg.houseEmail;
-                    orderDate = reg.DateCreated.ToString("M/d/yyyy");
-                }
-
-                lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
-
-                foreach (var fee in fees)
-                {
-                    lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + fee.Description + "</TD><TD></TD><TD Align=\"right\">" + fee.Amount + "</TD></TR>";
-                    orderAmount = orderAmount + fee.Amount;
-                }
-
-                lineItems = lineItems + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
-                lineItems = lineItems + "<TR><TD></TD><TD></TD><TD Align=\"right\">" + "Total" + "</TD><TD></TD><TD Align=\"right\">" + orderAmount + "</TD></TR>";
-
-                lineItems = lineItems + "</TABLE>";
-
-                //string numOfRegs = Convert.ToString(numReg);
-
-                var addresses = new List<string>();
-                var mode = ConfigurationManager.AppSettings["MailMode"];
-                var emailText = string.Empty;
-                var subjectText = string.Empty;
-                var sender = string.Empty;
-                var ccs = new List<string>();  //i use cc here because it actaully bccs and that is what i want
-                var bcc = new List<string>();
-                //this is actually bbc
-                //an amazon issue?
-
-                if (mode == "TEST")
-                {
-                    addresses.Add("boone@firstegg.com");
-                    subjectText = "TEST: Eventure Sports Confirmation";
-                    sender = "boone@firstegg.com";
-                    emailText = "<img src=\"http://www.eventuresports.com/Portals/0/Skins/EventureSports_Skin/img/logo.png\"><br><br>";
-                }
-                else
-                {
-                    addresses.Add(houseEmail);
-
-                    var owner = db.Owners.Where(o => o.Id == ownerId).SingleOrDefault();
-                    subjectText = owner.SendConfirmEmailSubject;
-                    sender = owner.SendMailEmailAddress;
-                    bcc.Add("boone@firstegg.com");
-                    bcc.Add("podaniel@firstegg.com");
-                    bcc.Add(sender);
-                    ////emailText = "<img src=\"https://reg.headfirstperformance.com/Content/images/logo.png\"><br><br>";
-                    emailText = owner.SendImageHtml;
-                }
-                emailText = emailText + "Order Date: " + orderDate + "<BR>";
-                emailText = emailText + "Dear " + houseName + ",<BR><BR>Thank you for purchasing your registration. This email serves as your receipt. Your confirmation number is " + orderNum + ". <BR><BR><BR>You have been charged for the following:";
-                emailText = emailText + "<BR>" + lineItems;
-
-                //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
-                var ses = new AmazonSimpleEmailServiceClient("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV", Amazon.RegionEndpoint.USEast1);
-
-                Destination destination = new Destination();
-                destination.ToAddresses = addresses;
-                destination.CcAddresses = ccs;
-                destination.BccAddresses = bcc;
-
-                Body body = new Body() { Html = new Content(emailText) };
-                Content subject = new Content(subjectText);
-                Message message = new Message(subject, body);
-
-                //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
-                SendEmailRequest sendEmailRequest = new SendEmailRequest(sender, destination, message);
-                ses.SendEmail(sendEmailRequest);
-                //ccs and bcc seem to be reversed
-
-                //string x = "test";
-                //string y = "ytest";
-                //string z = "my dod is " + x + "more shit" + y;
-
-
-                //if (mail.ErrorException == null)
-                //if ses.
-                //{
                 if (Request != null)
                     return Request.CreateResponse(HttpStatusCode.OK);
                 else
                     return new HttpResponseMessage(HttpStatusCode.OK);
-                //}
-                //else
-                //{
-                //    //var log = new EventureLog();
-                //    //log.Message = "orderId: " + id + "_email failed" + mail.ErrorException;
-                //    //log.Caller = "Mail Api_SendConfirmMail";
-                //    //log.Status = "Error";
-                //    //log.LogDate = System.DateTime.Now.ToLocalTime();
-                //    //db.EventureLogs.Add(log);
-                //    //db.SaveChanges();
-                //    if (Request != null)
-                //        return Request.CreateResponse(HttpStatusCode.OK); //change this ??  //mjb
-                //    else
-                //    {
-                //        return new HttpResponseMessage(HttpStatusCode.OK);
-                //    }
-                //}
-
             }
             catch (Exception ex)
             {
@@ -212,6 +61,7 @@ namespace evs.API.Controllers
                 }
             }
         }
+        
 
         public HttpResponseMessage SendResetPassword(string email, string resetCode)
         {
@@ -220,12 +70,47 @@ namespace evs.API.Controllers
             var _mailService = new MailService();
             //var _mailBuilder = new MailBuilder();
 
-            var success = _mailService.SendResetPassword(email, resetCode, ownerId, false);
+            var success = _mailService.SendResetPassword(email, resetCode, ownerId);
 
             if (Request != null)
                 return Request.CreateResponse(HttpStatusCode.OK);
             else
                 return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        [Route("ResendReceipt")]
+        [HttpPost]
+        public HttpResponseMessage ResendReceipt(JObject jsonBundle)
+        {
+            try
+            {
+                int id = (Int32)jsonBundle["orderId"];
+                var _mailService = new MailService();
+                var success = _mailService.SendConfirmEmail(id, true);
+
+                if (Request != null)
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                else
+                    return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                //var logE = new EventureLog();
+                //logE.Message = "orderId: " + id + "_Error Handler: " + ex.Message;
+                //logE.Caller = "Mail Api_SendConfirmMail";
+                //logE.Status = "ERROR";
+                //logE.LogDate = System.DateTime.Now.ToLocalTime();
+                //db.EventureLogs.Add(logE);
+                //db.SaveChanges();
+
+                if (Request != null)
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                }
+            }
+
         }
 
 
