@@ -72,7 +72,7 @@ namespace evs.Service
                 bool processed = false;
                 while (!processed)
                 {
-                    if ((DateTime.Now - timeControllerForSendingEmails).TotalSeconds >= .2)
+                    if ((DateTime.Now - timeControllerForSendingEmails).TotalSeconds >= .22)
                     {
                         timeControllerForSendingEmails = DateTime.Now;
 
@@ -104,26 +104,6 @@ namespace evs.Service
             return log;
         }
 
-        //    public void SendList(List<EmailEnt> queuedEmails)
-        //{
-        //    IList<Task> tasks = new List<Task>();
-        //    List<string> logLines = new List<string>();
-
-        //    foreach (EmailEnt emailEnt in queuedEmails)
-        //    {
-        //        string subject = "﻿Hello {name}";
-        //        string body = "im the body;
-        //        
-        //        tasks.Add(Task.Factory.StartNew(() =>
-        //        {
-        //            SendEmail(emailEnt, subject, body);
-        //        }));
-        //    }
-
-
-        //    Task.WaitAll(tasks.ToArray());
-        //}
-
         private Boolean SendEmail(string messageBody, string messageSubject, string sender, List<string> mailTo, List<string> bcc)
         {
             AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient(ConfigurationManager.AppSettings["AWSAccessKey"], ConfigurationManager.AppSettings["AWSKey"], Amazon.RegionEndpoint.USEast1);
@@ -143,8 +123,23 @@ namespace evs.Service
         }
     }
 
-
-
-
-
 }
+//    public void SendList(List<EmailEnt> queuedEmails)
+//{
+//    IList<Task> tasks = new List<Task>();
+//    List<string> logLines = new List<string>();
+
+//    foreach (EmailEnt emailEnt in queuedEmails)
+//    {
+//        string subject = "﻿Hello {name}";
+//        string body = "im the body;
+//        
+//        tasks.Add(Task.Factory.StartNew(() =>
+//        {
+//            SendEmail(emailEnt, subject, body);
+//        }));
+//    }
+
+
+//    Task.WaitAll(tasks.ToArray());
+//}

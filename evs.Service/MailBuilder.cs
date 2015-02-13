@@ -23,6 +23,7 @@ namespace evs.Service
         public string GetSender(Int32 ownerId)
         {
             string sender = string.Empty;
+            //repo:  getOwnersById
             var ownerInfo = db.Owners
               .Where(o => o.Id == ownerId)
               .Select(o => new
@@ -33,13 +34,14 @@ namespace evs.Service
             sender = ownerInfo.SendMailEmailAddress;
 
             if (string.IsNullOrEmpty(sender))
-                sender = "boone@firstegg.com";
+                sender = ConfigurationManager.AppSettings["DevEmail"];
 
             return sender;
         }
 
         public string GetSubject(MailType emailType, Int32 ownerId)
         {
+            //repo:  getOwnersById
             var ownerInfo = db.Owners
              .Where(o => o.Id == ownerId)
              .Select(o => new
@@ -49,7 +51,6 @@ namespace evs.Service
                  //o.SendConfirmTeamEmailSubject,
                  o.SendConfirmTeamInviteEmailSubject
              }).FirstOrDefault();
-
 
             var subject = string.Empty;
             switch (emailType)
@@ -63,16 +64,17 @@ namespace evs.Service
                 case MailType.ResetPassword:
                     subject = ownerInfo.Name + " Password Assistance";
                     break;
-                //case MailType.OrderConfirm:
-                //    subject = ownerInfo.SendConfirmEmailSubject;
-                //    break;
                 //default:
                 //    Console.WriteLine("Default case");
                 //    break;
             }
 
             if (subject.Length == 0)
-                subject = "Thank You for your registration.";
+                subject = "Thank You";
+
+            if (ConfigurationManager.AppSettings["MailMode"] == "TEST")
+                subject = "TEST: " + subject;
+
             return subject;
         }
 
@@ -80,16 +82,21 @@ namespace evs.Service
         {
             List<string> bcc = new List<string>();
 
-            var ownerInfo = db.Owners
-              .Where(o => o.Id == ownerId)
-              .Select(o => new
-                  {
-                      o.Email
-                  }).FirstOrDefault();
-            bcc.Add(ownerInfo.Email);
-
-            bcc.Add(ConfigurationManager.AppSettings["AdminBcc"]);
-            bcc.Add(ConfigurationManager.AppSettings["DevBcc"]);
+            if (ConfigurationManager.AppSettings["MailMode"] != "TEST")
+            {
+                //repo:  getOwnersById
+                var ownerInfo = db.Owners
+                                  .Where(o => o.Id == ownerId)
+                                  .Select(o => new
+                                      {
+                                          o.Email
+                                      }).FirstOrDefault();
+                bcc.Add(ownerInfo.Email);
+                if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["AdminEmail"]))
+                    bcc.Add(ConfigurationManager.AppSettings["AdminEmail"]);
+                if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["DevEmail"]))
+                    bcc.Add(ConfigurationManager.AppSettings["DevEmail"]);
+            }
 
             return bcc;
         }
@@ -98,26 +105,25 @@ namespace evs.Service
         {
             List<string> sendTo = new List<string>();
             if (ConfigurationManager.AppSettings["MailMode"] == "TEST")
-                sendTo.Add("boone@firstegg.com");
+                sendTo.Add(ConfigurationManager.AppSettings["DevEmail"]);
             else
             {
-                //orderEmailBy
+                //repo: getOrdersById
                 var orderInfo = db.Orders
-               .Where(o => o.Id == orderId)
-               .Select(o => new
-              {
-                  o.House.Email
-              }).FirstOrDefault();
+                                   .Where(o => o.Id == orderId)
+                                   .Select(o => new
+                                      {
+                                          o.House.Email
+                                      }).FirstOrDefault();
                 sendTo.Add(orderInfo.Email);
             }
             return sendTo;
         }
-        
+
         public string BuildConfirmEmailBody(Int32 orderId)
         {
             string body = System.IO.File.ReadAllText(System.Web.Hosting.HostingEnvironment.MapPath("/Content/EmailTemplates/order-confirmation.min.html"));
 
-            
             //repo getOrdersById
             var orderInfo = db.Orders
                 .Where(o => o.Id == orderId)
@@ -144,12 +150,13 @@ namespace evs.Service
             replaceTokens.Add("GROUPNAME", orderInfo.GroupName);
             replaceTokens.Add("LISTINGNAME", orderInfo.ListingName);
             replaceTokens.Add("PARTNAME", orderInfo.FirstName + " " + orderInfo.LastName);
-
-            replaceTokens.Add("IMAGEURL", orderInfo.Url + "/Content/images/" + orderInfo.LogoImageName);
             replaceTokens.Add("SUPPORTEMAIL", orderInfo.SupportEmail);
             replaceTokens.Add("SUPPORTPHONE", " " + orderInfo.SupportPhone);  //added " " because the minification removes it
             replaceTokens.Add("MAINCOLOR", orderInfo.MainColor);
-
+            if (ConfigurationManager.AppSettings["MailMode"] == "TEST")
+                replaceTokens.Add("IMAGEURL", ConfigurationManager.AppSettings["TestLogo"]);
+            else
+                replaceTokens.Add("IMAGEURL", orderInfo.Url + "/Content/images/" + orderInfo.LogoImageName);
             replaceTokens.Add("TABLEBODY", BuildOrderSummaryTable(orderId));
 
             replaceTokens.Select(a => body = body.Replace(string.Concat("{{", a.Key, "}}"), a.Value)).ToList();
@@ -177,7 +184,10 @@ namespace evs.Service
             Dictionary<string, string> replaceTokens = new Dictionary<string, string>();
             replaceTokens.Add("COMPANYNAME", ownerInfo.Name);
             replaceTokens.Add("URL", ownerInfo.Url);
-            replaceTokens.Add("IMAGEURL", ownerInfo.Url + "/Content/images/" + ownerInfo.LogoImageName);
+            if (ConfigurationManager.AppSettings["MailMode"] == "TEST")
+                replaceTokens.Add("IMAGEURL", ConfigurationManager.AppSettings["TestLogo"]);
+            else
+                replaceTokens.Add("IMAGEURL", ownerInfo.Url + "/Content/images/" + ownerInfo.LogoImageName);
             replaceTokens.Add("SUPPORTEMAIL", ownerInfo.SupportEmail);
             replaceTokens.Add("SUPPORTPHONE", ownerInfo.SupportPhone);
             replaceTokens.Add("RESETPASSWORDURL", ownerInfo.Url + "#/resetpassword?userId=" + resetCode);
@@ -192,7 +202,7 @@ namespace evs.Service
         {
             try
             {
-                //regs by orderId
+                //repo: getRegsoByOrderId
                 var regs = from o in db.Orders
                            join r in db.Registrations
                                on o.Id equals r.EventureOrderId
@@ -217,11 +227,10 @@ namespace evs.Service
                                regQuantity = r.Quantity,
                            };
 
-                //surcharges by orderId
+                //repo:  getSurchargesByOrderId
                 var fees = from s in db.Surcharges
                            where s.EventureOrderId == orderId
                            select new { s.Amount, s.Description };
-
 
                 string summaryTable = "<tbody>";
                 int numReg = 0;
@@ -234,22 +243,18 @@ namespace evs.Service
                     numReg = numReg + reg.regQuantity;
                     orderAmount = orderAmount + (reg.ListAmount * reg.Quantity);
                 }
-
-                summaryTable = summaryTable + "<TR><TD></TD><TD></TD><TD>&nbsp;</TD><TD></TD><TD></TD></TR>";
-
+                summaryTable = summaryTable + "<TR><TD></TD><TD></TD><TD>&nbsp;</TD><TD></TD><TD></TD></TR>";  //empty row
+                
                 foreach (var fee in fees)
                 {
                     summaryTable = summaryTable + "<TR><TD></TD><TD></TD><TD Align=\"center\">" + fee.Description + "</TD><TD></TD><TD Align=\"center\">" + fee.Amount + "</TD></TR>";
                     orderAmount = orderAmount + fee.Amount;
                 }
-
                 summaryTable = summaryTable + "<TR><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>";
                 summaryTable = summaryTable + "<TR><TD></TD><TD></TD><TD Align=\"center\">" + "Total" + "</TD><TD></TD><TD Align=\"center\">" + orderAmount + "</TD></TR>";
-
                 summaryTable = summaryTable + "</tbody>";
 
                 return summaryTable;
-
             }
             catch (Exception ex)
             {
