@@ -61,6 +61,74 @@ namespace evs.API.Controllers
                 }
             }
         }
+
+        [Route("SendMassMessage")]
+        [HttpPost]
+        public HttpResponseMessage SendMassMessage(JObject jsonBundle)
+        {
+            try
+            {
+                //dynamic emailBundle = jsonBundle;
+                //if (emailBundle.email != null)  //if no surcharges skip this
+                //{
+
+                //    foreach (dynamic dynEmail in emailBundle.emails)
+                //    {
+                //        emails.Add(dynEmail.email)
+                //    }
+                //}
+
+                //string body = (Int32)jsonBundle["body"];
+                //string subject = (Int32)jsonBundle["subject"];
+                string body = "this is an email that you rewquesteed to inform you of the chance of inclement weather.  Please stay tuned for an update on our website at ww.eventuresports.com"; 
+                string subject = "weather warning  snow possible";
+                Int32 ownerId = 1;  
+                List<string> emails = new List<string>();
+
+                emails.Add("boone.mike@gmail.com");
+                emails.Add("boone@eventuresports.com");
+                emails.Add("boone@firstegg.com");
+                emails.Add("boone.mike@gmail.com");
+                emails.Add("boone@eventuresports.com");
+                emails.Add("boone@firstegg.com");
+                emails.Add("boone.mike@gmail.com");
+                emails.Add("boone@eventuresports.com");
+                emails.Add("boone@firstegg.com");
+                //emails.Add("podaniel@firstegg.com");
+                //emails.Add("wgoolsby@me.com");
+                //emails.Add("kmacdonald@firstegg.com");
+                //emails.Add("XXXX");
+                //emails.Add("XXXX");
+                //emails.Add("XXXX");
+                //emails.Add("XXXX");
+                //emails.Add("XXXX");
+
+                var _mailService = new MailService();
+                var returnMessage = _mailService.SendGroupEmailGroup(emails, subject, body, ownerId);
+
+                if (Request != null)
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                else
+                    return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                //var logE = new EventureLog();
+                //logE.Message = "orderId: " + id + "_Error Handler: " + ex.Message;
+                //logE.Caller = "Mail Api_SendConfirmMail";
+                //logE.Status = "ERROR";
+                //logE.LogDate = System.DateTime.Now.ToLocalTime();
+                //db.EventureLogs.Add(logE);
+                //db.SaveChanges();
+
+                if (Request != null)
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                }
+            }
+        }
         
 
         public HttpResponseMessage SendResetPassword(string email, string resetCode)
@@ -84,9 +152,9 @@ namespace evs.API.Controllers
         {
             try
             {
-                int id = (Int32)jsonBundle["orderId"];
+                int orderId = (Int32)jsonBundle["orderId"];
                 var _mailService = new MailService();
-                var success = _mailService.SendConfirmEmail(id, true);
+                var success = _mailService.SendConfirmEmail(orderId, true);
 
                 if (Request != null)
                     return Request.CreateResponse(HttpStatusCode.OK);

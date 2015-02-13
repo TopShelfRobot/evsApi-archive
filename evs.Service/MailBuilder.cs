@@ -30,11 +30,11 @@ namespace evs.Service
                   o.SendMailEmailAddress
               }).FirstOrDefault();
 
-           sender = ownerInfo.SendMailEmailAddress;
+            sender = ownerInfo.SendMailEmailAddress;
 
             if (string.IsNullOrEmpty(sender))
                 sender = "boone@firstegg.com";
-            
+
             return sender;
         }
 
@@ -76,21 +76,49 @@ namespace evs.Service
             return subject;
         }
 
-        public List<string> getEventureBcc()
+        public List<string> getEventureBcc(Int32 ownerId)
         {
             List<string> bcc = new List<string>();
+
+            var ownerInfo = db.Owners
+              .Where(o => o.Id == ownerId)
+              .Select(o => new
+                  {
+                      o.Email
+                  }).FirstOrDefault();
+            bcc.Add(ownerInfo.Email);
+
             bcc.Add(ConfigurationManager.AppSettings["AdminBcc"]);
             bcc.Add(ConfigurationManager.AppSettings["DevBcc"]);
 
             return bcc;
         }
 
+        public List<string> getSendToAddressFromOrderId(Int32 orderId)
+        {
+            List<string> sendTo = new List<string>();
+            if (ConfigurationManager.AppSettings["MailMode"] == "TEST")
+                sendTo.Add("boone@firstegg.com");
+            else
+            {
+                //orderEmailBy
+                var orderInfo = db.Orders
+               .Where(o => o.Id == orderId)
+               .Select(o => new
+              {
+                  o.House.Email
+              }).FirstOrDefault();
+                sendTo.Add(orderInfo.Email);
+            }
+            return sendTo;
+        }
+        
         public string BuildConfirmEmailBody(Int32 orderId)
         {
             string body = System.IO.File.ReadAllText(System.Web.Hosting.HostingEnvironment.MapPath("/Content/EmailTemplates/order-confirmation.min.html"));
 
-            //move this call to respository
-
+            
+            //repo getOrdersById
             var orderInfo = db.Orders
                 .Where(o => o.Id == orderId)
                 .Select(o => new
@@ -99,18 +127,18 @@ namespace evs.Service
                    o.DateCreated,
                    o.House.FirstName,
                    o.House.LastName,
-                    o.Owner.MainColor,
-                    o.Owner.Name,
-                    o.Owner.GroupName,
-                    o.Owner.ListingName,
-                    o.Owner.Url,
-                    o.Owner.LogoImageName,
-                    o.Owner.SupportPhone,
-                    o.Owner.SupportEmail
+                   o.Owner.MainColor,
+                   o.Owner.Name,
+                   o.Owner.GroupName,
+                   o.Owner.ListingName,
+                   o.Owner.Url,
+                   o.Owner.LogoImageName,
+                   o.Owner.SupportPhone,
+                   o.Owner.SupportEmail
                }).FirstOrDefault();
 
             Dictionary<string, string> replaceTokens = new Dictionary<string, string>();
-            replaceTokens.Add("COMPANYNAME", orderInfo.Name);    
+            replaceTokens.Add("COMPANYNAME", orderInfo.Name);
             replaceTokens.Add("ORDERDATE", orderInfo.DateCreated.ToString("MMMM dd, yyyy"));
             replaceTokens.Add("ORDERNUMBER", orderId.ToString());
             replaceTokens.Add("GROUPNAME", orderInfo.GroupName);
@@ -164,6 +192,7 @@ namespace evs.Service
         {
             try
             {
+                //regs by orderId
                 var regs = from o in db.Orders
                            join r in db.Registrations
                                on o.Id equals r.EventureOrderId
@@ -182,17 +211,18 @@ namespace evs.Service
                                p.FirstName,
                                p.LastName,
                                r.Quantity,
-                               regGroup = r.EventureGroup.Name,   //|| ""
+                               regGroup = r.EventureGroup.Name,   //this can be null but doesn't seem to cause an issue
                                r.ListAmount,
                                e.DisplayHeading,
                                regQuantity = r.Quantity,
                            };
 
+                //surcharges by orderId
                 var fees = from s in db.Surcharges
                            where s.EventureOrderId == orderId
                            select new { s.Amount, s.Description };
 
-               
+
                 string summaryTable = "<tbody>";
                 int numReg = 0;
                 decimal orderAmount = 0;
