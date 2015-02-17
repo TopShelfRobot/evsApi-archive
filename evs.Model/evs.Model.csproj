@@ -52,7 +52,6 @@
     <Compile Include="AccountModels.cs" />
     <Compile Include="DataConv.cs" />
     <Compile Include="Enum.cs" />
-    <Compile Include="EventureTransfer.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="Eventure.cs" />
     <Compile Include="Facility.cs" />
@@ -69,6 +68,7 @@
     <Compile Include="Surcharge.cs" />
     <Compile Include="Team.cs" />
     <Compile Include="Resource.cs" />
+    <Compile Include="EventureTransfer.cs" />
     <Compile Include="Volunteer.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -73,8 +73,11 @@ namespace evs.DAL
         public DbSet<VolunteerJob> VolunteerJobs { get; set; }
         public DbSet<VolunteerShift> VolunteerShifts { get; set; }
 
-        public DbSet<EventListCharge> EventListCharges { get; set; }
+        //public DbSet<EventListCharge> EventListCharges { get; set; }
+        public DbSet<RegistrationPost> RegistrationPosts { get; set; }
         //public DbSet<SurchargeType> SurchargeTypes { get; set; }
+
+        public DbSet<Refund> Refunds { get; set; }
 
         public DbSet<UserAgent> UserAgents { get; set; }
         

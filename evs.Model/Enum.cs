@@ -36,8 +36,6 @@ namespace evs.Model
         MassParticipant
     };
 
-   
-
     public enum AmountType
     {
         Dollars = 0,

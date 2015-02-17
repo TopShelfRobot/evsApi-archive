@@ -63,13 +63,15 @@ namespace evs.Model
     {
         public Int32 Id { get; set; }
         public decimal Amount { get; set; }
-        public Int32 eventureOrderId { get; set; }
-        public string description { get; set; }
+        public Int32 EventureOrderId { get; set; }
+        public string Description { get; set; }
         public DateTime DateCreated { get; set; }
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
         //public Int32 registrationId { get; set; }
+
+        public virtual EventureOrder EventureOrder { get; set; }
     }
 
     public class Addon   //deprecated
@@ -87,17 +89,18 @@ namespace evs.Model
         public Int32 OwnerId { get; set; }
     }
 
-    public class EventListCharge
+    public class RegistrationPost
     {
         public Int32 Id { get; set; }
         public Int32 RegistrationId { get; set; }
         public decimal Amount { get; set; }
-        public SurchargeType SurchargeType { get; set; }
-        public Int32? CouponId { get; set; }
+        //public SurchargeType SurchargeType { get; set; }
+        //public Int32? CouponId { get; set; }
+        public Int32? SurchargeId { get; set; }
         public Int32 OwnerId { get; set; }
-        public Int32 SurchargeId { get; set; }
         public DateTime DateCreated { get; set; }
         //public DateTime DateModified { get; set; }
+        public Int32 TransactionId { get; set; }
     }
 
 
