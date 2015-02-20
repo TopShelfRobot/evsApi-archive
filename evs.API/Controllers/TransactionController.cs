@@ -42,7 +42,7 @@ namespace evs.API.Controllers
                 db.EventureLogs.Add(log);
                 db.SaveChanges();
 
-                var transfer = db.EventureTransfers.Where(t => t.Id == transferId).Single();
+                var transfer = db.Transfers.Where(t => t.Id == transferId).Single();
 
                 var order = new EventureOrder
                 {

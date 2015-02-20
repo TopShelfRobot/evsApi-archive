@@ -601,7 +601,7 @@ namespace evs.API.Controllers
         [HttpGet]
         public object GetTransferInfo(Int32 id)
         {
-            var transfer = from t in _contextProvider.Context.EventureTransfers
+            var transfer = from t in _contextProvider.Context.Transfers
                            join fl in _contextProvider.Context.EventureLists
                            on t.EventureListIdFrom equals fl.Id
                            join tl in _contextProvider.Context.EventureLists
@@ -686,9 +686,9 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public IQueryable<EventureTransfer> EventureTransfers()
+        public IQueryable<EventureTransfer> Transfers()
         {
-            return _contextProvider.Context.EventureTransfers;
+            return _contextProvider.Context.Transfers;
         }
 
         [HttpGet]

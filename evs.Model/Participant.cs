@@ -41,9 +41,19 @@ namespace evs.Model
 
         public string Position { get; set; }
         public string ShirtSize { get; set; }
- 
     }
-
+    
+    public class Employee
+    {
+        public Int32 Id { get; set; }
+        [MaxLength(100)]
+        public string Email { get; set; }
+        [MaxLength(50)]
+        public string FirstName { get; set; }
+        [MaxLength(50)]
+        public string LastName { get; set; }
+        public Int32 OwnerId { get; set; }
+    }
      
     public class UserAgent
     {

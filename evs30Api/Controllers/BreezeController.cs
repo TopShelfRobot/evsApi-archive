@@ -308,7 +308,7 @@ namespace evs30Api.Controllers
         [HttpGet]
         public object GetTransferInfo(int id)
         {
-            var transfer = from t in _contextProvider.Context.EventureTransfers
+            var transfer = from t in _contextProvider.ContextTransfers
                            join fl in _contextProvider.Context.EventureLists
                            on t.EventureListIdFrom equals fl.Id
                            join tl in _contextProvider.Context.EventureLists

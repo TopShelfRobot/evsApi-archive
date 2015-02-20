@@ -70,7 +70,6 @@ namespace evs.Model
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
-        
 
         public virtual EventureOrder EventureOrder { get; set; }
     }

@@ -626,10 +626,10 @@ namespace evs.API.Controllers
         [AllowAnonymous]
         [Route("GetUserRolesByUserId")]
         //public List<string> GetUserRolesByUserId(JObject jUserName) //email
-        public List<string> GetUserRolesByUserId() 
+        public List<string> GetUserRolesByUserId(string userId) 
         {
             //string userId = (string)jUserName["userId"];
-            string userId = "boone@boone.com";
+            //string userId = "boone@boone.com";
             return _repo.GetRolesByUserId(userId);
             //return JsonConvert.SerializeObject(_repo.GetRolesByUserId(userId).ToList());
         }
