@@ -100,21 +100,26 @@ namespace evs.API
             return _ctx.RefreshTokens.ToList();
         }
 
-        public List<RoleDTO> GetAllRolesDTO()   //ByOwnerId
+        public IEnumerable<RoleDTO> GetAllRolesDTO()   //ByOwnerId
         {
             return _ctx.Roles
                         .Select(r => new RoleDTO
                                         {
-                                            RoleId = r.Id, 
+                                            RoleId = r.Id,
                                             Name = r.Name
-                                        }).ToList();
+                                        });
         }
 
-        public class RoleDTO
-        {
-            public string RoleId;
-            public string Name;
-        }
+        //public IEnumerable<IdentityRole> GetAllRolesDTO()   //ByOwnerId
+        //{
+        //    //_roleManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
+        //    var rm = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
+
+        //    var x = rm.Roles.
+        //    return rm.Roles;
+        //}
+
+        
 
         public List<string> GetRolesByUserId(string userId)
         {

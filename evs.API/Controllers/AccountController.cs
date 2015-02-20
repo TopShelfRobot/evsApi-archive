@@ -616,10 +616,13 @@ namespace evs.API.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("GetAllRoles")]
-        //public List<IdentityRole> GetRoles()
-        public object GetAllRoles()
+        //public  GetRoles()
+        //public IEnumerable<Test> GetAllRoles()
+        public IEnumerable<RoleDTO> GetAllRoles()
         {
-            return JsonConvert.SerializeObject(_repo.GetAllRolesDTO());
+            //return JsonConvert.SerializeObject(_repo.GetAllRolesDTO());
+            var x = _repo.GetAllRolesDTO();
+            return x;
         }
 
         [HttpGet]

@@ -16,6 +16,8 @@ namespace evs.DAL
             //Database.SetInitializer(new DropCreateDatabaseAlways<evsContext>());
         }
 
+        public DbSet<Test> Tests { get; set; }
+
         public DbSet<Eventure> Eventures { get; set; }
         public DbSet<EventureList> EventureLists { get; set; }
         public DbSet<Participant> Participants { get; set; }

@@ -172,4 +172,10 @@ namespace evs.Model
         JavaScript = 0,
         NativeConfidential = 1
     };
+
+    public class RoleDTO
+    {
+        public string RoleId;
+        public string Name;
+    }
 }

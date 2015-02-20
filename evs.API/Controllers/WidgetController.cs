@@ -17,6 +17,13 @@ namespace evs.API.Controllers
     {
         readonly evsContext db = new evsContext();
 
+
+        //[HttpGet]
+        //public IEnumerable<Test> GetAllRoles(Int32 id)
+        //{
+        //    return db.Tests;
+        //}
+
         [HttpGet]
         public IEnumerable<Eventure> GetAllEventuresByOwnerId(Int32 id)
         {

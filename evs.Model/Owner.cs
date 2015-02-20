@@ -115,4 +115,10 @@ namespace evs.Model
     //    public string Email { get; set; }
     //    public string AccessType { get; set; }
     //}
+
+    public class Test
+    {
+        public Int32 Id { get; set; }
+        public string Name { get; set; }
+    }
 }
