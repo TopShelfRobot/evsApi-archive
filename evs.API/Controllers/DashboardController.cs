@@ -764,6 +764,12 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
+        public IQueryable<Employee> Employees()
+        {
+            return _contextProvider.Context.Employees;
+        }
+
+        [HttpGet]
         public IQueryable<TeamMemberPayment> TeamMemberPayments()
         {
             return _contextProvider.Context.TeamMemberPayments;
