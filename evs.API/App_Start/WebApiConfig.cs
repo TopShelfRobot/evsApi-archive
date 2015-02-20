@@ -29,6 +29,11 @@ namespace evs.API
           //);
 
             var jsonFormatter = config.Formatters.OfType<JsonMediaTypeFormatter>().First();
+
+            //var json = config.Formatters.JsonFormatter;
+            jsonFormatter.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
+            
+            
             jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
     }

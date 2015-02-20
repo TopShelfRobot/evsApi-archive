@@ -20,6 +20,8 @@ namespace evs.API.Controllers
         //[HttpPost]
         //[AllowAnonymous]
         //[System.Web.Mvc.ValidateAntiForgeryToken]
+        [HttpPost]
+        [Route("Transfer")]
         public HttpResponseMessage Transfer(JObject saveBundle)
         {
             try
@@ -184,6 +186,31 @@ namespace evs.API.Controllers
                     //return new HttpResponseMessage(HttpStatusCode.InternalServerError,);
                 }
             }
+
+        }
+
+
+        [HttpPost]
+        [Route("Refund")]
+        public HttpResponseMessage Refund(JObject jRefund)
+        {
+            decimal amount = (Int32)jRefund["amount"];
+            Int32 eventureOrderId = (Int32)jRefund["eventureOrderId"];
+            string description = (string)jRefund["description"];
+            //Int32 regId = (Int32)(jRefund["description"] || 0;
+
+            var refund = new Refund();
+            refund.Amount = amount;
+            refund.EventureOrderId = eventureOrderId;
+            //if (!regId ==0 )
+            //    refund.RegistrationId;
+            refund.DateCreated = DateTime.Now;
+            db.Refunds.Add(refund);
+            db.SaveChanges();
+
+            var resp = Request.CreateResponse(HttpStatusCode.OK);
+            //resp.Content = new StringContent("ok", Encoding.UTF8, "text/plain");
+            return resp;
 
         }
     }

@@ -17,6 +17,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using evs.Service;
 
 using evs.Model;  //user model
@@ -29,12 +30,12 @@ namespace evs.API.Controllers
     public class AccountController : ApiController
     {
         private AuthRepository _repo = null;
-        private MailService _mailService = null;
+        //private MailService _mailService = null;
 
         public AccountController()
         {
             _repo = new AuthRepository();
-            _mailService = new MailService();
+            //_mailService = new MailService();
 
         }
 
@@ -499,7 +500,7 @@ namespace evs.API.Controllers
                 //string callbackUrl = this.Url.Link("ResetPassword", new { userId = user.Id, code = code });   //, protocol: Request.Url.Scheme
                 //var callbackUrl = "http://localhost:65468/#/resetpassword?userId=" + code;
                 //var callbackUrl = ConfigurationManager.AppSettings["resetPasswordLink"] + "/#/resetpassword?userId=" + code;
-                
+
                 //ConfigurationManager.AppSettings["resetPasswordLink"];
 
                 //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>")
@@ -532,7 +533,7 @@ namespace evs.API.Controllers
             {
                 evsContext db = new evsContext();
                 var logE = new EventureLog();
-                logE.Message = "Order exception: " + ex.Message +  " -- bundle: ";
+                logE.Message = "Order exception: " + ex.Message + " -- bundle: ";
                 logE.Caller = "Order_ERROR";
                 logE.Status = "ERROR";
                 logE.LogDate = System.DateTime.Now.ToLocalTime();
@@ -612,5 +613,25 @@ namespace evs.API.Controllers
             public string Code { get; set; }
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("GetAllRoles")]
+        //public List<IdentityRole> GetRoles()
+        public object GetAllRoles()
+        {
+            return JsonConvert.SerializeObject(_repo.GetAllRolesDTO());
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("GetUserRolesByUserId")]
+        //public List<string> GetUserRolesByUserId(JObject jUserName) //email
+        public List<string> GetUserRolesByUserId() 
+        {
+            //string userId = (string)jUserName["userId"];
+            string userId = "boone@boone.com";
+            return _repo.GetRolesByUserId(userId);
+            //return JsonConvert.SerializeObject(_repo.GetRolesByUserId(userId).ToList());
+        }
     }
 }

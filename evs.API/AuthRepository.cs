@@ -7,18 +7,11 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using evs.DAL;
 using evs.Model;
+//using Microsoft.AspNet.Identity.Owin;
+//using Microsoft.Owin.Security;
+//using System.Globalization;
+//using System.Security.Claims;
 
-using System.Globalization;
-//using IdentitySample.Models;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using System;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Mvc;
 
 namespace evs.API
 {
@@ -107,10 +100,31 @@ namespace evs.API
             return _ctx.RefreshTokens.ToList();
         }
 
+        public List<RoleDTO> GetAllRolesDTO()   //ByOwnerId
+        {
+            return _ctx.Roles
+                        .Select(r => new RoleDTO
+                                        {
+                                            RoleId = r.Id, 
+                                            Name = r.Name
+                                        }).ToList();
+        }
+
+        public class RoleDTO
+        {
+            public string RoleId;
+            public string Name;
+        }
+
+        public List<string> GetRolesByUserId(string userId)
+        {
+            var user = _userManager.FindByName(userId);
+            return _userManager.GetRoles(user.Id).ToList();
+        }
+
         public async Task<IdentityUser> FindAsync(UserLoginInfo loginInfo)
         {
             IdentityUser user = await _userManager.FindAsync(loginInfo);
-
             return user;
         }
 
@@ -147,9 +161,6 @@ namespace evs.API
             return true;
         }
 
-
-        //UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
-
         public async Task<IdentityResult> ResetPasswordAsync(string id, string code, string password)     //mjb 
         {
 
@@ -172,8 +183,7 @@ namespace evs.API
             //    return IdentityResult.Failed(errors.ToArray());
             //}
         }
-
-
+        
         public async Task<IdentityResult> AddLoginAsync(string userId, UserLoginInfo login)
         {
             var result = await _userManager.AddLoginAsync(userId, login);

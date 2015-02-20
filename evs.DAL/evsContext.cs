@@ -27,6 +27,8 @@ namespace evs.DAL
         public DbSet<EventureOrder> Orders { get; set; }
        
         public DbSet<UserProfile> UserProfiles { get; set; }
+        //public DbSet<IdentityRole> Roles { get; set; }
+
         public DbSet<Addon> Addons { get; set; }
         public DbSet<Surcharge> Surcharges { get; set; }
         public DbSet<FeeSchedule> FeeSchedules { get; set; }
@@ -49,15 +51,22 @@ namespace evs.DAL
         public DbSet<EventureClient> EventureClients { get; set; }
         public DbSet<EventureService> EventureServices { get; set; }
 
-        public DbSet<Dc_Part> DcParts { get; set; }
-        public DbSet<Dc_Reg> DcRegs { get; set; }
-        public DbSet<Dc_StagePart> DcStageParts { get; set; }
-        public DbSet<Dc_Order> DcOrders { get; set; }
-        public DbSet<Dc_StateLookup> DcStateLookups { get; set; }
+
 
         public DbSet<EventureLog> EventureLogs { get; set; }
         public DbSet<EventureTransfer> EventureTransfers { get; set; }
+        //public DbSet<EventListCharge> EventListCharges { get; set; }
+        public DbSet<RegistrationPost> RegistrationPosts { get; set; }
+        //public DbSet<SurchargeType> SurchargeTypes { get; set; }
 
+        public DbSet<Refund> Refunds { get; set; }
+
+        public DbSet<UserAgent> UserAgents { get; set; }
+        
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Client> Clients { get; set; }
+
+        //////////////////////////////////////////////////////////////
         public DbSet<Player> Players { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<Roster> Rosters { get; set; }
@@ -73,16 +82,13 @@ namespace evs.DAL
         public DbSet<VolunteerJob> VolunteerJobs { get; set; }
         public DbSet<VolunteerShift> VolunteerShifts { get; set; }
 
-        //public DbSet<EventListCharge> EventListCharges { get; set; }
-        public DbSet<RegistrationPost> RegistrationPosts { get; set; }
-        //public DbSet<SurchargeType> SurchargeTypes { get; set; }
+        public DbSet<Dc_Part> DcParts { get; set; }
+        public DbSet<Dc_Reg> DcRegs { get; set; }
+        public DbSet<Dc_StagePart> DcStageParts { get; set; }
+        public DbSet<Dc_Order> DcOrders { get; set; }
+        public DbSet<Dc_StateLookup> DcStateLookups { get; set; }
+        //////////////////////////////////////////////////////////////
 
-        public DbSet<Refund> Refunds { get; set; }
-
-        public DbSet<UserAgent> UserAgents { get; set; }
-        
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<Client> Clients { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

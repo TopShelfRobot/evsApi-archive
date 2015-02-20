@@ -66,10 +66,11 @@ namespace evs.Model
         public Int32 EventureOrderId { get; set; }
         public string Description { get; set; }
         public DateTime DateCreated { get; set; }
+        public Int32? RegistrationId { get; set; }
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
-        //public Int32 registrationId { get; set; }
+        
 
         public virtual EventureOrder EventureOrder { get; set; }
     }

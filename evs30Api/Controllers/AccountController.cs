@@ -468,6 +468,15 @@ namespace evs30Api.Controllers
             return result;
         }
 
+
+        [HttpGet]
+        public IEnumerable<AspNetUser> ParticipantsByHouseId(int houseId)
+        {
+            return _db.Participants
+                        .Where(p => p.HouseId == houseId) //.Where(p => p.Hous)eId = 1);
+                        .OrderBy(p => (p.HouseId == p.Id) ? -1 : 1);   //this should cause the one that is houseID to top
+        }
+
         //[AllowAnonymous]
         //public ActionResult PasswordReset1(string un, string rt)
         //{
