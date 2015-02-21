@@ -71,7 +71,17 @@ namespace evs.Model
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
 
-        public virtual EventureOrder EventureOrder { get; set; }
+        public Int32? AmountRefunded { get; set; }
+        public Int32 BalanceTransaction { get; set; }
+        public string BalanceTransactionId { get; set; }
+        public string CustomerId {get; set;}
+        public string FailureMessage { get; set; }
+
+        public Boolean? Paid { get; set; }
+        public string ReceiptEmail { get; set; }
+        public Boolean? Refunded { get; set; }
+
+        //public virtual EventureOrder EventureOrder { get; set; }
     }
 
     public class Addon   //deprecated

@@ -9,6 +9,8 @@ using evs.Model;
 using Newtonsoft.Json.Linq;
 using Stripe;
 using System.Text;
+using evs.Service;
+
 
 namespace evs.API.Controllers
 {
@@ -17,7 +19,6 @@ namespace evs.API.Controllers
     {
         private evsContext db = new evsContext();
 
-        //[HttpPost]
         //[AllowAnonymous]
         //[System.Web.Mvc.ValidateAntiForgeryToken]
         [HttpPost]
@@ -194,19 +195,17 @@ namespace evs.API.Controllers
         [Route("Refund")]
         public HttpResponseMessage Refund(JObject jRefund)
         {
-            decimal amount = (Int32)jRefund["amount"];
-            Int32 eventureOrderId = (Int32)jRefund["eventureOrderId"];
-            string description = (string)jRefund["description"];
-            //Int32 regId = (Int32)(jRefund["description"] || 0;
+            //decimal amount = (Decimal)jRefund["amount"];
+            //Int32 eventureOrderId = (Int32)jRefund["eventureOrderId"];
+            //string description = (string)jRefund["description"];
+            ////Int32 regId = (Int32)(jRefund["description"] || 0;
 
             var refund = new Refund();
-            refund.Amount = amount;
-            refund.EventureOrderId = eventureOrderId;
-            //if (!regId ==0 )
-            //    refund.RegistrationId;
-            refund.DateCreated = DateTime.Now;
-            db.Refunds.Add(refund);
-            db.SaveChanges();
+            refund.Amount = (Decimal)jRefund["amount"];
+            refund.EventureOrderId = (Int32)jRefund["eventureOrderId"];
+            
+            var _tranMan = new TransactionManager();
+            _tranMan.ProcessRefund(refund);
 
             var resp = Request.CreateResponse(HttpStatusCode.OK);
             //resp.Content = new StringContent("ok", Encoding.UTF8, "text/plain");

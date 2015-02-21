@@ -58,8 +58,9 @@
     <Reference Include="SendGridMail">
       <HintPath>..\packages\Sendgrid.5.0.0\lib\SendGridMail.dll</HintPath>
     </Reference>
-    <Reference Include="Stripe.net">
-      <HintPath>..\packages\Stripe.net.2.3.4\lib\net40\Stripe.net.dll</HintPath>
+    <Reference Include="Stripe.net, Version=2.3.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\evs.API\bin\Stripe.net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
