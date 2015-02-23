@@ -22,7 +22,7 @@ namespace evs.API.Controllers
         //[AllowAnonymous]
         //[System.Web.Mvc.ValidateAntiForgeryToken]
         [HttpPost]
-        [Route("Transfer")]
+        [Route("transfer")]
         public HttpResponseMessage Transfer(JObject saveBundle)
         {
             try
@@ -34,14 +34,14 @@ namespace evs.API.Controllers
                 var transferNewListName = (string)saveBundle["transferNewListName"];
                 var participantId = (Int32)saveBundle["partId"];
 
-                var log = new EventureLog();
-                log.Message = "starting transfer: " + transferId;
-                log.Caller = "transfer";
-                log.Status = "Info";
-                log.LogDate = System.DateTime.Now.ToLocalTime();
-                log.DateCreated = System.DateTime.Now.ToLocalTime();
-                db.EventureLogs.Add(log);
-                db.SaveChanges();
+                //var log = new EventureLog();
+                //log.Message = "starting transfer: " + transferId;
+                //log.Caller = "transfer";
+                //log.Status = "Info";
+                //log.LogDate = System.DateTime.Now.ToLocalTime();
+                //log.DateCreated = System.DateTime.Now.ToLocalTime();
+                //db.EventureLogs.Add(log);
+                //db.SaveChanges();
 
                 var transfer = db.Transfers.Where(t => t.Id == transferId).Single();
 
