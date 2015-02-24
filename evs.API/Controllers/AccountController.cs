@@ -625,9 +625,37 @@ namespace evs.API.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("GetUserRolesByUserId/{user}")]
-        public List<string> GetUserRolesByUserId(string user)   //email
+        public IEnumerable<RoleDTO> GetUserRolesByUserId(string user)   //email
         {
-            return _repo.GetRolesByUserId(user);
+            var roles =  _repo.GetRolesByUserId(user);
+            return roles;
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("PutRoles")]
+        public IEnumerable<RoleDTO> PutRoles(JObject jRoles)   //email
+        {
+            var userId = "boone.mike@gmail.com";
+            var newRoles = new List<RoleDTO>();
+
+            //RoleDTO newRole = new RoleDTO();
+            //newRole.Name = "Admin";
+            //newRole.RoleId = "2" 
+            //newRoles.Add(newRole);
+
+            //var newRole = new RoleDTO();
+            //newRole.Name = "Money";
+            //newRole.RoleId = "4 
+            //newRoles.Add(newRole);
+
+            var x = _repo.AddUsersToRole("test");
+
+            var roles =  _repo.GetRolesByUserId(userId);
+                        
+            return roles;
+        }
+
+
     }
 }

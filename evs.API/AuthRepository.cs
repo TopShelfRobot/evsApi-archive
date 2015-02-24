@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using evs.DAL;
 using evs.Model;
+using System.Web.Security;
 //using Microsoft.AspNet.Identity.Owin;
 //using Microsoft.Owin.Security;
 //using System.Globalization;
@@ -100,33 +101,6 @@ namespace evs.API
             return _ctx.RefreshTokens.ToList();
         }
 
-        public IEnumerable<RoleDTO> GetAllRolesDTO()   //ByOwnerId
-        {
-            return _ctx.Roles
-                        .Select(r => new RoleDTO
-                                        {
-                                            RoleId = r.Id,
-                                            Name = r.Name
-                                        });
-        }
-
-        //public IEnumerable<IdentityRole> GetAllRolesDTO()   //ByOwnerId
-        //{
-        //    //_roleManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
-        //    var rm = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
-
-        //    var x = rm.Roles.
-        //    return rm.Roles;
-        //}
-
-        
-
-        public List<string> GetRolesByUserId(string userId)
-        {
-            var user = _userManager.FindByName(userId);
-            return _userManager.GetRoles(user.Id).ToList();
-        }
-
         public async Task<IdentityUser> FindAsync(UserLoginInfo loginInfo)
         {
             IdentityUser user = await _userManager.FindAsync(loginInfo);
@@ -195,6 +169,99 @@ namespace evs.API
 
             return result;
         }
+
+        public IEnumerable<RoleDTO> GetAllRolesDTO()   //ByOwnerId
+        {
+            return _ctx.Roles
+                        .Select(r => new RoleDTO
+                        {
+                            RoleId = r.Id,
+                            Name = r.Name
+                        });
+        }
+
+        //public IEnumerable<RoleDTO> GetAllRolesDTO()   //ByOwnerId
+        //{
+        //    //_roleManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
+        //    var rm = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
+
+        //    //var x = rm.Roles.
+        //    return rm.Roles;
+        //}
+
+        public IEnumerable<RoleDTO> GetRolesByUserId(string userId)
+        //public IEnumerable<IdentityRole> GetRolesByUserId(string userId)
+        {
+            var user = _userManager.FindByName(userId);
+            var roles = _userManager.GetRoles(user.Id);    //.OrderBy(r
+
+            var dtos = new List<RoleDTO>();
+
+            var dto = new RoleDTO();
+            dto.RoleId = "1";
+            dto.Name = "user";
+
+            dtos.Add(dto);
+
+
+            var dto1 = new RoleDTO();
+            dto1.RoleId = "3";
+            dto1.Name = "admin";
+
+            dtos.Add(dto1);
+
+            return dtos;
+
+
+            //foreach(var role in roles)
+            //{
+            //    var dto = new RoleDTO();
+            //    dto.RoleId = 
+            //}
+
+            //return _ctx.Roles
+            //            .Select(r => new RoleDTO
+            //            {
+            //                RoleId = r.Id,
+            //                Name = r.Name
+            //            });
+
+            //var xy = _userManager.GetRoles(userId.Id);
+            ////var rm = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
+
+            //return _userManager.GetRoles(user.Id).ToList();
+            //var x = rm.user
+            //return xy;
+        }
+
+        public async Task<string> AddUsersToRole(string trest)     //mjb 
+        {
+
+            //var rm = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
+            //rm.
+            //Roles.AddUserToRole("boone.mike@gmail.com", "admin");
+
+            var userId = "boone.mike@gmail.com";
+
+            var user = _userManager.FindByName(userId);
+
+            //var currentUser = _userManager.FindByName(user.UserName);
+
+            var roleresult = _userManager.AddToRole(user.Id, "admin");
+
+            //string[] userGroup = new string[2];
+            //userGroup[0] = "JillShrader";
+            //userGroup[1] = "ShaiBassli";
+            //Roles.AddUsersToRole(userGroup, "members");
+            return "test";
+        }
+
+        //public List<string> GetRolesByUserId(string userId)
+        //{
+        //    var user = _userManager.FindByName(userId);
+        //    return _userManager.GetRoles(user.Id).ToList();
+        //}
+
 
         public void Dispose()
         {

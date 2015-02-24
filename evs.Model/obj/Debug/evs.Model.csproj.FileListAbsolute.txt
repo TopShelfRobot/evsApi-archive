@@ -29,3 +29,6 @@ D:\source\evs30Api\evs.Model\bin\EntityFramework.SqlServer.xml
 D:\source\evs30Api\evs.Model\bin\Microsoft.AspNet.Identity.Core.xml
 D:\source\evs30Api\evs.Model\obj\Debug\evs.Model.dll
 D:\source\evs30Api\evs.Model\obj\Debug\evs.Model.pdb
+D:\source\evs30Api\evs.Model\bin\evs.Model.dll.CodeAnalysisLog.xml
+D:\source\evs30Api\evs.Model\bin\evs.Model.dll.lastcodeanalysissucceeded
+D:\source\evs30Api\evs.Model\obj\Debug\evs.Model.csprojResolveAssemblyReference.cache
