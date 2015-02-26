@@ -53,6 +53,8 @@ namespace evs.Model
         [MaxLength(50)]
         public string LastName { get; set; }
         public Int32 OwnerId { get; set; }
+        public DateTime DateCreated { get; set; }
+        public Int32 CreatedById { get; set; }
     }
      
     public class UserAgent

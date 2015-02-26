@@ -195,6 +195,10 @@ namespace evs.API
             var user = _userManager.FindByName(userId);
             var roles = _userManager.GetRoles(user.Id);    //.OrderBy(r
 
+           
+
+
+
             var dtos = new List<RoleDTO>();
 
             var dto = new RoleDTO();
@@ -234,26 +238,45 @@ namespace evs.API
             //return xy;
         }
 
-        public async Task<string> AddUsersToRole(string trest)     //mjb 
+        public async Task<IdentityResult> AddUsersToRole(List<RoleDTO> roles, string userName)     //mjb 
         {
 
-            //var rm = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
+            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
             //rm.
             //Roles.AddUserToRole("boone.mike@gmail.com", "admin");
 
-            var userId = "boone.mike@gmail.com";
+            var user = _userManager.FindByName(userName);
 
-            var user = _userManager.FindByName(userId);
+            //roleManager.
 
             //var currentUser = _userManager.FindByName(user.UserName);
 
-            var roleresult = _userManager.AddToRole(user.Id, "admin");
+            //foreach (var role in roles)
+            //{
+            //    //var roleresult = _userManager.AddToRole(user.Id, role);
+            //    var x = _userManager.RemoveFromRoles
+            //}
+            var newRoles = new string[roles.Count];
+            var count = 0;
+
+            foreach (var role in roles)
+            {
+                newRoles[count] = role.Name;
+                count = count + 1;
+            }
+
+
+            //var x = _userManager.RemoveFromRoles   //maybe remove from all roles then add what we want
+            //var roleresult = _userManager.add
+            var result = await _userManager.AddToRolesAsync(user.Id, newRoles);
+            return result;
+                
 
             //string[] userGroup = new string[2];
             //userGroup[0] = "JillShrader";
             //userGroup[1] = "ShaiBassli";
             //Roles.AddUsersToRole(userGroup, "members");
-            return "test";
+            //return "test";
         }
 
         //public List<string> GetRolesByUserId(string userId)

@@ -618,8 +618,7 @@ namespace evs.API.Controllers
         [Route("GetAllRoles")]
         public IEnumerable<RoleDTO> GetAllRoles()
         {
-           var x = _repo.GetAllRolesDTO();
-           return x;
+           return _repo.GetAllRolesDTO();
         }
 
         [HttpGet]
@@ -634,26 +633,45 @@ namespace evs.API.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("PutRoles")]
-        public IEnumerable<RoleDTO> PutRoles(JObject jRoles)   //email
+        public async Task<IHttpActionResult> PutRoles(JObject jRoles)   //email
         {
-            var userId = "boone.mike@gmail.com";
+            var userName = (string)jRoles["userName"];
             var newRoles = new List<RoleDTO>();
 
-            //RoleDTO newRole = new RoleDTO();
-            //newRole.Name = "Admin";
-            //newRole.RoleId = "2" 
-            //newRoles.Add(newRole);
+            dynamic bundle = jRoles;
+            if (bundle.roles != null)  
+            {
+                foreach (dynamic roleBundle in bundle.roles)
+                {
+                    RoleDTO newRole = new RoleDTO();
+                    newRole.Name = roleBundle.name;
+                    newRole.RoleId = roleBundle.roleId;
+                    newRoles.Add(newRole);
+                }
+            }
 
-            //var newRole = new RoleDTO();
-            //newRole.Name = "Money";
-            //newRole.RoleId = "4 
-            //newRoles.Add(newRole);
+            var result = await _repo.AddUsersToRole(newRoles, userName);
+            if (result.Succeeded)
+            {
+                //return RedirectToAction("ResetPasswordConfirmation", "Account");
+                return Ok();
+            }
+            else
+            {
+                return NotFound(); // BadRequest(result);
+            }
+           
 
-            var x = _repo.AddUsersToRole("test");
+            ////var newRole = new RoleDTO();
+            ////newRole.Name = "Money";
+            ////newRole.RoleId = "4 
+            ////newRoles.Add(newRole);
 
-            var roles =  _repo.GetRolesByUserId(userId);
+            //var x = _repo.AddUsersToRole("test");
+
+            //var roles =  _repo.GetRolesByUserId(userId);
                         
-            return roles;
+            //return roles;
         }
 
 

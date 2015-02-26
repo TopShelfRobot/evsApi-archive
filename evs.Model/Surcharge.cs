@@ -112,8 +112,4 @@ namespace evs.Model
         //public DateTime DateModified { get; set; }
         public Int32 TransactionId { get; set; }
     }
-
-
-   
-
 }

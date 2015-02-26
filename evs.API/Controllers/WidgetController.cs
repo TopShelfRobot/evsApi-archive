@@ -470,6 +470,18 @@ namespace evs.API.Controllers
             return db.Database.SqlQuery<DtoVolunteerData>(query).ToList();
         }
 
+        [HttpGet]
+        public object GetOrdersByOwnerId(Int32 ownerId)
+        {
+            return db.Orders.Where(o => o.OwnerId == ownerId);
+        }
+
+        [HttpGet]
+        public object GetRegistrationsByOrderId(Int32 orderId)
+        {
+            return db.Registrations.Where(r => r.EventureOrderId == orderId);
+        }
+
         public class DtoVolunteerData
         {
             public Int32 Id { get; set; }
