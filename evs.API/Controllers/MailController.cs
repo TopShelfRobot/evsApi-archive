@@ -246,14 +246,17 @@ namespace evs.API.Controllers
                 emailText = emailText + " league. <BR> Please click on the following link: " + url;
 
                 //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
-
                 //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);
 
-
+                var mailTo = new List<string>();
+                var ccMail= new List<string>();
+                mailTo.Add(teamMember.Email);
+                ccMail.Add("boone@firstegg.com");
 
                 //ccs and bcc seem to be reversed
                 MailService _mailService = new MailService();
-                //mjb var y = _mailService.SendSingleEmail(teamMember.Email, subject, emailText);
+                //var y = _mailService.SendSingleEmail(teamMember.Email, subject, emailText);
+                var x = _mailService.SendEmail(emailText, subject, sender, mailTo, ccMail);
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
 

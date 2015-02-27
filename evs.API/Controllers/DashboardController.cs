@@ -631,6 +631,17 @@ namespace evs.API.Controllers
             return listTypes;
         }
 
+        [HttpGet]
+        public object GetVolunteersByEventureId(Int32 id)
+        {
+            return _contextProvider.Context.VolunteerSchedules
+                                            .Where(s => s.EventureId == id)
+                                            .Select(s => new { s.Volunteer.Participant.Email })
+                                            .ToList();
+        }
+
+
+
         //[HttpGet]
         //public IQueryable<Participant> ParticipantsByHouseId(int houseId)
         //{

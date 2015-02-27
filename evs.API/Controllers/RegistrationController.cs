@@ -146,7 +146,7 @@ namespace evs.API.Controllers
                      }).ToList();
         }
 
-        [Authorize]
+        //[Authorize]   //this is turned off because team members are not required to be logged in //mjb
         [HttpGet]
         public object GetTeamMemberPaymentInfoByTeamMemberGuid(Guid id)
         {
@@ -162,10 +162,12 @@ namespace evs.API.Controllers
                          m.Id,
                          m.Team.Name,
                          teamMemberId = m.Id,
+                         m.Email,
                          teamId = m.Team.Id
                      }).ToList();
         }     //this will only be used on member payment receipt??
 
+        //[Authorize]   //this is turned off because team members are not required to be logged in //mjb
         [HttpGet]
         public object GetNotPaidTeamMemberCountByTeamGuid(Guid id)
         {
@@ -176,6 +178,7 @@ namespace evs.API.Controllers
             return allTeamCount - paidTeamCount;
         }
 
+        //[Authorize]   //this is turned off because team members are not required to be logged in //mjb
         [HttpGet]
         public object GetTeamMemberPaymentSumByTeamGuid(Guid id)
         {

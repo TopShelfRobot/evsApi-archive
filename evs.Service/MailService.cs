@@ -104,7 +104,7 @@ namespace evs.Service
             return log;
         }
 
-        private Boolean SendEmail(string messageBody, string messageSubject, string sender, List<string> mailTo, List<string> bcc)
+        public Boolean SendEmail(string messageBody, string messageSubject, string sender, List<string> mailTo, List<string> bcc)   //todo  make private again
         {
             AmazonSimpleEmailServiceClient client = new AmazonSimpleEmailServiceClient(ConfigurationManager.AppSettings["AWSAccessKey"], ConfigurationManager.AppSettings["AWSKey"], Amazon.RegionEndpoint.USEast1);
             Destination destination = new Destination();

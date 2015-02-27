@@ -364,8 +364,9 @@ namespace evs.API.Controllers
                     t.ParticipantId,
                     Balance = t.Team.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
                     Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
+                    DateCreated = t.DateCreated,
                     EventureOrderId = t.Team.Registration.EventureOrder.Id
-                })
+                }).OrderBy(t => t.DateCreated)
                 .ToList();
         }
 
@@ -382,7 +383,7 @@ namespace evs.API.Controllers
                     CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
                     Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
                     Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
-                    t.Divison,
+                    t.Division,
                     t.TimeFinish,
                     EventName = t.Registration.EventureList.Eventure.Name
                 })

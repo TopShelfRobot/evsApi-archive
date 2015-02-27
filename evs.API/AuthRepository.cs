@@ -265,13 +265,11 @@ namespace evs.API
                 count = count + 1;
             }
 
-
             //var x = _userManager.RemoveFromRoles   //maybe remove from all roles then add what we want
             //var roleresult = _userManager.add
             var result = await _userManager.AddToRolesAsync(user.Id, newRoles);
             return result;
-                
-
+            
             //string[] userGroup = new string[2];
             //userGroup[0] = "JillShrader";
             //userGroup[1] = "ShaiBassli";

@@ -562,200 +562,133 @@ namespace evs.API.Controllers
                 decimal totalFees = 0;
                 Int32 teamMemberId = (Int32)saveBundle["teamMemberId"];
                 Int32 teamId = (Int32)saveBundle["teamId"];
-
+                Int32 participantId = (Int32)saveBundle["participantId"];
                 //public static EventureOrder populateOrderFromBundle(JObject saveBundle)
-                var order = new EventureOrder
-                {
-                    DateCreated = DateTime.Now,
-                    HouseId = 2,      //(Int32)saveBundle["participantId"],
-                    Amount = (Decimal)saveBundle["orderAmount"],
-                    Token = (string)saveBundle["stripeToken"],
-                    OwnerId = (Int32)saveBundle["ownerId"],  //need to send
-                    Status = "Init",
-                    Voided = false
-                };
-                db.Orders.Add(order);
+                //var order = new EventureOrder
+                //{
+                //    DateCreated = DateTime.Now,
+                //    HouseId = 2,      //(Int32)saveBundle["participantId"],
+                //    Amount = (Decimal)saveBundle["orderAmount"],
+                //    Token = (string)saveBundle["stripeToken"],
+                //    OwnerId = (Int32)saveBundle["ownerId"],  //need to send
+                //    Status = "Init",
+                //    Voided = false
+                //};
+                //db.Orders.Add(order);
 
                 dynamic bundle = saveBundle;
-                //foreach (dynamic regBundle in bundle.regs)  //this is not nessessary now because only 1 reg in team
+
+                var member = db.TeamMembers.Where(m => m.Id == teamMemberId).FirstOrDefault();
+                member.ParticipantId = participantId;
+                
+
+                //populate surcharge    //todo 
+                //if (bundle.charges != null)  //if no surcharges skip this
                 //{
-                //    var registration = new Registration
+                //    foreach (dynamic surchargeBundle in bundle.charges)
                 //    {
-                //        EventureListId = regBundle.eventureListId,
-                //        ParticipantId = regBundle.partId,
-                //        ListAmount = regBundle.fee,
-                //        Quantity = regBundle.quantity,
-                //        EventureOrderId = order.Id,    //mjb1 this one seems ok
-                //        DateCreated = DateTime.Now,
-                //        TotalAmount = Convert.ToDecimal(regBundle.fee),
-                //        Type = "reg"
-                //    };
-                //    db.Registrations.Add(registration);
+                //        var surcharge = new Surcharge
+                //        {
+                //            Amount = surchargeBundle.amount,
+                //            EventureListId = surchargeBundle.listId,
+                //            ChargeType = surchargeBundle.chargeType,
+                //            Description = surchargeBundle.desc,
+                //            ParticipantId = surchargeBundle.partId,
+                //            EventureOrderId = order.Id,
+                //            DateCreated = DateTime.Now,
+                //            CouponId = surchargeBundle.couponId
+                //        };
+                //        totalFees = totalFees + Convert.ToDecimal(surchargeBundle.amount);
+                //        db.Surcharges.Add(surcharge);
+                //    }
                 //}
 
-                //var team = new Team
-                //    {
+                //var payment = new TeamMemberPayment();
+                ////{
+                //payment.TeamId = teamId;
+                //payment.Amount = 0;   // order.Amount;
+                //payment.TeamMemberId = teamMemberId;
+                //payment.DateCreated = DateTime.Now;
+                
+                ////};
+                //db.TeamMemberPayments.Add(payment);
 
-                //    }
-
-                //populate surcharge
-                if (bundle.charges != null)  //if no surcharges skip this
-                {
-                    foreach (dynamic surchargeBundle in bundle.charges)
-                    {
-                        var surcharge = new Surcharge
-                        {
-                            Amount = surchargeBundle.amount,
-                            EventureListId = surchargeBundle.listId,
-                            ChargeType = surchargeBundle.chargeType,
-                            Description = surchargeBundle.desc,
-                            ParticipantId = surchargeBundle.partId,
-                            EventureOrderId = order.Id,
-                            DateCreated = DateTime.Now,
-                            CouponId = surchargeBundle.couponId
-                        };
-                        totalFees = totalFees + Convert.ToDecimal(surchargeBundle.amount);
-                        db.Surcharges.Add(surcharge);
-                    }
-                }
-
-
-                Int32 participantId = 0;
-                //if (bundle.participant != null)
+                //Owner owner = db.Owners.Where(o => o.Id == 1).SingleOrDefault();
+                //if (owner == null)
                 //{
-                //    dynamic part = bundle.charges;
-
-                //    var getPart = db.Participants.Where(p => p.Email == part.email).SingleOrDefault();
-                //    if (getPart != null)
-                //    {
-                //        //enter part and get part id
-
-                //    }
-                //    else
-                //    {
-                //        participantId = getPart.Id;
-                //    }
-
+                //    throw new Exception("Owner Setup is Not Configured Correctly");
                 //}
-
-                var payment = new TeamMemberPayment();
-                //{
-                payment.TeamId = teamId;
-                payment.Amount = order.Amount;
-                payment.TeamMemberId = teamMemberId;
-                //};
-                db.TeamMemberPayments.Add(payment);
-
-                Owner owner = db.Owners.Where(o => o.Id == 1).SingleOrDefault();
-                if (owner == null)
-                {
-                    throw new Exception("Owner Setup is Not Configured Correctly");
-                }
 
                 //calulate
-                order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
-                order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
-                order.LocalApplicationFee = order.LocalFeeInCents - order.CardProcessorFeeInCents;
+                //order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
+                //order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
+                //order.LocalApplicationFee = order.LocalFeeInCents - order.CardProcessorFeeInCents;
 
-                if (order.LocalApplicationFee < 0)
-                    order.LocalApplicationFee = 0;
+                //if (order.LocalApplicationFee < 0)
+                //    order.LocalApplicationFee = 0;
 
-                string custDesc = string.Empty;
-                string partEmail = string.Empty;
-                var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
-                if (part != null)
-                {
-                    custDesc = part.FirstName + " " + part.LastName + "_ord" + order.Id;
-                    partEmail = part.Email;
-                }
-                else
-                {
-                    //this should never happen  throw exception?
-                    //custDesc = "participant" + "_ord" + order.Id + "_id:" + order.HouseId;
-                    //partEmail = "email" + "_ord" + order.Id + "_id:" + order.HouseId;
-                    throw new Exception("No Partipant found to match houseId ");
-                }
+                //string custDesc = string.Empty;
+                //string partEmail = string.Empty;
+                //var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
+                //if (part != null)
+                //{
+                //    custDesc = part.FirstName + " " + part.LastName + "_ord" + order.Id;
+                //    partEmail = part.Email;
+                //}
+                //else
+                //{
+                //    //this should never happen  throw exception?
+                //    //custDesc = "participant" + "_ord" + order.Id + "_id:" + order.HouseId;
+                //    //partEmail = "email" + "_ord" + order.Id + "_id:" + order.HouseId;
+                //    throw new Exception("No Partipant found to match houseId ");
+                //}
 
-                // create customer
-                var customerOptions = new StripeCustomerCreateOptions
-                {
-                    Email = partEmail,
-                    Description = custDesc,
-                    TokenId = order.Token,
-                };
+                //// create customer
+                //var customerOptions = new StripeCustomerCreateOptions
+                //{
+                //    Email = partEmail,
+                //    Description = custDesc,
+                //    TokenId = order.Token,
+                //};
 
-                var stripeCustomerService = new StripeCustomerService(owner.AccessToken);
-                var customer = stripeCustomerService.Create(customerOptions);
+                //var stripeCustomerService = new StripeCustomerService(owner.AccessToken);
+                //var customer = stripeCustomerService.Create(customerOptions);
 
-                var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
-                var stripeChargeOption = new StripeChargeCreateOptions()
-                {
-                    Amount = Convert.ToInt32(order.Amount * 100),
-                    Currency = "usd",
-                    CustomerId = customer.Id,
-                    Description = owner.Name,
-                    ApplicationFee = order.LocalApplicationFee
-                };
-                var stripeCharge = stripeChargeService.Create(stripeChargeOption);
+                //var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
+                //var stripeChargeOption = new StripeChargeCreateOptions()
+                //{
+                //    Amount = Convert.ToInt32(order.Amount * 100),
+                //    Currency = "usd",
+                //    CustomerId = customer.Id,
+                //    Description = owner.Name,
+                //    ApplicationFee = order.LocalApplicationFee
+                //};
+                //var stripeCharge = stripeChargeService.Create(stripeChargeOption);
 
-                if (string.IsNullOrEmpty(stripeCharge.FailureCode))
-                {
-                    order.AuthorizationCode = stripeCharge.Id;
-                    //stripeCharge.
-                    order.CardNumber = stripeCharge.StripeCard.Last4;
-                    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
-                    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
-                    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
-                    //order.CardId = stripeCharge.StripeCard.;
-                    order.CardName = stripeCharge.StripeCard.Name;
-                    order.CardOrigin = stripeCharge.StripeCard.Country;
-                    //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
-                    order.Voided = false;
-                    order.Status = "Complete";
-                    //mjb fix order.PaymentType = "credit";
-                    //db.Orders.Add(order);
+                //if (string.IsNullOrEmpty(stripeCharge.FailureCode))
+                //{
+                //    order.AuthorizationCode = stripeCharge.Id;
+                //    order.CardNumber = stripeCharge.StripeCard.Last4;
+                //    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
+                //    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
+                //    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
+                //    order.CardName = stripeCharge.StripeCard.Name;
+                //    order.CardOrigin = stripeCharge.StripeCard.Country;
+                //    order.Voided = false;
+                //    order.Status = "Complete";
                     db.SaveChanges();
-
-
-                    //flip flag
-
-                    //adjust reg.TotalAmount to for surcharge
-                    //mjb this might br going through entire db.reg
-                    //foreach (var reg in db.Registrations) //order id = order.Id
-                    //{
-                    //    if (reg.EventureListId == surcharge.EventureListId &&
-                    //        reg.ParticipantId == surcharge.ParticipantId)
-                    //        reg.TotalAmount = reg.TotalAmount + surcharge.Amount;
-                    //}
-                    ////if coupon adust Redeemed  //mjb
-                    //if (surcharge.ChargeType == "coupon")
-                    //{
-                    //    Coupon coupon = db.Coupons.Single(c => c.Id == surcharge.CouponId);
-                    //    coupon.Redeemed++;
-                    //    //db.SaveChanges(coupon);
-                    //}
-
-                    //call mail
-                    //HttpResponseMessage result = new MailController().SendConfirmMail(order.Id);
-
-                    //mjb fixHttpResponseMessage result = new MailController().SendTeamPaymentConfirmMail(payment.Id);
-
-                    //return Request.CreateResponse(HttpStatusCode.OK, stripeCharge);
-
-
 
                     var resp = Request.CreateResponse(HttpStatusCode.OK);
-                    //resp.Content = new StringContent();
-                    resp.Content = new StringContent(payment.Id.ToString(), Encoding.UTF8, "text/plain");
+                    //resp.Content = new StringContent(payment.Id.ToString(), Encoding.UTF8, "text/plain");
                     return resp;
 
-                }
-                else
-                {
-                    order.Status = stripeCharge.FailureMessage;
-                    db.SaveChanges();
-                    return Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
-                }
+                //}
+                //else
+                //{
+                //    order.Status = stripeCharge.FailureMessage;
+                //    db.SaveChanges();
+                //    return Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
+                //}
 
             }
             catch (Exception ex)
@@ -836,7 +769,6 @@ namespace evs.API.Controllers
                 dynamic bundle = saveBundle;
                 foreach (dynamic regBundle in bundle.regs) //this is not nessessary now because only 1 reg in team
                 {
-
                     var registration = new Registration
                     {
                         EventureListId = regBundle.eventureListId,
@@ -849,8 +781,7 @@ namespace evs.API.Controllers
                         TotalAmount = Convert.ToDecimal(regBundle.fee),
                         Type = "reg"
                     };
-
-
+                    
                     var team = new Team
                     {
                         Name = regBundle.teamName, // (string)saveBundle["teamName"];
@@ -860,6 +791,8 @@ namespace evs.API.Controllers
                         OwnerId = order.OwnerId,
                         IsPaidInFull = false,
                         DateCreated = DateTime.Now,
+                        TimeFinish = regBundle.timeFinish,
+                        Division = regBundle.division,
                         Active = true
                     };
                     //db.Teams.Add(team);
