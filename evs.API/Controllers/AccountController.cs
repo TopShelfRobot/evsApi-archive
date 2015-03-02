@@ -626,13 +626,25 @@ namespace evs.API.Controllers
         [AllowAnonymous]
         [Route("GetUserRolesByUserId/{user}")]
         //public IEnumerable<RoleDTO> GetUserRolesByUserId(string user)   //email
-        public List<NameDTO> GetUserRolesByUserId(string user)
+        public object GetUserRolesByUserId(string user)
         {
             var roles = _repo.GetRolesByUserId(user);
             var ret = new List<NameDTO>();
             foreach (var role in roles)
                 ret.Add(new NameDTO(role));
             return ret;
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("GetUserRolesByUserIdInArray/{user}")]
+        public List<string> GetUserRolesByUserIdInArray(string user)
+        {
+            return  _repo.GetRolesByUserId(user);
+            //var ret = new List<NameDTO>();
+            //foreach (var role in roles)
+            //    ret.Add(new NameDTO(role));
+            //return ret;
         }
 
         public class NameDTO
