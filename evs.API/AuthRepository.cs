@@ -145,14 +145,14 @@ namespace evs.API
 
             //try
             //{
-                var provider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("ResetPassword");
-                _userManager.UserTokenProvider = new Microsoft.AspNet.Identity.Owin.DataProtectorTokenProvider<IdentityUser>(provider.Create("ResetPassword"))
-                {
-                    TokenLifespan = TimeSpan.FromHours(100)
-                };
+            var provider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("ResetPassword");
+            _userManager.UserTokenProvider = new Microsoft.AspNet.Identity.Owin.DataProtectorTokenProvider<IdentityUser>(provider.Create("ResetPassword"))
+            {
+                TokenLifespan = TimeSpan.FromHours(100)
+            };
 
-                var result =  await _userManager.ResetPasswordAsync(id, code, password);
-                return result;
+            var result = await _userManager.ResetPasswordAsync(id, code, password);
+            return result;
 
             //}
             //catch (Exception ex)
@@ -162,7 +162,7 @@ namespace evs.API
             //    return IdentityResult.Failed(errors.ToArray());
             //}
         }
-        
+
         public async Task<IdentityResult> AddLoginAsync(string userId, UserLoginInfo login)
         {
             var result = await _userManager.AddLoginAsync(userId, login);
@@ -170,144 +170,43 @@ namespace evs.API
             return result;
         }
 
-        //public IEnumerable<RoleDTO> GetAllRolesDTO()   //ByOwnerId
         public List<string> GetAllRoles()
         {
-            //return _ctx.Roles
-            //            .Select(r => new RoleDTO
-            //            {
-            //                //RoleId = r.Id,
-            //                Name = r.Name
-            //            });
-
             var rolesList = new List<string>();
 
-           var x =   _ctx.Roles
-                        .Select(r => new RoleDTO
-                        {
-                            //RoleId = r.Id,
-                            Name = r.Name
-                        });
+            var x = _ctx.Roles
+                         .Select(r => new RoleDTO
+                         {
+                             //RoleId = r.Id,
+                             Name = r.Name
+                         });
 
-           foreach (var y in x)
-           {
-               string test = y.Name.ToString();
-                rolesList.Add(test);
-           }
+            foreach (var y in x)
+            {
+                rolesList.Add(y.Name.ToString());
+            }
 
-           return rolesList;
+            return rolesList;
         }
 
-        //public IEnumerable<RoleDTO> GetAllRolesDTO()   //ByOwnerId
-        //{
-        //    //_roleManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
-        //    var rm = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
-
-        //    //var x = rm.Roles.
-        //    return rm.Roles;
-        //}
-
-        //public IEnumerable<RoleDTO> GetRolesByUserId(string userId)
-            //public List<RoleDTO> GetRolesByUserId(string userId)
         public List<string> GetRolesByUserId(string userId)
-        //public IEnumerable<IdentityRole> GetRolesByUserId(string userId)
         {
             var user = _userManager.FindByName(userId);
-            var roles = _userManager.GetRoles(user.Id).ToList();    //.OrderBy(r
-
-            //var dtos = new List<RoleDTO>();
-
-            //var dto = new RoleDTO();
-            //dto.RoleId = "1";
-            //dto.Name = "user";
-
-            //dtos.Add(dto);
-
-
-            //var dto1 = new RoleDTO();
-            //dto1.RoleId = "3";
-            //dto1.Name = "admin";
-
-            //dtos.Add(dto1);
-
-            //return dtos;
-
-                return roles;
-
-
-            //foreach(var role in roles)
-            //{
-            //    var dto = new RoleDTO();
-            //    dto.RoleId = 
-            //}
-
-            //return _ctx.Roles
-            //            .Select(r => new RoleDTO
-            //            {
-            //                RoleId = r.Id,
-            //                Name = r.Name
-            //            });
-
-            //var xy = _userManager.GetRoles(userId.Id);
-            ////var rm = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
-
-            //return _userManager.GetRoles(user.Id).ToList();
-            //var x = rm.user
-            //return xy;
+            var roles = _userManager.GetRoles(user.Id).ToList();
+            return roles;
         }
 
-        public async Task<IdentityResult> AddUsersToRole(List<string> roles, string userName)     //mjb 
+        public async Task<IdentityResult> AddUsersToRole(List<string> roles, string userName)
         {
-
             var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
-            //rm.
-            //Roles.AddUserToRole("boone.mike@gmail.com", "admin");
-
             var user = _userManager.FindByName(userName);
-
-            //roleManager.
-
-            //var currentUser = _userManager.FindByName(user.UserName);
-
-            //foreach (var role in roles)
-            //{
-            //    //var roleresult = _userManager.AddToRole(user.Id, role);
-            //    var x = _userManager.RemoveFromRoles
-            //}
-            //var newRoles = new string[roles.Count];
-            //var count = 0;
-
-            //foreach (var role in roles)
-            //{
-            //    newRoles[count] = role.Name;
-            //    count = count + 1;
-            //}
-
-            //var myStringArray = new string[] { "a", "b", "c" };
-
             var allRoles = _userManager.GetRoles(user.Id).ToArray();
 
+            var removeResult = _userManager.RemoveFromRoles(user.Id, allRoles);
 
-            _userManager.RemoveFromRoles(user.Id, allRoles);
-
-            //var x = _userManager.RemoveFromRoles   //maybe remove from all roles then add what we want
-            //var roleresult = _userManager.add
-            var result = _userManager.AddToRoles(user.Id, roles.ToArray());
-            return result;
-            
-            //string[] userGroup = new string[2];
-            //userGroup[0] = "JillShrader";
-            //userGroup[1] = "ShaiBassli";
-            //Roles.AddUsersToRole(userGroup, "members");
-            //return "test";
+            var addResult = _userManager.AddToRoles(user.Id, roles.ToArray());
+            return addResult;
         }
-
-        //public List<string> GetRolesByUserId(string userId)
-        //{
-        //    var user = _userManager.FindByName(userId);
-        //    return _userManager.GetRoles(user.Id).ToList();
-        //}
-
 
         public void Dispose()
         {

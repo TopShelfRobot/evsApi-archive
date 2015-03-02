@@ -619,27 +619,27 @@ namespace evs.API.Controllers
         //public IEnumerable<RoleDTO> GetAllRoles()
         public List<string> GetAllRoles()
         {
-           return _repo.GetAllRoles();
+            return _repo.GetAllRoles();
         }
 
         [HttpGet]
         [AllowAnonymous]
         [Route("GetUserRolesByUserId/{user}")]
         //public IEnumerable<RoleDTO> GetUserRolesByUserId(string user)   //email
-        public List<stupioDTO> GetUserRolesByUserId(string user)  
+        public List<NameDTO> GetUserRolesByUserId(string user)
         {
-            var roles =  _repo.GetRolesByUserId(user);
-            var ret = new List<stupioDTO>();
+            var roles = _repo.GetRolesByUserId(user);
+            var ret = new List<NameDTO>();
             foreach (var role in roles)
-                ret.Add(new stupioDTO(role));
+                ret.Add(new NameDTO(role));
             return ret;
         }
 
-        public class stupioDTO
+        public class NameDTO
         {
-               public string Name;
+            public string Name;
 
-               public stupioDTO(string name)
+            public NameDTO(string name)
             {
                 Name = name;
             }
@@ -651,19 +651,13 @@ namespace evs.API.Controllers
         public async Task<IHttpActionResult> PutRoles(JObject jRoles)   //email
         {
             var userName = (string)jRoles["userName"];
-            //var newRoles = new List<RoleDTO>();
             var roles = new List<string>();
-            
+
             dynamic bundle = jRoles;
-            if (bundle.roles != null)  
+            if (bundle.roles != null)
             {
                 foreach (dynamic roleBundle in bundle.roles)
                 {
-                    //RoleDTO newRole = new RoleDTO();
-                    //newRole.Name = roleBundle.name;
-                    //newRole.RoleId = roleBundle.roleId;
-                    //newRoles.Add(newRole);
-                    //var test = roleBundle;
                     roles.Add(roleBundle.name.Value);
                 }
             }
@@ -671,25 +665,12 @@ namespace evs.API.Controllers
             var result = await _repo.AddUsersToRole(roles, userName);
             if (result.Succeeded)
             {
-                //return RedirectToAction("ResetPasswordConfirmation", "Account");
                 return Ok();
             }
             else
             {
                 return NotFound(); // BadRequest(result);
             }
-           
-
-            ////var newRole = new RoleDTO();
-            ////newRole.Name = "Money";
-            ////newRole.RoleId = "4 
-            ////newRoles.Add(newRole);
-
-            //var x = _repo.AddUsersToRole("test");
-
-            //var roles =  _repo.GetRolesByUserId(userId);
-                        
-            //return roles;
         }
 
 
