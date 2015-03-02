@@ -616,18 +616,33 @@ namespace evs.API.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("GetAllRoles")]
-        public IEnumerable<RoleDTO> GetAllRoles()
+        //public IEnumerable<RoleDTO> GetAllRoles()
+        public List<string> GetAllRoles()
         {
-           return _repo.GetAllRolesDTO();
+           return _repo.GetAllRoles();
         }
 
         [HttpGet]
         [AllowAnonymous]
         [Route("GetUserRolesByUserId/{user}")]
-        public IEnumerable<RoleDTO> GetUserRolesByUserId(string user)   //email
+        //public IEnumerable<RoleDTO> GetUserRolesByUserId(string user)   //email
+        public List<stupioDTO> GetUserRolesByUserId(string user)  
         {
             var roles =  _repo.GetRolesByUserId(user);
-            return roles;
+            var ret = new List<stupioDTO>();
+            foreach (var role in roles)
+                ret.Add(new stupioDTO(role));
+            return ret;
+        }
+
+        public class stupioDTO
+        {
+               public string Name;
+
+               public stupioDTO(string name)
+            {
+                Name = name;
+            }
         }
 
         [HttpPost]
@@ -636,21 +651,24 @@ namespace evs.API.Controllers
         public async Task<IHttpActionResult> PutRoles(JObject jRoles)   //email
         {
             var userName = (string)jRoles["userName"];
-            var newRoles = new List<RoleDTO>();
-
+            //var newRoles = new List<RoleDTO>();
+            var roles = new List<string>();
+            
             dynamic bundle = jRoles;
             if (bundle.roles != null)  
             {
                 foreach (dynamic roleBundle in bundle.roles)
                 {
-                    RoleDTO newRole = new RoleDTO();
-                    newRole.Name = roleBundle.name;
-                    newRole.RoleId = roleBundle.roleId;
-                    newRoles.Add(newRole);
+                    //RoleDTO newRole = new RoleDTO();
+                    //newRole.Name = roleBundle.name;
+                    //newRole.RoleId = roleBundle.roleId;
+                    //newRoles.Add(newRole);
+                    //var test = roleBundle;
+                    roles.Add(roleBundle.name.Value);
                 }
             }
 
-            var result = await _repo.AddUsersToRole(newRoles, userName);
+            var result = await _repo.AddUsersToRole(roles, userName);
             if (result.Succeeded)
             {
                 //return RedirectToAction("ResetPasswordConfirmation", "Account");

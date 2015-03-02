@@ -170,14 +170,32 @@ namespace evs.API
             return result;
         }
 
-        public IEnumerable<RoleDTO> GetAllRolesDTO()   //ByOwnerId
+        //public IEnumerable<RoleDTO> GetAllRolesDTO()   //ByOwnerId
+        public List<string> GetAllRoles()
         {
-            return _ctx.Roles
+            //return _ctx.Roles
+            //            .Select(r => new RoleDTO
+            //            {
+            //                //RoleId = r.Id,
+            //                Name = r.Name
+            //            });
+
+            var rolesList = new List<string>();
+
+           var x =   _ctx.Roles
                         .Select(r => new RoleDTO
                         {
-                            RoleId = r.Id,
+                            //RoleId = r.Id,
                             Name = r.Name
                         });
+
+           foreach (var y in x)
+           {
+               string test = y.Name.ToString();
+                rolesList.Add(test);
+           }
+
+           return rolesList;
         }
 
         //public IEnumerable<RoleDTO> GetAllRolesDTO()   //ByOwnerId
@@ -189,32 +207,32 @@ namespace evs.API
         //    return rm.Roles;
         //}
 
-        public IEnumerable<RoleDTO> GetRolesByUserId(string userId)
+        //public IEnumerable<RoleDTO> GetRolesByUserId(string userId)
+            //public List<RoleDTO> GetRolesByUserId(string userId)
+        public List<string> GetRolesByUserId(string userId)
         //public IEnumerable<IdentityRole> GetRolesByUserId(string userId)
         {
             var user = _userManager.FindByName(userId);
-            var roles = _userManager.GetRoles(user.Id);    //.OrderBy(r
+            var roles = _userManager.GetRoles(user.Id).ToList();    //.OrderBy(r
 
-           
+            //var dtos = new List<RoleDTO>();
 
+            //var dto = new RoleDTO();
+            //dto.RoleId = "1";
+            //dto.Name = "user";
 
-
-            var dtos = new List<RoleDTO>();
-
-            var dto = new RoleDTO();
-            dto.RoleId = "1";
-            dto.Name = "user";
-
-            dtos.Add(dto);
+            //dtos.Add(dto);
 
 
-            var dto1 = new RoleDTO();
-            dto1.RoleId = "3";
-            dto1.Name = "admin";
+            //var dto1 = new RoleDTO();
+            //dto1.RoleId = "3";
+            //dto1.Name = "admin";
 
-            dtos.Add(dto1);
+            //dtos.Add(dto1);
 
-            return dtos;
+            //return dtos;
+
+                return roles;
 
 
             //foreach(var role in roles)
@@ -238,7 +256,7 @@ namespace evs.API
             //return xy;
         }
 
-        public async Task<IdentityResult> AddUsersToRole(List<RoleDTO> roles, string userName)     //mjb 
+        public async Task<IdentityResult> AddUsersToRole(List<string> roles, string userName)     //mjb 
         {
 
             var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
@@ -256,18 +274,25 @@ namespace evs.API
             //    //var roleresult = _userManager.AddToRole(user.Id, role);
             //    var x = _userManager.RemoveFromRoles
             //}
-            var newRoles = new string[roles.Count];
-            var count = 0;
+            //var newRoles = new string[roles.Count];
+            //var count = 0;
 
-            foreach (var role in roles)
-            {
-                newRoles[count] = role.Name;
-                count = count + 1;
-            }
+            //foreach (var role in roles)
+            //{
+            //    newRoles[count] = role.Name;
+            //    count = count + 1;
+            //}
+
+            //var myStringArray = new string[] { "a", "b", "c" };
+
+            var allRoles = _userManager.GetRoles(user.Id).ToArray();
+
+
+            _userManager.RemoveFromRoles(user.Id, allRoles);
 
             //var x = _userManager.RemoveFromRoles   //maybe remove from all roles then add what we want
             //var roleresult = _userManager.add
-            var result = await _userManager.AddToRolesAsync(user.Id, newRoles);
+            var result = _userManager.AddToRoles(user.Id, roles.ToArray());
             return result;
             
             //string[] userGroup = new string[2];
