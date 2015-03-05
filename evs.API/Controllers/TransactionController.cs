@@ -48,7 +48,7 @@ namespace evs.API.Controllers
                 var order = new EventureOrder
                 {
                     DateCreated = DateTime.Now,
-                    //HouseId = (Int32)saveBundle["houseId"],
+                    HouseId = (Int32)saveBundle["houseId"],
                     Amount = (Decimal)saveBundle["amount"],
                     Token = (string)saveBundle["token"],   //is this safe??
                     OwnerId = (Int32)saveBundle["ownerId"],

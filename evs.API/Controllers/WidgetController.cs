@@ -472,16 +472,19 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public object GetOrdersByOwnerId(Int32 ownerId)
+        //public object GetOrdersByOwnerId(Int32 Id)
+            public IEnumerable<EventureOrder> GetOrdersByOwnerId(Int32 Id)
         {
-            return db.Orders.Where(o => o.OwnerId == ownerId);
+            return db.Orders.Where(o => o.OwnerId == Id).ToList();
         }
 
         [HttpGet]
-        public object GetRegistrationsByOrderId(Int32 orderId)
+       // public object GetRegistrationsByOrderId(Int32 Id)
+            public IEnumerable<Registration> GetRegistrationsByOrderId(Int32 Id)
         {
-            return db.Registrations.Where(r => r.EventureOrderId == orderId);
+            return db.Registrations.Where(r => r.EventureOrderId == Id).ToList();
         }
+
 
         public class DtoVolunteerData
         {
