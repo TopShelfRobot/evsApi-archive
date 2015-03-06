@@ -68,48 +68,36 @@ namespace evs.API.Controllers
         {
             try
             {
-                //dynamic emailBundle = jsonBundle;
-                //if (emailBundle.email != null)  //if no surcharges skip this
-                //{
-
-                //    foreach (dynamic dynEmail in emailBundle.emails)
-                //    {
-                //        emails.Add(dynEmail.email)
-                //    }
-                //}
-
-                //string body = (Int32)jsonBundle["body"];
-                //string subject = (Int32)jsonBundle["subject"];
-                string body = "this is an email that you rewquesteed to inform you of the chance of inclement weather.  Please stay tuned for an update on our website at ww.eventuresports.com"; 
-                string subject = "weather warning  snow possible";
-                Int32 ownerId = 1;  
                 List<string> emails = new List<string>();
+                dynamic emailBundle = jsonBundle;
+                if (emailBundle.email != null)  //if no surcharges skip this
+                {
+                    foreach (dynamic dynEmail in emailBundle.email)
+                    {
+                        emails.Add(dynEmail.Value);
+                    }
+                }
 
-                emails.Add("boone.mike@gmail.com");
-                emails.Add("boone@eventuresports.com");
-                emails.Add("boone@firstegg.com");
-                emails.Add("boone.mike@gmail.com");
-                emails.Add("boone@eventuresports.com");
-                emails.Add("boone@firstegg.com");
-                emails.Add("boone.mike@gmail.com");
-                emails.Add("boone@eventuresports.com");
-                emails.Add("boone@firstegg.com");
-                //emails.Add("podaniel@firstegg.com");
-                //emails.Add("wgoolsby@me.com");
-                //emails.Add("kmacdonald@firstegg.com");
-                //emails.Add("XXXX");
-                //emails.Add("XXXX");
-                //emails.Add("XXXX");
-                //emails.Add("XXXX");
-                //emails.Add("XXXX");
+                string body = (string)jsonBundle["body"];
+                string subject = (string)jsonBundle["subject"];
+                Int32 ownerId = (Int32)jsonBundle["ownerId"]; 
+                
+
+               
 
                 var _mailService = new MailService();
                 var returnMessage = _mailService.SendGroupEmailGroup(emails, subject, body, ownerId);
 
-                if (Request != null)
-                    return Request.CreateResponse(HttpStatusCode.OK);
-                else
-                    return new HttpResponseMessage(HttpStatusCode.OK);
+                var resp = Request.CreateResponse(HttpStatusCode.OK);
+                //resp.Content = new StringContent();
+                resp.Content = new StringContent(returnMessage, Encoding.UTF8, "text/plain");
+                return resp;
+
+
+                //if (Request != null)
+                //    return Request.CreateResponse(HttpStatusCode.OK);
+                //else
+                //    return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
