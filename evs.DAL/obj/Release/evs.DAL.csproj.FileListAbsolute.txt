@@ -1,9 +1,0 @@
-D:\source\evs\evs.DAL\obj\Release\evs.DAL.csprojResolveAssemblyReference.cache
-D:\source\evs\evs.DAL\bin\Release\evs.DAL.dll
-D:\source\evs\evs.DAL\bin\Release\evs.DAL.pdb
-D:\source\evs\evs.DAL\bin\Release\EntityFramework.dll
-D:\source\evs\evs.DAL\bin\Release\evs.Model.dll
-D:\source\evs\evs.DAL\bin\Release\evs.Model.pdb
-D:\source\evs\evs.DAL\bin\Release\EntityFramework.xml
-D:\source\evs\evs.DAL\obj\Release\evs.DAL.dll
-D:\source\evs\evs.DAL\obj\Release\evs.DAL.pdb

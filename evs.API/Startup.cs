@@ -9,6 +9,8 @@ using System.Web.Http;
 using evs.API.Providers;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.Facebook;
+using System.Configuration;
+//using Microsoft.Owin.Security.DataHandler;
 
 [assembly: OwinStartup(typeof(evs.API.Startup))]
 namespace evs.API
@@ -34,23 +36,24 @@ namespace evs.API
         {
             //use a cookie to temporarily store information about a user logging in with a third party login provider
             app.UseExternalSignInCookie(Microsoft.AspNet.Identity.DefaultAuthenticationTypes.ExternalCookie);
-            //int x = 1;
-            //int y = 0;
-            //int z = x / y;
             OAuthBearerOptions = new OAuthBearerAuthenticationOptions();
-
+           
             OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
             {
                 AllowInsecureHttp = true,
                 TokenEndpointPath = new PathString("/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
                 Provider = new SimpleAuthorizationServerProvider(),
+               // AccessTokenFormat = new TicketDataFormat(app.CreateDataProtector(typeof(OAuthAuthorizationServerMiddleware).Namespace,"Access_Token", "v1")),
+                //AccessTokenFormat = new TicketDataFormat(app.
                 RefreshTokenProvider = new SimpleRefreshTokenProvider()
             };
 
+            //OAuthBearerOptions.AccessTokenFormat = OAuthServerOptions.AccessTokenFormat;
+
             // Token Generation
             app.UseOAuthAuthorizationServer(OAuthServerOptions);
-            app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
+            app.UseOAuthBearerAuthentication(OAuthBearerOptions);
 
             //Configure Google External Login
             googleAuthOptions = new GoogleOAuth2AuthenticationOptions()
@@ -64,10 +67,19 @@ namespace evs.API
             //Configure Facebook External Login
             facebookAuthOptions = new FacebookAuthenticationOptions()
             {
-                AppId = "447816931997733",
-                AppSecret = "ed72d01390147d4be82cd86e6d7106e4",
+                AppId =  ConfigurationManager.AppSettings["fbAppId"],   //"447816931997733",  
+                AppSecret = ConfigurationManager.AppSettings["fbAppSecret"], //"ed72d01390147d4be82cd86e6d7106e4",
                 Provider = new FacebookAuthProvider()
+                //{
+                //    OnAuthenticated = (context) =>
+                //    {
+                //        context.Identity.AddClaim(new System.Security.Claims.Claim("urn:facebook:access_token", context.AccessToken, XmlSchemaString, "Facebook"));
+                //        context.Identity.AddClaim(new System.Security.Claims.Claim("urn:facebook:email", context.Email, XmlSchemaString, "Facebook"));
+                //        return Task.FromResult(0);
+                //    }
+                //}
             };
+            facebookAuthOptions.Scope.Add("email");
             app.UseFacebookAuthentication(facebookAuthOptions);
         }
     }

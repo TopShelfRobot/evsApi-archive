@@ -3,16 +3,15 @@ namespace evs.DAL.Migrations
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
+    //using System.Data.Entity.Core.mi
     using System.Linq;
 
     internal sealed class Configuration : DbMigrationsConfiguration<evs.DAL.evsContext>
     {
         public Configuration()
         {
-            //AutomaticMigrationsEnabled = false;
-
-            AutomaticMigrationsEnabled = true;
-            AutomaticMigrationDataLossAllowed = true;
+            AutomaticMigrationsEnabled = false;
+            //AutomaticMigrationDataLossAllowed = true;
         }
 
         protected override void Seed(evs.DAL.evsContext context)

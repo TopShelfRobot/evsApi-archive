@@ -116,15 +116,13 @@ namespace evs.API.Controllers
 
             bool hasRegistered = user != null;
 
-            redirectUri = string.Format("{0}#external_access_token={1}&provider={2}&haslocalaccount={3}&external_user_name={4}",
+            redirectUri = string.Format("{0}#external_access_token={1}&provider={2}&haslocalaccount={3}&username={4}",
                                             redirectUri,
                                             externalLogin.ExternalAccessToken,
                                             externalLogin.LoginProvider,
                                             hasRegistered.ToString(),
                                             externalLogin.UserName);
-
             return Redirect(redirectUri);
-
         }
 
         private class ExternalLoginData
@@ -157,7 +155,7 @@ namespace evs.API.Controllers
                 {
                     LoginProvider = providerKeyClaim.Issuer,
                     ProviderKey = providerKeyClaim.Value,
-                    UserName = identity.FindFirstValue(ClaimTypes.Name),
+                    UserName = identity.FindFirstValue(ClaimTypes.Email),
                     ExternalAccessToken = identity.FindFirstValue("ExternalAccessToken"),
                 };
             }
@@ -246,37 +244,44 @@ namespace evs.API.Controllers
         [Route("ObtainLocalAccessToken")]
         public async Task<IHttpActionResult> ObtainLocalAccessToken(string provider, string externalAccessToken)
         {
+            //try
+            //{
 
-            if (string.IsNullOrWhiteSpace(provider) || string.IsNullOrWhiteSpace(externalAccessToken))
-            {
-                return BadRequest("Provider or external access token is not sent");
-            }
+                if (string.IsNullOrWhiteSpace(provider) || string.IsNullOrWhiteSpace(externalAccessToken))
+                {
+                    return BadRequest("Provider or external access token is not sent");
+                }
 
-            var verifiedAccessToken = await VerifyExternalAccessToken(provider, externalAccessToken);
-            if (verifiedAccessToken == null)
-            {
-                return BadRequest("Invalid Provider or External Access Token");
-            }
+                var verifiedAccessToken = await VerifyExternalAccessToken(provider, externalAccessToken);
+                if (verifiedAccessToken == null)
+                {
+                    return BadRequest("Invalid Provider or External Access Token");
+                }
 
-            IdentityUser user = await _repo.FindAsync(new UserLoginInfo(provider, verifiedAccessToken.user_id));
+                IdentityUser user = await _repo.FindAsync(new UserLoginInfo(provider, verifiedAccessToken.user_id));
 
-            bool hasRegistered = user != null;
+                bool hasRegistered = user != null;
 
-            if (!hasRegistered)
-            {
-                return BadRequest("External user is not registered");
-            }
+                if (!hasRegistered)
+                {
+                    return BadRequest("External user is not registered");
+                }
 
-            //generate access token response
-            var accessTokenResponse = GenerateLocalAccessTokenResponse(user.UserName);
+                //generate access token response
+                var accessTokenResponse = GenerateLocalAccessTokenResponse(user.UserName);
 
-            return Ok(accessTokenResponse);
+                return Ok(accessTokenResponse);
+            //}
+            //catch (Exception ex)
+            //{
 
+            //    var x = ex.Message + " - " + ex.InnerException;
+            //    return Ok();
+            //}
         }
 
         private JObject GenerateLocalAccessTokenResponse(string userName)
         {
-
             var tokenExpiration = TimeSpan.FromDays(1);
 
             ClaimsIdentity identity = new ClaimsIdentity(OAuthDefaults.AuthenticationType);
@@ -302,77 +307,79 @@ namespace evs.API.Controllers
                                         new JProperty(".issued", ticket.Properties.IssuedUtc.ToString()),
                                         new JProperty(".expires", ticket.Properties.ExpiresUtc.ToString())
         );
-
             return tokenResponse;
         }
 
         private async Task<ParsedExternalAccessToken> VerifyExternalAccessToken(string provider, string accessToken)
         {
-            ParsedExternalAccessToken parsedToken = null;
-
-            var verifyTokenEndPoint = "";
-
-            if (provider == "Facebook")
+          try
             {
-                //You can get it from here: https://developers.facebook.com/tools/accesstoken/
-                //More about debug_tokn here: http://stackoverflow.com/questions/16641083/how-does-one-get-the-app-access-token-for-debug-token-inspection-on-facebook
-
-                var appToken = "xxxxx";
-                verifyTokenEndPoint = string.Format("https://graph.facebook.com/debug_token?input_token={0}&access_token={1}", accessToken, appToken);
-            }
-            else if (provider == "Google")
-            {
-                verifyTokenEndPoint = string.Format("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={0}", accessToken);
-            }
-            else
-            {
-                return null;
-            }
-
-            var client = new HttpClient();
-            var uri = new Uri(verifyTokenEndPoint);
-            var response = await client.GetAsync(uri);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-
-                dynamic jObj = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(content);
-
-                parsedToken = new ParsedExternalAccessToken();
+                ParsedExternalAccessToken parsedToken = null;
+                var verifyTokenEndPoint = "";
 
                 if (provider == "Facebook")
                 {
-                    parsedToken.user_id = jObj["data"]["user_id"];
-                    parsedToken.app_id = jObj["data"]["app_id"];
+                    //You can get it from here: https://developers.facebook.com/tools/accesstoken/
+                    //More about debug_tokn here: http://stackoverflow.com/questions/16641083/how-does-one-get-the-app-access-token-for-debug-token-inspection-on-facebook
 
-                    if (!string.Equals(Startup.facebookAuthOptions.AppId, parsedToken.app_id, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return null;
-                    }
+                    var appToken = ConfigurationManager.AppSettings["fbAppToken"];     //"1616809328551404|qRN7xVIJWnNJxDXH-BHxgznZnnE";
+                    verifyTokenEndPoint = string.Format("https://graph.facebook.com/debug_token?input_token={0}&access_token={1}", accessToken, appToken);
                 }
                 else if (provider == "Google")
                 {
-                    parsedToken.user_id = jObj["user_id"];
-                    parsedToken.app_id = jObj["audience"];
-
-                    if (!string.Equals(Startup.googleAuthOptions.ClientId, parsedToken.app_id, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return null;
-                    }
-
+                    verifyTokenEndPoint = string.Format("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={0}", accessToken);
+                }
+                else
+                {
+                    return null;
                 }
 
-            }
+                var client = new HttpClient();
+                var uri = new Uri(verifyTokenEndPoint);
+                var response = await client.GetAsync(uri);
 
-            return parsedToken;
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    dynamic jObj = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(content);
+
+                    parsedToken = new ParsedExternalAccessToken();
+
+                    if (provider == "Facebook")
+                    {
+                        parsedToken.user_id = jObj["data"]["user_id"];
+                        parsedToken.app_id = jObj["data"]["app_id"];
+
+                        if (!string.Equals(Startup.facebookAuthOptions.AppId, parsedToken.app_id, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return null;
+                        }
+                    }
+                    else if (provider == "Google")
+                    {
+                        parsedToken.user_id = jObj["user_id"];
+                        parsedToken.app_id = jObj["audience"];
+
+                        if (!string.Equals(Startup.googleAuthOptions.ClientId, parsedToken.app_id, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return null;
+                        }
+                    }
+                }
+                return parsedToken;
+            }
+            catch (Exception ex)
+            {
+                var x = ex.Message + " - " + ex.InnerException;
+                return new ParsedExternalAccessToken();
+                //return Ok();
+            }
         }
 
         private string ValidateClientAndRedirectUri(HttpRequestMessage request, ref string redirectUriOutput)
         {
-
             Uri redirectUri;
-
             var redirectUriString = GetQueryString(Request, "redirect_uri");
 
             if (string.IsNullOrWhiteSpace(redirectUriString))
@@ -405,11 +412,8 @@ namespace evs.API.Controllers
             {
                 return string.Format("The given URL is not allowed by Client_id '{0}' configuration.", clientId);
             }
-
             redirectUriOutput = redirectUri.AbsoluteUri;
-
             return string.Empty;
-
         }
 
         private string GetQueryString(HttpRequestMessage request, string key)
@@ -431,7 +435,6 @@ namespace evs.API.Controllers
             {
                 _repo.Dispose();
             }
-
             base.Dispose(disposing);
         }
 
@@ -457,10 +460,8 @@ namespace evs.API.Controllers
                     // No ModelState errors are available to send, so just return an empty BadRequest.
                     return BadRequest();
                 }
-
                 return BadRequest(ModelState);
             }
-
             return null;
         }
 
@@ -638,7 +639,7 @@ namespace evs.API.Controllers
         [Route("GetUserRolesByUserIdInArray/{user}")]
         public List<string> GetUserRolesByUserIdInArray(string user)
         {
-            return  _repo.GetRolesByUserId(user);
+            return _repo.GetRolesByUserId(user);
             //var ret = new List<NameDTO>();
             //foreach (var role in roles)
             //    ret.Add(new NameDTO(role));

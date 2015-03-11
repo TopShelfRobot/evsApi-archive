@@ -9,7 +9,8 @@ using System.Configuration;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using evs.Model;  //just here for enums
-using evs.DAL;  //get rid of this
+using evs.DAL;
+using System.Web;  //get rid of this
 
 
 namespace evs.Service
@@ -75,30 +76,25 @@ namespace evs.Service
                     if ((DateTime.Now - timeControllerForSendingEmails).TotalSeconds >= .22)
                     {
                         timeControllerForSendingEmails = DateTime.Now;
-
-                        //    //this method gets a list of 60 emails and remove them from the main list
-                        //    List<EmailEnt> queuedEmails = GetEmailsQueue(emails, 60));
-
-                        //    SendList(queuedEmails);
+                        
                         try
                         {
                             List<string> mailTos = new List<string>();
                             mailTos.Add(email);
                             SendEmail(body, subject, _mailBuilder.GetSender(ownerId), mailTos, new List<string>());
                             //SendEmail(new List<string>().Add(email.ToString()), body, subject, new List<string>(), new List<string>());
-                            log = log + "_success: " + DateTime.Now.ToString("o") + " @ " + email  +" || ";
-                            
+                            log = log + "_success: " + DateTime.Now.ToString("o") + " @ " + email + " ||";
                         }
                         catch (Exception ex)
                         {
-                            log = log + "_error: " + DateTime.Now.ToString("o") + " err-> " + ex.Message + " || ";
+                            log = log + "_error: " + DateTime.Now.ToString("o") + " err-> " + ex.Message + " ||";
                         }
-                        finally{
+                        finally
+                        {
                             processed = true;
                         }
                         //timeControllerForSendingEmails = DateTime.Now;
                     }
-
                 }
             }
             return log;
@@ -113,7 +109,8 @@ namespace evs.Service
             {
                 destination.BccAddresses = bcc;
             }
-            Body body = new Body() { Html = new Content(messageBody) };
+
+            Body body = new Body() { Html = new Content(HttpUtility.HtmlDecode(messageBody)) };
             Content subject = new Content(messageSubject);
             Message message = new Message(subject, body);
             SendEmailRequest sendEmailRequest = new SendEmailRequest(sender, destination, message);

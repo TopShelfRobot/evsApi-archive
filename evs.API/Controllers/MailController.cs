@@ -81,10 +81,7 @@ namespace evs.API.Controllers
                 string body = (string)jsonBundle["body"];
                 string subject = (string)jsonBundle["subject"];
                 Int32 ownerId = (Int32)jsonBundle["ownerId"]; 
-                
-
-               
-
+ 
                 var _mailService = new MailService();
                 var returnMessage = _mailService.SendGroupEmailGroup(emails, subject, body, ownerId);
 
@@ -292,12 +289,7 @@ namespace evs.API.Controllers
                 }
             }
         }
-
-
-
-
     }
-
 }
 
 

@@ -12,8 +12,10 @@ namespace evs.DAL
         public evsContext()
             : base("evsContext")
         {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<evsContext, Configuration>());
+            //Database.SetInitializer(new MigrateDatabaseToLatestVersion<evsContext, Configuration>());
             //Database.SetInitializer(new DropCreateDatabaseAlways<evsContext>());
+            Database.SetInitializer<evsContext>(null);
+           
         }
 
         public DbSet<Test> Tests { get; set; }
