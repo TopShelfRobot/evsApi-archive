@@ -12,6 +12,7 @@ using System.Web.Security;
 //using Microsoft.Owin.Security;
 //using System.Globalization;
 //using System.Security.Claims;
+using evs.API.Infrastructure;
 
 
 namespace evs.API
@@ -21,13 +22,24 @@ namespace evs.API
         // private AuthContext _ctx;// = new evsContext();
         private evsContext _ctx;//= new evsContext();
 
-        private UserManager<IdentityUser> _userManager;
+        //private UserManager<IdentityUser> _userManager;
+        //private ApplicationUserManager _userManager;
+        private ApplicationUserManager _AppUserManager = null;
+        private ApplicationRoleManager _AppRoleManager = null;
 
         public AuthRepository()
         {
             _ctx = new evsContext();
             // _ctx = new AuthContext();
-            _userManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
+            //_userManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
+            //var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
+            //_AppUserManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            //_appRoleManager = Request.GetOwinContext().GetUserManager<ApplicationRoleManager>();
+
+            _AppUserManager = new ApplicationUserManager(new UserStore<IdentityUser>(_ctx));
+
+
+
         }
 
         public async Task<IdentityResult> RegisterUser(UserModel userModel)
@@ -37,14 +49,14 @@ namespace evs.API
                 UserName = userModel.UserName
             };
 
-            var result = await _userManager.CreateAsync(user, userModel.Password);
+            var result = await _AppUserManager.CreateAsync(user, userModel.Password);
 
             return result;
         }
 
         public async Task<IdentityUser> FindUser(string userName, string password)
         {
-            IdentityUser user = await _userManager.FindAsync(userName, password);
+            IdentityUser user = await _AppUserManager.FindAsync(userName, password);
 
             return user;
         }
@@ -103,20 +115,20 @@ namespace evs.API
 
         public async Task<IdentityUser> FindAsync(UserLoginInfo loginInfo)
         {
-            IdentityUser user = await _userManager.FindAsync(loginInfo);
+            IdentityUser user = await _AppUserManager.FindAsync(loginInfo);
             return user;
         }
 
         public async Task<IdentityUser> FindAsync(string email)  //mjb
         {
-            IdentityUser user = await _userManager.FindByNameAsync(email);
+            IdentityUser user = await _AppUserManager.FindByNameAsync(email);
 
             return user;
         }
 
         public async Task<IdentityResult> CreateAsync(IdentityUser user)
         {
-            var result = await _userManager.CreateAsync(user);
+            var result = await _AppUserManager.CreateAsync(user);
 
             return result;
         }
@@ -124,18 +136,18 @@ namespace evs.API
         public async Task<string> GeneratePasswordResetTokenAsync(string tkey)     //mjb 
         {
             var provider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("ResetPassword");
-            _userManager.UserTokenProvider = new Microsoft.AspNet.Identity.Owin.DataProtectorTokenProvider<IdentityUser>(provider.Create("ResetPassword"))
+            _AppUserManager.UserTokenProvider = new Microsoft.AspNet.Identity.Owin.DataProtectorTokenProvider<IdentityUser>(provider.Create("ResetPassword"))
               {
                   TokenLifespan = TimeSpan.FromHours(3)
               };
 
-            return _userManager.GeneratePasswordResetToken(tkey);
+            return _AppUserManager.GeneratePasswordResetToken(tkey);
         }
 
         //await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
         public async Task<bool> SendEmailAsync(string id, string subject, string body)     //mjb 
         {
-            await _userManager.SendEmailAsync(id, subject, body);
+            await _AppUserManager.SendEmailAsync(id, subject, body);
             //return Ok();
             return true;
         }
@@ -146,12 +158,12 @@ namespace evs.API
             //try
             //{
             var provider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider("ResetPassword");
-            _userManager.UserTokenProvider = new Microsoft.AspNet.Identity.Owin.DataProtectorTokenProvider<IdentityUser>(provider.Create("ResetPassword"))
+            _AppUserManager.UserTokenProvider = new Microsoft.AspNet.Identity.Owin.DataProtectorTokenProvider<IdentityUser>(provider.Create("ResetPassword"))
             {
                 TokenLifespan = TimeSpan.FromHours(100)
             };
 
-            var result = await _userManager.ResetPasswordAsync(id, code, password);
+            var result = await _AppUserManager.ResetPasswordAsync(id, code, password);
             return result;
 
             //}
@@ -165,7 +177,7 @@ namespace evs.API
 
         public async Task<IdentityResult> AddLoginAsync(string userId, UserLoginInfo login)
         {
-            var result = await _userManager.AddLoginAsync(userId, login);
+            var result = await _AppUserManager.AddLoginAsync(userId, login);
 
             return result;
         }
@@ -191,27 +203,27 @@ namespace evs.API
 
         public List<string> GetRolesByUserId(string userId)
         {
-            var user = _userManager.FindByName(userId);
-            var roles = _userManager.GetRoles(user.Id).ToList();
+            var user = _AppUserManager.FindByName(userId);
+            var roles = _AppUserManager.GetRoles(user.Id).ToList();
             return roles;
         }
 
         public async Task<IdentityResult> AddUsersToRole(List<string> roles, string userName)
         {
-            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
-            var user = _userManager.FindByName(userName);
-            var allRoles = _userManager.GetRoles(user.Id).ToArray();
+            //var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_ctx));
+            var user = _AppUserManager.FindByName(userName);
+            var allRoles = _AppUserManager.GetRoles(user.Id).ToArray();
 
-            var removeResult = _userManager.RemoveFromRoles(user.Id, allRoles);
+            var removeResult = _AppUserManager.RemoveFromRoles(user.Id, allRoles);
 
-            var addResult = _userManager.AddToRoles(user.Id, roles.ToArray());
+            var addResult = _AppUserManager.AddToRoles(user.Id, roles.ToArray());
             return addResult;
         }
 
         public void Dispose()
         {
             _ctx.Dispose();
-            _userManager.Dispose();
+            _AppUserManager.Dispose();
 
         }
     }

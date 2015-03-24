@@ -13,6 +13,7 @@ using evs.Model;
 using System.Data.Entity.Core.Objects;
 using System.Web.Mvc.Html;
 
+
 namespace evs.API.Controllers
 {
     //[Authorize]
@@ -52,7 +53,7 @@ namespace evs.API.Controllers
                     && (l.Active)
                     && (EntityFunctions.TruncateTime(l.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
                     && (EntityFunctions.TruncateTime(l.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now))
-                    && l.Capacity > l.Registration.Count()
+                    && l.Capacity > l.Registrations.Count()
                     );
         }
 
@@ -640,7 +641,7 @@ namespace evs.API.Controllers
                                             .ToList();
         }
 
-
+      
 
         //[HttpGet]
         //public IQueryable<Participant> ParticipantsByHouseId(int houseId)
@@ -697,6 +698,12 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
+        public IQueryable<EventureListBundle> EventureListBundles()
+        {
+            return _contextProvider.Context.EventureListBundles;
+        }
+
+        [HttpGet]
         public IQueryable<EventureTransfer> Transfers()
         {
             return _contextProvider.Context.Transfers;
@@ -714,6 +721,12 @@ namespace evs.API.Controllers
             return _contextProvider.Context.Coupons;
         }
 
+        [HttpGet]
+        public IQueryable<Addon> Addons()
+        {
+            return _contextProvider.Context.Addons;
+        }
+        
         [HttpGet]
         public IQueryable<EventureClient> EventureClients()
         {
@@ -996,11 +1009,6 @@ namespace evs.API.Controllers
 //    return new { participants };  //, timeslots
 //}
 
-//[HttpGet]
-//public IQueryable<Addon> Addons()
-//{
-//    return _contextProvider.Context.Addons;
-//}
 
 //[HttpGet]
 //public IQueryable<StockQuestionSet> StockQuestionSets()

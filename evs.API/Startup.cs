@@ -10,6 +10,7 @@ using evs.API.Providers;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.Facebook;
 using System.Configuration;
+using evs.API.Infrastructure;
 //using Microsoft.Owin.Security.DataHandler;
 
 [assembly: OwinStartup(typeof(evs.API.Startup))]
@@ -34,6 +35,10 @@ namespace evs.API
 
         public void ConfigureOAuth(IAppBuilder app)
         {
+
+            app.CreatePerOwinContext(ApplicationDbContext.Create);
+            app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
+
             //use a cookie to temporarily store information about a user logging in with a third party login provider
             app.UseExternalSignInCookie(Microsoft.AspNet.Identity.DefaultAuthenticationTypes.ExternalCookie);
             OAuthBearerOptions = new OAuthBearerAuthenticationOptions();

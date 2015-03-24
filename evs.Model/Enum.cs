@@ -52,7 +52,8 @@ namespace evs.Model
         //DiscountList,
         //FeeList,
         //FeeEvent,
-        OnlineFee
+        OnlineFee,
+        Addon
     }
 
 }

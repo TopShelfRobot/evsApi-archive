@@ -11,6 +11,12 @@ using Stripe;
 using System.Text;
 using evs.Service;
 
+using System.Net.Http.Formatting;
+//using System.Json;
+//using System.Web.Script.Serialization;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
+
 
 namespace evs.API.Controllers
 {
@@ -212,5 +218,70 @@ namespace evs.API.Controllers
             return resp;
 
         }
+
+
+       
+        [HttpPost]
+        [Route("USATVerification")]
+        public object USATVerification(JObject jBundle)
+        {
+            var id = "6AXTAUF6VO";
+            var email = "christopher.west@usatriathlon.org";
+
+            //var id = "2100071375";
+            //var email = "akeyser85@gmail.com";
+
+            HttpClient client = new HttpClient();
+            //client.BaseAddress = new Uri("http://usatriathlon.org/");
+            client.BaseAddress = new Uri("http://batch-test.usatriathlon.org/");
+        
+            //client.BaseAddress = new Uri("http://batch-qa.usatriathlon.org/");
+            //'client.BaseAddress = new Uri("http://batch.usatriathlon.org/");
+
+            // Add an Accept header for JSON format.
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "Eventure", "3p9JZyn6"))));
+
+            var url = "api/license/" + id + "/" + email;
+            HttpResponseMessage response;
+
+            try
+            {
+                response = client.GetAsync(url).Result;
+            }
+            catch (Exception ex)
+            {
+                var err = ex.Message + " -- " + ex.InnerException;
+            }
+
+
+            var returnMessage = string.Empty;
+            //if (response.IsSuccessStatusCode)
+            //{
+            //    //var result = JsonConvert.DeserializeObject<EventValidationResponse>(response.Content.ReadAsStringAsync().Result);
+            //    returnMessage = "stop;";
+            //}
+            //else
+            //{
+            //    //process error(s)...
+            //}
+
+            if (Request != null)
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, returnMessage);
+            //return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            else
+            {
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                //return new HttpResponseMessage(HttpStatusCode.InternalServerError,);
+            }
+
+        }
+
+
+
+
+
+
     }
 }

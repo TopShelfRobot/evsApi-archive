@@ -24,6 +24,7 @@ using evs.Model;  //user model
 using evs.API.Results;  //ChallengeResult
 using evs.DAL;   //this is only for the current dirty error handling
 
+
 namespace evs.API.Controllers
 {
     [RoutePrefix("api/Account")]
@@ -653,6 +654,27 @@ namespace evs.API.Controllers
             public NameDTO(string name)
             {
                 Name = name;
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("GetLocalAccount/{userName}")]
+        public object GetLocalAccount(string userName)
+        {
+            Task<IdentityUser> user =  _repo.FindAsync(userName);
+            bool hasRegistered = user != null;
+            var userDto = new ExistingUserDTO(hasRegistered);
+            return userDto;
+        }
+
+        public class ExistingUserDTO
+        {
+            public Boolean Exists;
+
+            public ExistingUserDTO(Boolean exists)
+            {
+                Exists = exists;
             }
         }
 

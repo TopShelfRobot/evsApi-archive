@@ -27,12 +27,12 @@ namespace evs.API.Controllers
         public IEnumerable<EventureList> EventureListsByEventureId(int eventureId)
         {
             return _db.EventureLists
-                        .Where(l => (l.EventureId == eventureId)
-                        && (l.Active)
-                        && (EntityFunctions.TruncateTime(l.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
-                        && (EntityFunctions.TruncateTime(l.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now))
-                        && l.Capacity > l.Registration.Count()
-                        );
+                         .Where(l => (l.EventureId == eventureId)
+                         && (l.Active)
+                         && (EntityFunctions.TruncateTime(l.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
+                         && (EntityFunctions.TruncateTime(l.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now))
+                         && l.Capacity > l.Registrations.Count()
+                         );
         }
 
         [HttpGet]
@@ -256,6 +256,12 @@ namespace evs.API.Controllers
         public IQueryable<TeamMember> TeamMembers()
         {
             return _contextProvider.Context.TeamMembers;
+        }
+
+        [HttpGet]
+        public IQueryable<Addon> Addons()
+        {
+            return _contextProvider.Context.Addons;
         }
 
         [HttpPost]

@@ -58,7 +58,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="evs.Context.cs" />
     <Compile Include="evsContext.cs" />
     <Compile Include="Migrations\201503100315452_initial.cs" />
     <Compile Include="Migrations\201503100315452_initial.Designer.cs">
@@ -75,6 +74,18 @@
     <Compile Include="Migrations\201503111445373_addon.cs" />
     <Compile Include="Migrations\201503111445373_addon.Designer.cs">
       <DependentUpon>201503111445373_addon.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503121458290_bundle.cs" />
+    <Compile Include="Migrations\201503121458290_bundle.Designer.cs">
+      <DependentUpon>201503121458290_bundle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503121542393_addonCleanup.cs" />
+    <Compile Include="Migrations\201503121542393_addonCleanup.Designer.cs">
+      <DependentUpon>201503121542393_addonCleanup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503172012491_usat.cs" />
+    <Compile Include="Migrations\201503172012491_usat.Designer.cs">
+      <DependentUpon>201503172012491_usat.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -104,6 +115,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503111445373_addon.resx">
       <DependentUpon>201503111445373_addon.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503121458290_bundle.resx">
+      <DependentUpon>201503121458290_bundle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503121542393_addonCleanup.resx">
+      <DependentUpon>201503121542393_addonCleanup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503172012491_usat.resx">
+      <DependentUpon>201503172012491_usat.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

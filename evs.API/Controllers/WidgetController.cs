@@ -1,5 +1,4 @@
-﻿using evs.DAL;
-using evs.Model;
+﻿using evs.Model;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using evs.DAL;
 
 namespace evs.API.Controllers
 {
@@ -404,6 +404,34 @@ namespace evs.API.Controllers
                             select new { s.Amount, s.Description, l.Name, s.EventureOrderId, p.FirstName, p.LastName, s.CouponId };
 
             return surcharge;
+        }
+
+        //[HttpGet]
+        //public object GetAddonsUseByCouponId(Int32 id)
+        //{
+        //    var surcharge = from s in db.Surcharges
+        //                    join l in db.EventureLists
+        //                    on s.EventureListId equals l.Id
+        //                    join p in db.Participants
+        //                    on s.ParticipantId equals p.Id
+        //                    where s.ChargeType == "addon"
+        //                    && s.CouponId == id
+        //                    select new { s.Amount, s.Description, l.Name, s.EventureOrderId, p.FirstName, p.LastName, s.CouponId };
+
+        //    var surcharge = db.Surcharges.Where(s => s.SurchargeType == SurchargeType.Addon )
+
+        //    return surcharge;
+        //}
+
+        [HttpGet]
+        public object GetAddonsByOwnerId(Int32 id)
+        {
+            var addons = db.Addons.Where(a => a.OwnerId == id)
+                .Select(a => new { a.Id, a.Name, a.Amount, a.AddonType, EventureName = a.Eventure.Name, a.Active })
+                .OrderBy(a => a.Active).OrderBy(a => a.AddonType)   //.OrderBy(a => a.DateCreated)
+                .ToList();
+
+            return addons;
         }
 
         [HttpGet]

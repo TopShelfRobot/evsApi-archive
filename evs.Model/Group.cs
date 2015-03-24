@@ -22,6 +22,6 @@ namespace evs.Model
         //public Int32 CreatedById { get; set; }
     
         //public virtual EventureList EventureList { get; set; }
-        public ICollection<Registration> Registration { get; set; }
+        public ICollection<Registration> Registrations { get; set; }
     }
 }

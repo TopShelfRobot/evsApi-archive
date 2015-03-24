@@ -6,14 +6,17 @@ namespace evs.Model
     {
         public Int32 Id { get; set; }
         public Int32 EventureOrderId { get; set; }
+        public string Name { get; set; }
         public decimal Amount { get; set; }
         public string ChargeType { get; set; }   //listcoupon, listfee, eventcoupon
         public string Description { get; set; }
         //appears on receipt line item  //right now we only have list  eventcoupon is still tied to list w/diff type
         public Int32? EventureListId { get; set; }
-        public Int32? ParticipantId { get; set; }
+        public Int32? ParticipantId { get; set; }  
         public Int32? CouponId { get; set; }
         public Int32 ConvOrderId { get; set; }
+        public Int32? AddonId { get; set; }
+            
         public SurchargeType SurchargeType { get; set; }
         public DateTime DateCreated { get; set; }
         //public DateTime DateModified { get; set; }
@@ -87,6 +90,7 @@ namespace evs.Model
     public class Addon   //deprecated
     {
         public Int32 Id { get; set; }
+        public string Name { get; set; }
         public bool Active { get; set; }
         public decimal Amount { get; set; }
         //public Int32 AmountTypeId { get; set; }      // 0=$  1=%
@@ -99,6 +103,9 @@ namespace evs.Model
         public Int32? EventureId {get;set;}
         public Int32 OwnerId { get; set; }
         public string ImagePath { get; set; }
+        public DateTime DateCreated { get; set; }
+
+        public virtual Eventure Eventure { get; set; }
     }
 
     public class RegistrationPost

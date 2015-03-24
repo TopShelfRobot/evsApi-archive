@@ -76,14 +76,13 @@ namespace evs.Model
         //public Int32? EventureListTypeId { get; set; }  //eventually won't be ?
         public string PaymentTerms { get; set; }
         public Boolean IsGroupRequired { get; set; }
-
-
+        public Boolean IsUSAT { get; set; }
         // Navigation property 
         //public virtual Eventure Eventure { get; set; }
-        public ICollection<Registration> Registration { get; set; }
+        public ICollection<Registration> Registrations { get; set; }
         public Eventure Eventure { get; set; }
         public EventureListType EventureListType { get; set; }
-        public ICollection<EventureListBundle> EvenutreListBundles { get; set; }
+        public ICollection<EventureListBundle> EventureListBundles { get; set; }
         //public Result Result { get; set; }
         //public virtual string EventureName { get; set; }
         //public ICollection<Coupon> Coupons { get; set; }
@@ -97,7 +96,8 @@ namespace evs.Model
     public class EventureListBundle
     {
         public Int32 Id { get; set; }
-        public Int32 EvenureListId { get; set; }
+        public Int32 EventureListId { get; set; }
+        public Int32 ChildEventureListId { get; set; }
     }
 
     //public class EventureListType   //enum

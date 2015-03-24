@@ -33,5 +33,6 @@ D:\source\evs30Api\evs.DAL\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.x
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.firstUpdate.resources
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.facebook.resources
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.addon.resources
-D:\source\evs30Api\evs.DAL\bin\Debug\evs.DAL.dll.CodeAnalysisLog.xml
-D:\source\evs30Api\evs.DAL\bin\Debug\evs.DAL.dll.lastcodeanalysissucceeded
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.bundle.resources
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.addonCleanup.resources
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.usat.resources

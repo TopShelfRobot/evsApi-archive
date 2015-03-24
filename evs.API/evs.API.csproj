@@ -300,7 +300,6 @@
   <ItemGroup>
     <Compile Include="App_Start\BreezeWebApiConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="AuthContext.cs" />
     <Compile Include="AuthRepository.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AnalyticController.cs" />
@@ -316,6 +315,9 @@
     <Compile Include="Controllers\RegistrationController.cs" />
     <Compile Include="Controllers\WidgetController.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="Infrastructure\ApplicationDbContext.cs" />
+    <Compile Include="Infrastructure\ApplicationRoleManager.cs" />
+    <Compile Include="Infrastructure\ApplicationUserManger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controllers\Providers\FacebookAuthProvider.cs" />
     <Compile Include="Controllers\Providers\GoogleAuthProvider.cs" />
