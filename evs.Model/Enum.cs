@@ -36,6 +36,24 @@ namespace evs.Model
         MassParticipant
     };
 
+    public enum RegStatus
+    {
+        Completed = 0,
+        Refunded,
+        RefundedTest,
+        TransferredTo,
+        Transferred
+    };
+
+    public enum OrderStatus
+    {
+        Completed = 0,
+        Incomplete,
+        Refunded,
+        PartiallyRefunded
+        //Voided
+    };
+
     public enum AmountType
     {
         Dollars = 0,
@@ -45,15 +63,23 @@ namespace evs.Model
     public enum SurchargeType
     {
         Coupon = 1,
+        Discount,
+        OnlineFee,
+        Addon,
+        USAT
         //CouponEvent,
         //CouponList
-        Discount,
         //DiscountEvent,
         //DiscountList,
         //FeeList,
         //FeeEvent,
-        OnlineFee,
-        Addon
+    }
+
+    public enum RefundType
+    {
+        Order = 0,
+        Registration,
+        Partial
     }
 
 }

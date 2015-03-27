@@ -176,6 +176,7 @@ namespace evs.API.Controllers
                     //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
                     order.Voided = false;
                     order.Status = "Complete";
+                    order.OrderStatus = OrderStatus.Completed;
                     //mjb fix order.PaymentType = "credit";
                     //db.Orders.Add(order);
                     //db.SaveChanges();
@@ -395,12 +396,55 @@ namespace evs.API.Controllers
                         //EventureOrderId = order.Id,
                         EventureOrder = order,
                         DateCreated = DateTime.Now,
-                        CouponId = surchargeBundle.couponId
+                        CouponId = surchargeBundle.couponId                     
+                    };
+
+                    string  chargeType = surchargeBundle.chargeType ?? "";
+                    switch (chargeType)
+                    {
+                        case "coupon":
+                            surcharge.SurchargeType = SurchargeType.Coupon;
+                            break;
+                        case "cartRule":
+                            surcharge.SurchargeType = SurchargeType.Discount;
+                            break;
+                         case "onlineFee":
+                            surcharge.SurchargeType = SurchargeType.OnlineFee;
+                            break;
+                        default:
+                            break;
+                    }
+                    //totalFees = 33; //totalFees + Convert.ToDecimal(surchargeBundle.amount);
+                    order.Surcharges.Add(surcharge);
+                }
+            }
+
+            if (bundle.addons != null)  //if no surcharges skip this
+            {
+                foreach (dynamic addonBundle in bundle.addons)
+                {
+                    var surcharge = new Surcharge
+                    {
+                        Amount = addonBundle.amount,
+                        EventureListId = addonBundle.listId,
+                        ChargeType = addonBundle.chargeType,
+                        Description = addonBundle.addonName,
+                        ParticipantId = (Int32)orderBundle["orderHouseId"],  
+                        EventureOrder = order,
+                        DateCreated = DateTime.Now,
+                        AddonId = addonBundle.addonId,
+                        Quantity = addonBundle.quantity,
+                        SurchargeType = SurchargeType.Addon
+    
                     };
                     //totalFees = 33; //totalFees + Convert.ToDecimal(surchargeBundle.amount);
                     order.Surcharges.Add(surcharge);
                 }
             }
+
+
+
+
             //db.Orders.Add(order);
 
             foreach (var regBundle in bundle.regs)
@@ -419,6 +463,7 @@ namespace evs.API.Controllers
                         DateCreated = DateTime.Now,
                         TotalAmount = Convert.ToDecimal(regBundle.fee),
                         Type = "reg",
+                        RegStatus = RegStatus.Completed,
                         Redeemed = true
                     };
                 // order.

@@ -16,9 +16,10 @@ namespace evs.Model
         public Int32? CouponId { get; set; }
         public Int32 ConvOrderId { get; set; }
         public Int32? AddonId { get; set; }
-            
+        public Int32? Quantity { get; set; }  
         public SurchargeType SurchargeType { get; set; }
         public DateTime DateCreated { get; set; }
+       
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
@@ -70,6 +71,7 @@ namespace evs.Model
         public string Description { get; set; }
         public DateTime DateCreated { get; set; }
         public Int32? RegistrationId { get; set; }
+        public RefundType RefundType { get; set; }
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }

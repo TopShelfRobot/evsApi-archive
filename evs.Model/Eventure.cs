@@ -13,7 +13,7 @@ namespace evs.Model
         public Int32 Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public string Desc { get; set; }
+        //public string Desc { get; set; }
         public string DisplayHeading { get; set; }
         public string DisplayDate { get; set; }
         public DateTime DateEventure { get; set; }
@@ -77,6 +77,7 @@ namespace evs.Model
         public string PaymentTerms { get; set; }
         public Boolean IsGroupRequired { get; set; }
         public Boolean IsUSAT { get; set; }
+        public decimal UsatDiscountAmount { get; set; }
         // Navigation property 
         //public virtual Eventure Eventure { get; set; }
         public ICollection<Registration> Registrations { get; set; }

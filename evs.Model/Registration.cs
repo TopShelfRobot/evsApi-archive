@@ -38,6 +38,8 @@ namespace evs.Model
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
 
+        public RegStatus RegStatus { get; set; }
+
 
         [ForeignKey("GroupId")]
         public virtual EventureGroup EventureGroup { get; set; }

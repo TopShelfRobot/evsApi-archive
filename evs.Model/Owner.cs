@@ -61,6 +61,7 @@ namespace evs.Model
         public string EventureName { get; set; }
         public string ListingName { get; set; }
         public string GroupName { get; set; }
+        public string EventStatement { get; set; }
         public string ListStatement { get; set; }
         public string ParticipantButtonText { get; set; }
         public string StripeOrderDescription { get; set; }

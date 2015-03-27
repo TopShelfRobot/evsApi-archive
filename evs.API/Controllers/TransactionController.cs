@@ -201,22 +201,43 @@ namespace evs.API.Controllers
         [Route("Refund")]
         public HttpResponseMessage Refund(JObject jRefund)
         {
-            //decimal amount = (Decimal)jRefund["amount"];
-            //Int32 eventureOrderId = (Int32)jRefund["eventureOrderId"];
-            //string description = (string)jRefund["description"];
-            ////Int32 regId = (Int32)(jRefund["description"] || 0;
-
             var refund = new Refund();
             refund.Amount = (Decimal)jRefund["amount"];
             refund.EventureOrderId = (Int32)jRefund["eventureOrderId"];
+
+            switch ((string)jRefund["refundType"])
+            {
+                case "order":
+                    refund.RefundType = RefundType.Order;
+                    break;
+                case "registration":
+                    refund.RefundType = RefundType.Registration;
+                    break;
+                case "partial":
+                    refund.RefundType = RefundType.Partial;
+                    break;
+                default:
+                    Console.WriteLine("Default case");
+                    break;
+            }
             
             var _tranMan = new TransactionManager();
-            _tranMan.ProcessRefund(refund);
+            string result = _tranMan.ProcessRefund(refund);
 
-            var resp = Request.CreateResponse(HttpStatusCode.OK);
-            //resp.Content = new StringContent("ok", Encoding.UTF8, "text/plain");
-            return resp;
+            HttpStatusCode code;
 
+            if (result.Substring(0, 7) == "Success")
+            {
+                code = HttpStatusCode.OK;
+            }
+            else
+            {
+                code = HttpStatusCode.NotAcceptable;
+            }
+
+            var response = Request.CreateResponse(code);
+            response.Content = new StringContent(result, Encoding.UTF8, "text/plain");
+            return response;
         }
 
 

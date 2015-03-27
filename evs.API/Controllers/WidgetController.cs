@@ -17,13 +17,6 @@ namespace evs.API.Controllers
     {
         readonly evsContext db = new evsContext();
 
-
-        //[HttpGet]
-        //public IEnumerable<Test> GetAllRoles(Int32 id)
-        //{
-        //    return db.Tests;
-        //}
-
         [HttpGet]
         public IEnumerable<Eventure> GetAllEventuresByOwnerId(Int32 id)
         {
@@ -284,14 +277,14 @@ namespace evs.API.Controllers
         public object GetRegistrationsByPartId(Int32 id)
         {
             //need to check order.Status == 'Complete'   //mjb 
-            return db.Registrations.Where(r => r.ParticipantId == id).Select(r => new { r.EventureList.DisplayName, r.TotalAmount, r.Quantity, r.DateCreated, r.Id, r.EventureOrderId, r.StockAnswerSetId });
-            //return db.Registrations.Where(r => r.ParticipantId == id);
+            return db.Registrations.Where(r => r.ParticipantId == id)
+                .Select(r => new { r.EventureList.DisplayName, r.TotalAmount, r.Quantity, r.DateCreated, r.Id, r.EventureOrderId, r.StockAnswerSetId })
+                .ToList();
         }
 
         [HttpGet]
         public object GetRevenuePerEvent(Int32 id)
         {
-
             var eventureInfo = from r in db.Registrations
                                join l in db.EventureLists
                                on r.EventureListId equals l.Id
@@ -393,8 +386,7 @@ namespace evs.API.Controllers
         [HttpGet]
         public object GetCouponUseByCouponId(Int32 id)
         {
-            //return db.Coupons.Where(c => c.OwnerId == id).OrderByDescending(c => c.Id);
-            var surcharge = from s in db.Surcharges
+           var surcharge = from s in db.Surcharges
                             join l in db.EventureLists
                             on s.EventureListId equals l.Id
                             join p in db.Participants
@@ -406,22 +398,23 @@ namespace evs.API.Controllers
             return surcharge;
         }
 
-        //[HttpGet]
-        //public object GetAddonsUseByCouponId(Int32 id)
-        //{
-        //    var surcharge = from s in db.Surcharges
-        //                    join l in db.EventureLists
-        //                    on s.EventureListId equals l.Id
-        //                    join p in db.Participants
-        //                    on s.ParticipantId equals p.Id
-        //                    where s.ChargeType == "addon"
-        //                    && s.CouponId == id
-        //                    select new { s.Amount, s.Description, l.Name, s.EventureOrderId, p.FirstName, p.LastName, s.CouponId };
+        [HttpGet]
+        public object GetAddonsUseByAddonId(Int32 id)
+        {
+            //var surcharge = from s in db.Surcharges
+            //                join l in db.EventureLists
+            //                on s.EventureListId equals l.Id
+            //                join p in db.Participants
+            //                on s.ParticipantId equals p.Id
+            //                where s.ChargeType == "addon"
+            //                && s.CouponId == id
+            //                select new { s.Amount, s.Description, l.Name, s.EventureOrderId, Participant = p.FirstName + " " + p.LastName };
+            
+            var surcharge = db.Surcharges.Where(s => s.AddonId == id && s.SurchargeType == SurchargeType.Addon)
+                .Select(a => new { a.Quantity, a.Amount, house = a.EventureOrder.House.FirstName + " " + a.EventureOrder.House.LastName, orderId = a.EventureOrder.Id, total = (a.Quantity * a.Amount) }).ToList();
 
-        //    var surcharge = db.Surcharges.Where(s => s.SurchargeType == SurchargeType.Addon )
-
-        //    return surcharge;
-        //}
+            return surcharge;
+        }
 
         [HttpGet]
         public object GetAddonsByOwnerId(Int32 id)
@@ -475,7 +468,8 @@ namespace evs.API.Controllers
         public object GetExpensesByEventureId(Int32 id)
         {
             return db.Expenses.Where(e => e.EventureId == id)
-                     .Select(e => new { e.Id, e.Cost, e.CostType, e.PerRegNumber, item = e.ResourceItem.Name, category = e.ResourceItemCategory.Name });   //category = e.ItemCategory.Name
+                     .Select(e => new { e.Id, e.Cost, e.CostType, e.PerRegNumber, item = e.ResourceItem.Name, category = e.ResourceItemCategory.Name })
+                     .ToList();   //category = e.ItemCategory.Name
         }
 
         [HttpGet]
@@ -484,7 +478,6 @@ namespace evs.API.Controllers
             return db.Volunteers.Where(v => v.Participant.OwnerId == id)
                 .Select(v => new { v.Participant.FirstName, v.Participant.LastName, v.Participant.Email, v.Participant.PhoneMobile, v.Id })
                 .ToList();
-
         }
 
         [HttpGet]
@@ -501,24 +494,20 @@ namespace evs.API.Controllers
 
         [HttpGet]
         public object GetOrdersByOwnerId(Int32 Id)
-         //   public IEnumerable<EventureOrder> GetOrdersByOwnerId(Int32 Id)
         {
-
-            var orders = db.Orders.Where(o => o.OwnerId == Id)
+            return db.Orders.Where(o => o.OwnerId == Id)
                 .Select( o => new {o.Id, o.DateCreated, o.House.LastName, o.House.FirstName, o.Amount, o.PaymentType, o.OrderTypeId})
                 .ToList();
-            //return db.Orders.Where(o => o.OwnerId == Id).ToList();
-            return orders;
         }
 
         [HttpGet]
-       // public object GetRegistrationsByOrderId(Int32 Id)
-            public IEnumerable<Registration> GetRegistrationsByOrderId(Int32 Id)
+        public object GetRegistrationsByOrderId(Int32 Id)
         {
-            return db.Registrations.Where(r => r.EventureOrderId == Id).ToList();
+            return db.Registrations.Where(r => r.EventureOrderId == Id)
+                .Select(r => new { r.Id, r.EventureList.Name, r.ListAmount, r.DateCreated, r.Type, Participant = r.Participant.FirstName + " " + r.Participant.LastName, r.EventureOrderId })
+                .ToList();
         }
-
-
+        
         public class DtoVolunteerData
         {
             public Int32 Id { get; set; }
@@ -527,8 +516,6 @@ namespace evs.API.Controllers
             public Int32 Capacity { get; set; }
             public Int32 MaxCapacity { get; set; }
         }
-
-       
 
         public class DtoGraph
         {
@@ -545,8 +532,6 @@ namespace evs.API.Controllers
                 Rev = rev;
             }
         }
-
-       
 
         public class EventPartial
         {

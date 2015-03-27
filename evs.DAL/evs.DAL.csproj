@@ -87,6 +87,22 @@
     <Compile Include="Migrations\201503172012491_usat.Designer.cs">
       <DependentUpon>201503172012491_usat.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201503241935093_surchargeQuantity.cs" />
+    <Compile Include="Migrations\201503241935093_surchargeQuantity.Designer.cs">
+      <DependentUpon>201503241935093_surchargeQuantity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503242009362_eventVerbiage.cs" />
+    <Compile Include="Migrations\201503242009362_eventVerbiage.Designer.cs">
+      <DependentUpon>201503242009362_eventVerbiage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503251418592_usatamount.cs" />
+    <Compile Include="Migrations\201503251418592_usatamount.Designer.cs">
+      <DependentUpon>201503251418592_usatamount.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201503251552060_reg_order_status.cs" />
+    <Compile Include="Migrations\201503251552060_reg_order_status.Designer.cs">
+      <DependentUpon>201503251552060_reg_order_status.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -124,6 +140,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503172012491_usat.resx">
       <DependentUpon>201503172012491_usat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503241935093_surchargeQuantity.resx">
+      <DependentUpon>201503241935093_surchargeQuantity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503242009362_eventVerbiage.resx">
+      <DependentUpon>201503242009362_eventVerbiage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503251418592_usatamount.resx">
+      <DependentUpon>201503251418592_usatamount.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201503251552060_reg_order_status.resx">
+      <DependentUpon>201503251552060_reg_order_status.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -36,3 +36,7 @@ D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.addon.resources
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.bundle.resources
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.addonCleanup.resources
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.usat.resources
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.surchargeQuantity.resources
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.eventVerbiage.resources
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.usatamount.resources
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.reg_order_status.resources

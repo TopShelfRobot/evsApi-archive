@@ -45,6 +45,8 @@ namespace evs.Model
         public OrderType OrderTypeId { get; set; }    //manual online reg
 
         public DateTime DateCreated { get; set; }
+
+        public OrderStatus OrderStatus { get; set; }
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }
@@ -57,6 +59,4 @@ namespace evs.Model
         public ICollection<Registration> Registrations { get; set; }
         public ICollection<Surcharge> Surcharges { get; set; } 
     }
-
-   
 }
