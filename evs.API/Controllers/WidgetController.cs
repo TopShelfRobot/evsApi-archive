@@ -358,8 +358,13 @@ namespace evs.API.Controllers
                     Balance = t.Team.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
                     Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
                     DateCreated = t.DateCreated,
-                    EventureOrderId = t.Team.Registration.EventureOrder.Id
-                }).OrderBy(t => t.DateCreated)
+                    EventureOrderId = t.Team.Registration.EventureOrder.Id,
+                    TeamName = t.Team.Name,
+                    t.Participant.Position,
+                    t.Participant.PhoneMobile,
+                    t.Participant.EmergencyContact,
+                    t.Participant.EmergencyPhone
+                }).OrderBy(t => t.ParticipantId)
                 .ToList();
         }
 

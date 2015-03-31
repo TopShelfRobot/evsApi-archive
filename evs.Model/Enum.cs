@@ -11,7 +11,8 @@ namespace evs.Model
         credit = 0,
         cash = 1,
         giftCertificate = 2,
-        check = 3
+        check = 3,
+        zeroBalance = 4
     }
     public enum OrderType
     {

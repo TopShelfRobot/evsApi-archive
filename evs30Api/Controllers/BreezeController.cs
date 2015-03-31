@@ -185,6 +185,8 @@ namespace evs30Api.Controllers
                          RegAmount = m.Team.Registration.ListAmount,   //totalAmount??
                          userPaid = (decimal?)m.TeamMemberPayments.Sum(p => p.Amount) ?? 0,     //this is temp;  if they make multiple payments reciept will be wrong
                          m.Id,
+                         m.Team.Registration.EventureList.MinAge,
+                         m.Team.Registration.EventureList.MaxAge,
                          m.Team.Name,
                          teamMemberId = m.Id,
                          teamId = m.Team.Id

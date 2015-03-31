@@ -11,6 +11,9 @@ using evs.DAL;
 using evs.Model;
 //using evs30Api.Filters;
 
+using evs.Service;
+using System.Configuration;
+
 namespace evs.API.Controllers
 {
     //[Authorize]
@@ -580,7 +583,7 @@ namespace evs.API.Controllers
 
                 var member = db.TeamMembers.Where(m => m.Id == teamMemberId).FirstOrDefault();
                 member.ParticipantId = participantId;
-                
+
 
                 //populate surcharge    //todo 
                 //if (bundle.charges != null)  //if no surcharges skip this
@@ -609,7 +612,7 @@ namespace evs.API.Controllers
                 //payment.Amount = 0;   // order.Amount;
                 //payment.TeamMemberId = teamMemberId;
                 //payment.DateCreated = DateTime.Now;
-                
+
                 ////};
                 //db.TeamMemberPayments.Add(payment);
 
@@ -676,11 +679,11 @@ namespace evs.API.Controllers
                 //    order.CardOrigin = stripeCharge.StripeCard.Country;
                 //    order.Voided = false;
                 //    order.Status = "Complete";
-                    db.SaveChanges();
+                db.SaveChanges();
 
-                    var resp = Request.CreateResponse(HttpStatusCode.OK);
-                    //resp.Content = new StringContent(payment.Id.ToString(), Encoding.UTF8, "text/plain");
-                    return resp;
+                var resp = Request.CreateResponse(HttpStatusCode.OK);
+                //resp.Content = new StringContent(payment.Id.ToString(), Encoding.UTF8, "text/plain");
+                return resp;
 
                 //}
                 //else
@@ -723,6 +726,7 @@ namespace evs.API.Controllers
                 }
             }
         }
+
 
 
 
@@ -781,7 +785,7 @@ namespace evs.API.Controllers
                         TotalAmount = Convert.ToDecimal(regBundle.fee),
                         Type = "reg"
                     };
-                    
+
                     var team = new Team
                     {
                         Name = regBundle.teamName, // (string)saveBundle["teamName"];
@@ -878,7 +882,7 @@ namespace evs.API.Controllers
                     throw new Exception("Owner Setup is Not Configured Correctly");
                 }
 
-               
+
 
 
                 if (order.Amount > 0)
@@ -1122,9 +1126,219 @@ namespace evs.API.Controllers
         }
 
 
+        /////////////////
+
+        //////
+        [HttpPost]
+        [Route("PostTeamBalance")]
+        public HttpResponseMessage PostTeamCaptainPayment(JObject saveBundle)       //this is when we have
+        {
+            try
+            {
+                decimal totalFees = 0;
+                //Int32 teamMemberId = (Int32)saveBundle["teamMemberId"];
+                Int32 teamId = (Int32)saveBundle["teamId"];
+                Int32 participantId = (Int32)saveBundle["participantId"];
+                decimal amount = (decimal)saveBundle["amount"];
+
+                var order = new EventureOrder
+                {
+                    DateCreated = DateTime.Now,
+                    HouseId = participantId,      //(Int32)saveBundle["participantId"],
+                    Amount = amount,
+                    Token = (string)saveBundle["stripeToken"],
+                    OwnerId = (Int32)saveBundle["ownerId"], 
+                    Status = "Init",
+                    Voided = false
+                };
+                //db.Orders.Add(order);
+
+                int place = 0;
+
+                TeamMember member = db.TeamMembers.Where(m => m.ParticipantId == participantId && m.TeamId == teamId).SingleOrDefault();
+                var TeamMemberId = member.Id;
+
+                place = 1;
 
 
-    }
+                Owner owner = db.Owners.Where(o => o.Id == 1).SingleOrDefault();
+                if (owner == null)
+                {
+                    throw new Exception("Owner Setup is Not Configured Correctly");
+                }
+
+
+                var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
+                if (part != null)
+                {
+                    //custDesc = part.FirstName + " " + part.LastName + "_ord" + order.Id;
+                    //partEmail = part.Email;
+                    //partName = part.FirstName + " " + part.LastName;
+                }
+                else
+                {
+                    throw new Exception("couldn't find that houseId");
+                }
+
+
+
+
+                order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
+                order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
+                order.LocalApplicationFee = order.LocalFeeInCents - order.CardProcessorFeeInCents;
+
+                if (order.LocalApplicationFee < 0)
+                    order.LocalApplicationFee = 0;
+                //}
+
+                ////create stripe service,customer, charge
+                ////charge card
+                ////var stripeService = new Stripe.
+
+                ////if good
+                ////record charege
+                ////create order
+                ////StripeService stripeService = new StripeService();
+
+                //    //tring customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee
+                //    //var stripeCharge = stripeService.CreateCharge(part.Email, part.FirstName + " " + part.LastName, order.Token, owner.AccessToken, owner.Name, order.Amount, order.LocalApplicationFee);
+                //    //         public StripeCharge CreateCharge(string customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee )
+                //    //{
+
+                place = 3;
+
+                var customerOptions = new StripeCustomerCreateOptions
+                {
+                    Email = part.Email, //Email,
+                    Description = part.FirstName + " " + part.LastName,
+                    TokenId = order.Token,
+                };
+
+                var stripeCustomerService = new StripeCustomerService(owner.AccessToken);   //owner.AccessToken
+                var customer = stripeCustomerService.Create(customerOptions);
+
+                place = 4;
+
+                //int err = place / (place - place);
+
+                var stripeChargeService = new StripeChargeService(owner.AccessToken); //The token returned from the above method
+                var stripeChargeOption = new StripeChargeCreateOptions()
+                {
+                    Amount = Convert.ToInt32(order.Amount * 100),
+                    Currency = "usd",
+                    CustomerId = customer.Id,
+                    Description = owner.Name,
+                    ApplicationFee = order.LocalApplicationFee
+                };
+
+                place = 5;
+
+                var stripeCharge = stripeChargeService.Create(stripeChargeOption);
+
+                place = 6;
+
+
+                if (string.IsNullOrEmpty(stripeCharge.FailureCode))
+                {
+                    //orderService.CompleteOrder(stripeCharge)
+                    order.AuthorizationCode = stripeCharge.Id;
+                    //stripeCharge.
+                    order.CardNumber = stripeCharge.StripeCard.Last4;
+                    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
+                    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
+                    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
+                    //order.CardId = stripeCharge.StripeCard.;
+                    order.CardName = stripeCharge.StripeCard.Name;
+                    order.CardOrigin = stripeCharge.StripeCard.Country;
+                    //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
+                    order.Voided = false;
+                    order.Status = "Complete";
+                    order.OrderStatus = OrderStatus.Completed;
+                    //mjb fix order.PaymentType = "credit";
+                    //db.Orders.Add(order);
+                    //db.SaveChanges();
+
+                    place = 7;
+
+                    //not good return reason
+                    OrderService _orderService = new OrderService();
+                    var x = _orderService.CreateOrder(order);
+
+                    place = 8;
+
+
+                    var payment = new TeamMemberPayment
+                    {
+                        TeamId = teamId,
+                        Amount = amount,
+                        TeamMemberId = TeamMemberId,    //member.Id,
+                        Active = true,
+                        DateCreated = DateTime.Now,
+                        //EventureOrder = order
+                        EventureOrderId = order.Id
+                    };
+                    db.TeamMemberPayments.Add(payment);
+
+                    //HttpResponseMessage result;
+
+                    //if (ConfigurationManager.AppSettings["CustomName"] == "bourbonchase")
+                    //    //result = new MailController().SendBourbonLotteryConfirm(order.Id);
+                    //    result = new MailController().SendConfirmMail(order.Id);   //change back to bourbon chase??
+                    //else
+                    //    result = new MailController().SendConfirmMail(order.Id);
+
+
+                    //HttpResponseMessage result = new MailController().SendTestEmail();
+
+                    //var resp = Request.CreateResponse(HttpStatusCode.OK);
+                    ////resp.Content = new StringContent();
+                    //resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
+                    //return resp;
+
+                    db.SaveChanges();
+
+                    var response = Request.CreateResponse(HttpStatusCode.OK);
+                    return response;
+                }
+                else
+                {
+                    //order.Status = stripeCharge.FailureMessage;
+                    //db.SaveChanges();
+                    //return 
+                    //var badResponse = Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);  //stripeCharge.FailureCode
+                    //return badResponse;
+
+                    var logE = new EventureLog();
+                    logE.Message = "Stripe Exception: " + stripeCharge.FailureMessage + " -- place: " + place + " -- bundle: " + saveBundle;
+                    logE.Caller = "Order_ERROR_stripe";
+                    logE.Status = "Warning";
+                    logE.LogDate = System.DateTime.Now.ToLocalTime();
+                    logE.DateCreated = System.DateTime.Now.ToLocalTime();
+                    db.EventureLogs.Add(logE);
+                    db.SaveChanges();
+
+                    var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
+                    badResp.Content = new StringContent(stripeCharge.FailureMessage, Encoding.UTF8, "text/plain");
+                    return badResp;
+                }
+            }
+            catch (Exception ex)
+            {
+                var returnMessage = "error: " + ex.Message + " -- " + ex.InnerException;
+                var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, returnMessage);
+                return badResponse;
+
+            }
+        }
+
+
+
+
+
+
+        /////
+
+    }  //api controller
 
 
 

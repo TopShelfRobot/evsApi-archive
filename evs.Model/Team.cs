@@ -64,6 +64,7 @@ namespace evs.Model
         //public Int32 CreatedById { get; set; }
 
         //navigation
+        public virtual Participant Participant { get; set; }
         public virtual Team Team { get; set; }
         public ICollection<TeamMemberPayment> TeamMemberPayments { get; set; }
     }
