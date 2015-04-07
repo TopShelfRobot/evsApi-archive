@@ -228,7 +228,7 @@ namespace evs.API.Controllers
                              teamMember.TeamMemberGuid.ToString().ToUpper() + "/payment";
                 emailText = emailText + "Date: " + DateTime.Now.ToString("M/d/yyyy") + "<BR>";
                 emailText = emailText + "Dear " + teamMember.Name + ",<BR><BR>You have been invited by " + teamMember.FirstName + ' ' + teamMember.LastName + " to join team " + teamMember.teamName + " in the " + teamMember.DisplayName;
-                emailText = emailText + " league. <BR> Please click on the following link: " + url;
+                emailText = emailText + ". <BR> Please click on the following link: " + url;
 
                 //var ses = new AmazonSESWrapper("AKIAIACOACRTWREUKHWA", "eXlslxG5YX2+SKAvBbSuMqeJouwGEDci3cfa7TaV");
                 //AmazonSentEmailResult mail = ses.SendEmail(addresses, ccs, bcc, sender, sender, subject, emailText);

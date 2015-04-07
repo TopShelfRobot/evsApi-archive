@@ -78,6 +78,7 @@ namespace evs.Model
         public Boolean Active { get; set; }
         public DateTime DateCreated { get; set; }
         public Int32 EventureOrderId { get; set; }
+        public Int32 EventureListId { get; set; }
         //public DateTime DateModified { get; set; }
         //public Int32 ModifiedById { get; set; }
         //public Int32 CreatedById { get; set; }

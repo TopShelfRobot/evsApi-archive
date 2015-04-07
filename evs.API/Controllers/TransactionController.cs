@@ -10,7 +10,6 @@ using Newtonsoft.Json.Linq;
 using Stripe;
 using System.Text;
 using evs.Service;
-
 using System.Net.Http.Formatting;
 //using System.Json;
 //using System.Web.Script.Serialization;
@@ -196,7 +195,6 @@ namespace evs.API.Controllers
 
         }
 
-
         [HttpPost]
         [Route("Refund")]
         public HttpResponseMessage Refund(JObject jRefund)
@@ -220,7 +218,7 @@ namespace evs.API.Controllers
                     Console.WriteLine("Default case");
                     break;
             }
-            
+
             var _tranMan = new TransactionManager();
             string result = _tranMan.ProcessRefund(refund);
 
@@ -240,8 +238,6 @@ namespace evs.API.Controllers
             return response;
         }
 
-
-       
         [HttpPost]
         [Route("USATVerification")]
         public object USATVerification(JObject jBundle)
@@ -255,7 +251,7 @@ namespace evs.API.Controllers
             HttpClient client = new HttpClient();
             //client.BaseAddress = new Uri("http://usatriathlon.org/");
             client.BaseAddress = new Uri("http://batch-test.usatriathlon.org/");
-        
+
             //client.BaseAddress = new Uri("http://batch-qa.usatriathlon.org/");
             //'client.BaseAddress = new Uri("http://batch.usatriathlon.org/");
 
@@ -289,7 +285,7 @@ namespace evs.API.Controllers
             //}
 
             if (Request != null)
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, returnMessage);
+                return Request.CreateErrorResponse(HttpStatusCode.OK, returnMessage);
             //return Request.CreateResponse(HttpStatusCode.InternalServerError);
             else
             {
@@ -299,10 +295,26 @@ namespace evs.API.Controllers
 
         }
 
+        [HttpPost]
+        [Route("TeamRemove")]
+        public object RemoveTeamMemberFromTeam(JObject jRemove)
+        {
+            try
+            {
+                var teamId = (Int32)jRemove["teamId"];
+                var teamMemberId = (Int32)jRemove["teamMemberId"];
 
-
-
-
-
+                var teammember = db.TeamMembers
+                    .Where(m => m.TeamId == teamId
+                    && m.Id == teamMemberId).FirstOrDefault();
+                teammember.Active = false;
+                db.SaveChanges();
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch(Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

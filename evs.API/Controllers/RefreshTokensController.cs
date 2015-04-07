@@ -11,7 +11,6 @@ namespace evs.API.Controllers
     [RoutePrefix("api/RefreshTokens")]
     public class RefreshTokensController : ApiController
     {
-
         private AuthRepository _repo = null;
 
         public RefreshTokensController()

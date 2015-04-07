@@ -727,9 +727,6 @@ namespace evs.API.Controllers
             }
         }
 
-
-
-
         [HttpPost]
         [AllowAnonymous]
         //[AcceptVerbs("OPTIONS")]
@@ -1051,7 +1048,7 @@ namespace evs.API.Controllers
                         //if member.partId is null
                         if (member.ParticipantId == null)
                         {
-                            HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);
+                            //HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);   //bourbon chase doesn't want email
                             //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
                         }
                     }
@@ -1125,10 +1122,6 @@ namespace evs.API.Controllers
 
         }
 
-
-        /////////////////
-
-        //////
         [HttpPost]
         [Route("PostTeamBalance")]
         public HttpResponseMessage PostTeamCaptainPayment(JObject saveBundle)       //this is when we have
@@ -1180,31 +1173,13 @@ namespace evs.API.Controllers
                     throw new Exception("couldn't find that houseId");
                 }
 
-
-
-
                 order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
                 order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
                 order.LocalApplicationFee = order.LocalFeeInCents - order.CardProcessorFeeInCents;
 
                 if (order.LocalApplicationFee < 0)
                     order.LocalApplicationFee = 0;
-                //}
-
-                ////create stripe service,customer, charge
-                ////charge card
-                ////var stripeService = new Stripe.
-
-                ////if good
-                ////record charege
-                ////create order
-                ////StripeService stripeService = new StripeService();
-
-                //    //tring customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee
-                //    //var stripeCharge = stripeService.CreateCharge(part.Email, part.FirstName + " " + part.LastName, order.Token, owner.AccessToken, owner.Name, order.Amount, order.LocalApplicationFee);
-                //    //         public StripeCharge CreateCharge(string customerEmail,string customerDescription, string customerToken, string accessToken, string chargeDescription, decimal chargeAmount, Int32 applicationFee )
-                //    //{
-
+               
                 place = 3;
 
                 var customerOptions = new StripeCustomerCreateOptions
@@ -1266,7 +1241,6 @@ namespace evs.API.Controllers
 
                     place = 8;
 
-
                     var payment = new TeamMemberPayment
                     {
                         TeamId = teamId,
@@ -1274,6 +1248,7 @@ namespace evs.API.Controllers
                         TeamMemberId = TeamMemberId,    //member.Id,
                         Active = true,
                         DateCreated = DateTime.Now,
+                        EventureListId = (Int32)saveBundle["eventureListId"],
                         //EventureOrder = order
                         EventureOrderId = order.Id
                     };

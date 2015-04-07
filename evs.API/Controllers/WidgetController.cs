@@ -310,15 +310,16 @@ namespace evs.API.Controllers
         public object GetTeamRegistrationsByOwnerId(Int32 id)
         {
             return db.Teams.Where(t => t.Registration.EventureOrder.OwnerId == id
-                                    && t.Registration.EventureOrder.Status == "Complete")
+                                    && t.Registration.EventureOrder.Status == "Complete"
+                                    && t.Active == true)
                 .Select(t => new
                 {
                     t.Name,
                     t.Id,
                     ListName = t.Registration.EventureList.DisplayName,
                     CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
-                    Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
-                    Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
+                    Amount = (decimal?)t.TeamMemberPayments.Where(p => p.Active == true).Sum(p => p.Amount) ?? 0,
+                    Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Where(p => p.Active == true).Sum(p => p.Amount) ?? 0),
                     t.Registration.EventureList.EventureListType,
                     EventName = t.Registration.EventureList.Eventure.Name
                 })
@@ -329,7 +330,8 @@ namespace evs.API.Controllers
         public object GetTeamRegistrationsByHouseId(Int32 id)
         {
             return db.Teams.Where(t => t.Registration.EventureOrder.HouseId == id
-                                    && t.Registration.EventureOrder.Status == "Complete")
+                                    && t.Registration.EventureOrder.Status == "Complete"
+                                    && t.Active == true)
                 .Select(t => new
                 {
                     t.Name,
@@ -355,8 +357,8 @@ namespace evs.API.Controllers
                     t.TeamId,
                     t.Email,
                     t.ParticipantId,
-                    Balance = t.Team.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
-                    Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
+                    Balance = t.Team.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Where(p => p.Active == true).Sum(p => p.Amount) ?? 0),
+                    Amount = (decimal?)t.TeamMemberPayments.Where(p => p.Active == true).Sum(p => p.Amount) ?? 0,
                     DateCreated = t.DateCreated,
                     EventureOrderId = t.Team.Registration.EventureOrder.Id,
                     TeamName = t.Team.Name,
@@ -372,14 +374,15 @@ namespace evs.API.Controllers
         public object GetTeamRegistrationsByCoachId(Int32 id)
         {
             return db.Teams.Where(t => t.CoachId == id
-                                    && t.Registration.EventureOrder.Status == "Complete")
+                                    && t.Registration.EventureOrder.Status == "Complete"
+                                    && t.Active == true)
                 .Select(t => new
                 {
                     t.Name,
                     t.Id,
                     ListName = t.Registration.EventureList.DisplayName,
                     CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
-                    Amount = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
+                    Amount = (decimal?)t.TeamMemberPayments.Where(p => p.Active == true).Sum(p => p.Amount) ?? 0,
                     Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
                     t.Division,
                     t.TimeFinish,
@@ -512,6 +515,23 @@ namespace evs.API.Controllers
                 .Select(r => new { r.Id, r.EventureList.Name, r.ListAmount, r.DateCreated, r.Type, Participant = r.Participant.FirstName + " " + r.Participant.LastName, r.EventureOrderId })
                 .ToList();
         }
+
+        //public object GetTeamPaymentInfoByEventureId(Int32 Id)
+        //{ 
+        //    return db.TeamMemberPayments
+        //        .Where(p => p.Team.OwnerId == 1)
+        //        .Select(p => new {p.Team.Name, p.Amount, p.)
+
+        //}
+
+        //public object GetTeamRosterInfoEventureId(Int32 Id)
+        //{ 
+        //    return db.TeamMemberPayments
+        //        .Where(p => p.Team.OwnerId == 1)
+        //        .Select(p => new {p.Team.Name, p.Amount, p.)
+
+        //}
+
         
         public class DtoVolunteerData
         {
