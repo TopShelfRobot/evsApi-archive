@@ -365,7 +365,8 @@ namespace evs.API.Controllers
                     t.Participant.Position,
                     t.Participant.PhoneMobile,
                     t.Participant.EmergencyContact,
-                    t.Participant.EmergencyPhone
+                    t.Participant.EmergencyPhone,
+                    ParticipantGuid = t.Participant.ParticipantGuid.ToString() ?? Guid.Empty.ToString()
                 }).OrderBy(t => t.ParticipantId)
                 .ToList();
         }
@@ -392,9 +393,33 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
+        public object GetTeamRegistrationsByCoachGuid(Guid id)
+        {
+            return db.Teams.Where(t => t.Coach.ParticipantGuid == id
+                                    && t.Registration.EventureOrder.Status == "Complete"
+                                    && t.Active == true)
+                .Select(t => new
+                {
+                    t.Name,
+                    t.Id,
+                    ListName = t.Registration.EventureList.DisplayName,
+                    CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
+                    Amount = (decimal?)t.TeamMemberPayments.Where(p => p.Active == true).Sum(p => p.Amount) ?? 0,
+                    Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
+                    t.Division,
+                    t.TimeFinish,
+                    EventName = t.Registration.EventureList.Eventure.Name
+                })
+                .ToList();
+        }
+
+
+
+
+        [HttpGet]
         public object GetCouponUseByCouponId(Int32 id)
         {
-           var surcharge = from s in db.Surcharges
+            var surcharge = from s in db.Surcharges
                             join l in db.EventureLists
                             on s.EventureListId equals l.Id
                             join p in db.Participants
@@ -417,7 +442,7 @@ namespace evs.API.Controllers
             //                where s.ChargeType == "addon"
             //                && s.CouponId == id
             //                select new { s.Amount, s.Description, l.Name, s.EventureOrderId, Participant = p.FirstName + " " + p.LastName };
-            
+
             var surcharge = db.Surcharges.Where(s => s.AddonId == id && s.SurchargeType == SurchargeType.Addon)
                 .Select(a => new { a.Quantity, a.Amount, house = a.EventureOrder.House.FirstName + " " + a.EventureOrder.House.LastName, orderId = a.EventureOrder.Id, total = (a.Quantity * a.Amount) }).ToList();
 
@@ -504,7 +529,7 @@ namespace evs.API.Controllers
         public object GetOrdersByOwnerId(Int32 Id)
         {
             return db.Orders.Where(o => o.OwnerId == Id)
-                .Select( o => new {o.Id, o.DateCreated, o.House.LastName, o.House.FirstName, o.Amount, o.PaymentType, o.OrderTypeId})
+                .Select(o => new { o.Id, o.DateCreated, o.House.LastName, o.House.FirstName, o.Amount, o.PaymentType, o.OrderTypeId })
                 .ToList();
         }
 
@@ -516,23 +541,131 @@ namespace evs.API.Controllers
                 .ToList();
         }
 
-        //public object GetTeamPaymentInfoByEventureId(Int32 Id)
-        //{ 
-        //    return db.TeamMemberPayments
-        //        .Where(p => p.Team.OwnerId == 1)
-        //        .Select(p => new {p.Team.Name, p.Amount, p.)
+        public object GetTeamPaymentInfoByEventureId(Int32 Id)
+        {
+            //var queryListIds = db.EventureLists.Where(l => l.EventureId == Id).Select(l => new { l.Id });
+            var queryListIds = from l in db.EventureLists
+                               where l.EventureId == Id
+                               select l.Id;
 
-        //}
+            return db.Teams
+               .Where(t => queryListIds.Contains(t.Registration.EventureListId))
+               .Select(t => new
+               {
+                   TeamName = t.Name,
+                   AmountPaid = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
+                   Captain = t.Coach.FirstName + " " + t.Coach.LastName,
+                   t.Coach.Email,
+                   AmountOwed = t.Registration.TotalAmount,
+                   Balance = t.Registration.TotalAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0)
+               })
+               .OrderBy(t => t.Balance)
+               .ToList();
+        }
 
-        //public object GetTeamRosterInfoEventureId(Int32 Id)
-        //{ 
-        //    return db.TeamMemberPayments
-        //        .Where(p => p.Team.OwnerId == 1)
-        //        .Select(p => new {p.Team.Name, p.Amount, p.)
+        public object GetTeamRosterInfoByEventureId(Int32 Id)
+        {
+            //var queryListIds = db.EventureLists.Where(l => l.EventureId == Id).Select(l => new { l.Id });
+            var queryListIds = from l in db.EventureLists
+                               where l.EventureId == Id
+                               select l.Id;
 
-        //}
+            return db.TeamMembers
+                .Where(m => queryListIds.Contains(m.Team.Registration.EventureListId) && m.Active == true)
+                .Select(m => new
+                {
+                    MemberName = m.Participant.FirstName + " " + m.Participant.LastName,
+                    InviteName = m.Name,
+                    m.Participant.Email,
+                    TeamName = m.Team.Name,
+                    m.Participant.Position,
+                    m.Participant.ShirtSize,
+                    m.Participant.EmergencyPhone,
+                    m.Participant.EmergencyContact,
+                    m.Participant.PhoneMobile
+                })
+                .OrderBy(m => m.TeamName)
+                .ToList();
+        }
 
-        
+
+        [HttpGet]
+        public object GetGenderInfoByYear(Int32 id)
+        {
+            string query = "select p.Gender, count(*) as amount " +
+                            "from EventureOrder o inner join Registration r on o.Id = r.EventureOrderId inner join Participant p " +
+                            "on r.ParticipantId = p.Id inner join EventureList l on r.EventureListId = l.Id where status = 'Complete' " +
+                            "and year(l.DateEventureList) = " + id.ToString() +
+                            "group by gender ";
+
+            return db.Database.SqlQuery<DtoGenderKeyValue>(query).ToList();
+        }
+
+        [HttpGet]
+        public object GetAgeInfoByYear(Int32 id)
+        {
+            string query = " SELECT CASE " +
+	                            "WHEN CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) < 18 THEN '[Under 18]' " +
+                                "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 18 AND 24 THEN '[18-24]' " +
+                                "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 25 AND 34 THEN '[25-34]' " +
+	                            "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 35 AND 44 THEN '[35-44]' " +
+	                            "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 45 AND 54 THEN '[45-54]' " +
+	                            "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 55 AND 64 THEN '[55-64]' " +
+	                            "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) > 64 THEN '[55 and Up]' " +
+                            "End as AgeGroup, " +
+                            "Count(*) amount " +
+                            "from EventureOrder o inner join Registration r on o.Id = r.EventureOrderId inner join Participant p " +
+                            "on r.ParticipantId = p.Id inner join EventureList l on r.EventureListId = l.Id where status = 'Complete' " +
+                             "and year(l.DateEventureList) = " + id.ToString() +
+                             "group by CASE  " +
+		                             "WHEN CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) < 18 THEN '[Under 18]' " +
+                                     "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 18 AND 24 THEN '[18-24]' " +
+                                     "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 25 AND 34 THEN '[25-34]' " +
+		                             "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 35 AND 44 THEN '[35-44]' " +
+		                             "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 45 AND 54 THEN '[45-54]' " +
+		                             "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 55 AND 64 THEN '[55-64]' " +
+		                             "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) > 64 THEN '[55 and Up]' " +
+	                             "End ";
+
+
+            return db.Database.SqlQuery<DtoAgeGroupKeyValue>(query).ToList();
+        }
+
+        [HttpGet]
+        public object GetZipHeatMapByYear(Int32 id)     
+        {
+            string query = "select top 50 p.zip, count(*) as amount " +
+                            "from EventureOrder o inner join Registration r on o.Id = r.EventureOrderId inner join Participant p " +
+                            "on r.ParticipantId = p.Id inner join EventureList l on r.EventureListId = l.Id where status = 'Complete' " +
+                            "and year(l.DateEventureList) = " + id.ToString() +
+                            "group by p.zip " +
+                            "order by count(*) desc";
+
+            return db.Database.SqlQuery<DtoZipHeatKeyValue>(query).ToList();
+        }
+
+         [HttpGet]
+        public object GetCapacityRegDialsByYear(Int32 id)     
+        {
+            string query = "select top 3 id, name, capacity , " +
+                            "(" +
+                                "select count(*) " +
+                                "from EventureOrder o inner join Registration r on o.Id = r.EventureOrderId inner join Participant p " +
+                                "on r.ParticipantId = p.Id inner join EventureList l on r.EventureListId = l.Id where status = 'Complete' " +
+                                "and year(l.DateEventureList) = " + id.ToString() +
+                                "and r.EventureListId = ll.id " +
+                            ")  as regs "  +
+                            "from eventureList ll " +
+                            "where active = 1 " +
+                            //and Id in ( 11, 10, 9)  --at some point this will go away " +
+                            "order by DateEventureList desc ";
+
+
+            return db.Database.SqlQuery<DtoCapacityRegInfo>(query).ToList();
+        }
+
+
+
         public class DtoVolunteerData
         {
             public Int32 Id { get; set; }
@@ -540,6 +673,31 @@ namespace evs.API.Controllers
             public Int32 Shifts { get; set; }
             public Int32 Capacity { get; set; }
             public Int32 MaxCapacity { get; set; }
+        }
+
+        public class DtoGenderKeyValue
+        {
+            public String Gender { get; set; }
+            public Int32 Amount { get; set; }
+        }
+
+        public class DtoAgeGroupKeyValue
+        {
+            public String AgeGroup { get; set; }
+            public Int32 Amount { get; set; }
+        }
+
+        public class DtoZipHeatKeyValue
+        {
+            public String Zip { get; set; }
+            public Int32 Amount { get; set; }
+        }
+
+        public class DtoCapacityRegInfo
+        {
+            public String Name { get; set; }
+            public Int32 Capacity { get; set; }
+            public Int32 Regs { get; set; }
         }
 
         public class DtoGraph

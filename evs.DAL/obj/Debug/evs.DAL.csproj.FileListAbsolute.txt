@@ -40,3 +40,6 @@ D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.surchargeQuantity.resour
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.eventVerbiage.resources
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.usatamount.resources
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.reg_order_status.resources
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.team_eventureListId.resources
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.part_guid.resources
+D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.dbGenOption.resources

@@ -36,10 +36,17 @@ namespace evs.API
             //_AppUserManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
             //_appRoleManager = Request.GetOwinContext().GetUserManager<ApplicationRoleManager>();
 
-            _AppUserManager = new ApplicationUserManager(new UserStore<IdentityUser>(_ctx));
+            _AppUserManager = new ApplicationUserManager(new UserStore<IdentityUser>(_ctx) );
 
+             //new UserValidator<TUser>(UserManager) { AllowOnlyAlphanumericUserNames = false }
 
-
+            //_AppUserManager.UserValidator = new UserValidator(new UserStore<IdentityUser>(_ctx))
+            _AppUserManager.UserValidator = new UserValidator<IdentityUser>(_AppUserManager)   //{ AllowOnlyAlphanumericUserNames = false }
+            {
+                AllowOnlyAlphanumericUserNames = false
+                //RequireUniqueEmail = true
+            };
+      
         }
 
         public async Task<IdentityResult> RegisterUser(UserModel userModel)
@@ -48,6 +55,8 @@ namespace evs.API
             {
                 UserName = userModel.UserName
             };
+
+            //_AppUserManager.UserValidator = new UserValidator<user>(_AppUserManager) { AllowOnlyAlphanumericUserNames = false };
 
             var result = await _AppUserManager.CreateAsync(user, userModel.Password);
 

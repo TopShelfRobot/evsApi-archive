@@ -103,6 +103,18 @@
     <Compile Include="Migrations\201503251552060_reg_order_status.Designer.cs">
       <DependentUpon>201503251552060_reg_order_status.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201504081456411_team_eventureListId.cs" />
+    <Compile Include="Migrations\201504081456411_team_eventureListId.Designer.cs">
+      <DependentUpon>201504081456411_team_eventureListId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504092022256_part_guid.cs" />
+    <Compile Include="Migrations\201504092022256_part_guid.Designer.cs">
+      <DependentUpon>201504092022256_part_guid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504101606255_dbGenOption.cs" />
+    <Compile Include="Migrations\201504101606255_dbGenOption.Designer.cs">
+      <DependentUpon>201504101606255_dbGenOption.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -122,9 +134,11 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201503100315452_initial.resx">
       <DependentUpon>201503100315452_initial.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503100418217_firstUpdate.resx">
       <DependentUpon>201503100418217_firstUpdate.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503102012238_facebook.resx">
       <DependentUpon>201503102012238_facebook.cs</DependentUpon>
@@ -152,6 +166,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201503251552060_reg_order_status.resx">
       <DependentUpon>201503251552060_reg_order_status.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504081456411_team_eventureListId.resx">
+      <DependentUpon>201504081456411_team_eventureListId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504092022256_part_guid.resx">
+      <DependentUpon>201504092022256_part_guid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504101606255_dbGenOption.resx">
+      <DependentUpon>201504101606255_dbGenOption.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

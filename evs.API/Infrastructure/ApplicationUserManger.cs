@@ -29,7 +29,7 @@ namespace evs.API.Infrastructure
             // Configure validation logic for usernames
             appUserManager.UserValidator = new UserValidator<IdentityUser>(appUserManager)
             {
-                AllowOnlyAlphanumericUserNames = true,
+                AllowOnlyAlphanumericUserNames = false,
                 RequireUniqueEmail = true
             };
 

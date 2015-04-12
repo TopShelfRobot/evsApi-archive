@@ -51,10 +51,11 @@ namespace evs.Service
             var _mailBuilder = new MailBuilder();
 
             List<string> addresses = new List<string>();
-            addresses.Add(email);
+            addresses.Add(email);     //TODO:  remove this for b-f.com testing
 
             List<string> bcc = new List<string>();
-            //bcc = _mailBuilder.getEventureBcc();
+            //bcc = _mailBuilder.getEventureBcc();      
+            //bcc.Add("boone.mike@firstegg.com");   
 
             var subject = _mailBuilder.GetSubject(MailType.ResetPassword, ownerId);
             var sender = _mailBuilder.GetSender(ownerId);

@@ -816,18 +816,18 @@ namespace evs.API.Controllers
                     //db.SaveChanges();
                     //teamMemberGuid = teamCoach.TeamMemberGuid.ToString().ToUpper();     //this is returned to app in response
 
-                    //var payment = new TeamMemberPayment
-                    //{
-                    //    //payment.TeamId = team.Id;
-                    //    Team = team,
-                    //    Amount = order.Amount,
-                    //    TeamMemberId = teamCoach.Id,
-                    //    EventureOrder = order,
-                    //    DateCreated = DateTime.Now,
-                    //    Active = true
-                    //};
-                    ////db.TeamMemberPayments.Add(payment);
-                    //team.TeamMemberPayments.Add(payment);
+                    var payment = new TeamMemberPayment
+                    {
+                        Team = team,
+                        TeamMember = teamCoach,
+                        EventureOrder = order,
+                        EventureListId = regBundle.eventureListId,
+                        Amount = order.Amount,
+                        DateCreated = DateTime.Now,
+                        Active = true
+                    };
+                    //db.TeamMemberPayments.Add(payment);
+                    team.TeamMemberPayments.Add(payment);
 
                     //db.SaveChanges();
                     //paymentId = payment.Id;     //this is returned to app in response
@@ -879,12 +879,9 @@ namespace evs.API.Controllers
                     throw new Exception("Owner Setup is Not Configured Correctly");
                 }
 
-
-
-
                 if (order.Amount > 0)
                 {
-
+                    //TODO:  kill payment??
 
                     //calulate
                     order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
@@ -918,35 +915,6 @@ namespace evs.API.Controllers
 
                     if (string.IsNullOrEmpty(stripeCharge.FailureCode))
                     {
-                        //    order.AuthorizationCode = stripeCharge.Id;
-                        //    //stripeCharge.
-                        //    order.CardNumber = stripeCharge.StripeCard.Last4;
-                        //    order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
-                        //    order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
-                        //    order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
-                        //    //order.CardId = stripeCharge.StripeCard.;
-                        //    order.CardName = stripeCharge.StripeCard.Name;
-                        //    order.CardOrigin = stripeCharge.StripeCard.Country;
-                        //    order.CardType = stripeCharge.StripeCard.Type;
-                        //    order.Voided = false;
-                        //    order.Status = "Complete";
-                        //    order.PaymentType = PaymentType.credit;
-                        //    //db.Orders.Add(order);
-                        //    db.SaveChanges();
-
-
-
-                        //    //return Request.CreateResponse(HttpStatusCode.OK, stripeCharge);
-
-                        //    var resp = Request.CreateResponse(HttpStatusCode.OK);
-                        //    //order.Id.ToString()  we are using teamGuid for demo because we already have 
-                        //    //                     a getbyteamguid
-                        //    resp.Content = new StringContent(paymentId.ToString(), Encoding.UTF8, "text/plain");
-                        //    return resp;
-
-
-                        /////////////////////////////////////////////////////////////
-
                         //orderService.CompleteOrder(stripeCharge)
                         order.AuthorizationCode = stripeCharge.Id;
                         //stripeCharge.
@@ -961,9 +929,7 @@ namespace evs.API.Controllers
                         order.Voided = false;
                         order.Status = "Complete";
                         //mjb fix order.PaymentType = "credit";
-                        //db.Orders.Add(order);
-                        //db.SaveChanges();
-
+                       
                         //not good return reason
                         //OrderService _orderService = new OrderService();
                         //var x = _orderService.CreateOrder(order);
@@ -1048,12 +1014,12 @@ namespace evs.API.Controllers
                         //if member.partId is null
                         if (member.ParticipantId == null)
                         {
-                            //HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);   //bourbon chase doesn't want email
+                            HttpResponseMessage result = new MailController().SendTeamPlayerInviteMail(member.Id);
                             //teamGuid = member.Team.TeamGuid.ToString().ToUpper(); //this sucks too!!
                         }
                     }
 
-                    HttpResponseMessage confirmResult = new MailController().SendConfirmMail(order.Id);
+                    //HttpResponseMessage confirmResult = new MailController().SendConfirmMail(order.Id);    //TODO:  bourbon chase doesn't want email
 
                     //return Request.CreateResponse(HttpStatusCode.OK, stripeCharge);
                     var resp = Request.CreateResponse(HttpStatusCode.OK);
@@ -1140,7 +1106,7 @@ namespace evs.API.Controllers
                     HouseId = participantId,      //(Int32)saveBundle["participantId"],
                     Amount = amount,
                     Token = (string)saveBundle["stripeToken"],
-                    OwnerId = (Int32)saveBundle["ownerId"], 
+                    OwnerId = (Int32)saveBundle["ownerId"],
                     Status = "Init",
                     Voided = false
                 };
@@ -1179,7 +1145,7 @@ namespace evs.API.Controllers
 
                 if (order.LocalApplicationFee < 0)
                     order.LocalApplicationFee = 0;
-               
+
                 place = 3;
 
                 var customerOptions = new StripeCustomerCreateOptions
