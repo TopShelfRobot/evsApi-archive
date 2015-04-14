@@ -777,7 +777,7 @@ namespace evs.API.Controllers
                         ListAmount = regBundle.fee,
                         Quantity = regBundle.quantity,
                         EventureOrder = order,
-                        //EventureOrderId = order.Id, //mjb1 this one seems ok
+                        //EventureOrderId = order.Id, //mjb1 this one seems ok//
                         DateCreated = DateTime.Now,
                         TotalAmount = Convert.ToDecimal(regBundle.fee),
                         Type = "reg"
