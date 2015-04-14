@@ -231,6 +231,7 @@ namespace evs.API.Controllers
             return _contextProvider.Context.EventureLists;
         }
 
+        //[Authorize]
         [HttpGet]
         public IQueryable<Participant> Participants()
         {

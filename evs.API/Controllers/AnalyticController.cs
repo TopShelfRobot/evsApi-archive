@@ -87,6 +87,34 @@ namespace evs.API.Controllers
 
             //return db.Participants.Where(p => queryRegPartIdsByEventureList.Contains(p.Id));
 
+
+            //string query = " SELECT CASE " +
+            //                    "WHEN CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) < 18 THEN '[Under 18]' " +
+            //                    "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 18 AND 24 THEN '[18-24]' " +
+            //                    "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 25 AND 34 THEN '[25-34]' " +
+            //                    "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 35 AND 44 THEN '[35-44]' " +
+            //                    "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 45 AND 54 THEN '[45-54]' " +
+            //                    "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 55 AND 64 THEN '[55-64]' " +
+            //                    "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) > 64 THEN '[55 and Up]' " +
+            //                "End as AgeGroup, " +
+            //                "Count(*) amount " +
+            //                "from EventureOrder o inner join Registration r on o.Id = r.EventureOrderId inner join Participant p " +
+            //                "on r.ParticipantId = p.Id inner join EventureList l on r.EventureListId = l.Id where status = 'Complete' " +
+            //                 "and year(l.DateEventureList) = " + id.ToString() +
+            //                 "group by CASE  " +
+            //                         "WHEN CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) < 18 THEN '[Under 18]' " +
+            //                         "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 18 AND 24 THEN '[18-24]' " +
+            //                         "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 25 AND 34 THEN '[25-34]' " +
+            //                         "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 35 AND 44 THEN '[35-44]' " +
+            //                         "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 45 AND 54 THEN '[45-54]' " +
+            //                         "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) BETWEEN 55 AND 64 THEN '[55-64]' " +
+            //                         "WHEN  CONVERT(int,DATEDIFF(hour,p.DateBirth,GETDATE())/8766.0,0) > 64 THEN '[55 and Up]' " +
+            //                     "End ";
+
+
+            //return db.Database.SqlQuery<dtoKeyValue>(query).ToList();
+
+
             var agePieChart = new List<dtoKeyValue>();
             agePieChart.Add(new dtoKeyValue("under 20", 5.9));
             agePieChart.Add(new dtoKeyValue("21-25", 10.1));

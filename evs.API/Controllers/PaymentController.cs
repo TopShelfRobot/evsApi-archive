@@ -826,8 +826,10 @@ namespace evs.API.Controllers
                         DateCreated = DateTime.Now,
                         Active = true
                     };
-                    //db.TeamMemberPayments.Add(payment);
-                    team.TeamMemberPayments.Add(payment);
+                    if (payment.Amount > 0)
+                    {
+                        team.TeamMemberPayments.Add(payment);
+                    }
 
                     //db.SaveChanges();
                     //paymentId = payment.Id;     //this is returned to app in response
@@ -1097,7 +1099,7 @@ namespace evs.API.Controllers
                 decimal totalFees = 0;
                 //Int32 teamMemberId = (Int32)saveBundle["teamMemberId"];
                 Int32 teamId = (Int32)saveBundle["teamId"];
-                Int32 participantId = (Int32)saveBundle["participantId"];
+                Int32 participantId = (Int32)saveBundle["participantId"];   
                 decimal amount = (decimal)saveBundle["amount"];
 
                 var order = new EventureOrder
@@ -1214,7 +1216,7 @@ namespace evs.API.Controllers
                         TeamMemberId = TeamMemberId,    //member.Id,
                         Active = true,
                         DateCreated = DateTime.Now,
-                        EventureListId = (Int32)saveBundle["eventureListId"],
+                        EventureListId = (Int32)saveBundle["eventureListId"],   
                         //EventureOrder = order
                         EventureOrderId = order.Id
                     };
