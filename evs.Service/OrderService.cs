@@ -21,7 +21,7 @@ namespace evs.Service
         {
             // _modelState = modelState;
             //_repository = repository;
-        }GetTeamRegistrationsByCoachId
+        }
 
         protected bool ValidateOrder(EventureOrder orderToValidate)
         {
