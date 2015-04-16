@@ -737,8 +737,13 @@ namespace evs.API.Controllers
             try
             {
                 decimal totalFees = 0;
+
+                //var teams = new IColllection<Team>();
+
                 //Int32 teamId = 0;
                 //string teamMemberGuid;
+                //db.Teams.AddRange(teams);
+              
 
                 var order = new EventureOrder
                 {
@@ -847,9 +852,10 @@ namespace evs.API.Controllers
                             DateCreated = DateTime.Now
                             //db.TeamMembers.Add(teamMember);
                         };
-                        //team.TeamMembers.Add(teamMember);
-                        db.TeamMembers.Add(teamMember);
+                        team.TeamMembers.Add(teamMember);
+                        //db.TeamMembers.Add(teamMember);
                     }
+                    db.Teams.Add(team);
 
                     //}
                     //populate surcharge
@@ -936,6 +942,10 @@ namespace evs.API.Controllers
                         //OrderService _orderService = new OrderService();
                         //var x = _orderService.CreateOrder(order);
 
+                       
+
+                        
+
                         db.Orders.Add(order);
                         db.SaveChanges();
 
@@ -992,6 +1002,10 @@ namespace evs.API.Controllers
                     else
                     {
                         order.Status = stripeCharge.FailureMessage;
+
+                        //db.Teams.Local.Remove(db.Teams.Local)
+                        //db.Teams.Remove(db.Teams.Local[0]);    //deletd team obj 
+
                         db.SaveChanges();
                         return Request.CreateResponse(HttpStatusCode.ExpectationFailed, stripeCharge);
                     }
@@ -1050,7 +1064,7 @@ namespace evs.API.Controllers
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
 
-                var returnMessage = "There was error with your transaction, please try again.";
+                var returnMessage = "There was an error with your transaction, please try again.";
 
                 if (ex.Source == "Stripe.net")
                     returnMessage = ex.Message;
