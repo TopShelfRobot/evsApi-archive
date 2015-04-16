@@ -845,9 +845,11 @@ namespace evs.API.Controllers
                             DateCreated = DateTime.Now
                             //db.TeamMembers.Add(teamMember);
                         };
-                        //team.TeamMembers.Add(teamMember);
-                        db.TeamMembers.Add(teamMember);
+                        team.TeamMembers.Add(teamMember);
+                        
                     }
+
+                    
 
                     //}
                     //populate surcharge
@@ -871,6 +873,7 @@ namespace evs.API.Controllers
                             order.Surcharges.Add(surcharge);
                         }
                     }
+                    db.Teams.Add(team);
                 }
 
                 Owner owner = db.Owners.Where(o => o.Id == order.OwnerId).SingleOrDefault();
@@ -1048,7 +1051,7 @@ namespace evs.API.Controllers
                 db.EventureLogs.Add(logE);
                 db.SaveChanges();
 
-                var returnMessage = "There was error with your transaction, please try again.";
+                var returnMessage = "There was an error with your transaction, please try again.";
 
                 if (ex.Source == "Stripe.net")
                     returnMessage = ex.Message;
