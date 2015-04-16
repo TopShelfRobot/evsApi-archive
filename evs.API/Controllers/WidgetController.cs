@@ -548,19 +548,38 @@ namespace evs.API.Controllers
                                where l.EventureId == Id
                                select l.Id;
 
-            return db.Teams
-               .Where(t => queryListIds.Contains(t.Registration.EventureListId))
-               .Select(t => new
-               {
-                   TeamName = t.Name,
-                   AmountPaid = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
-                   Captain = t.Coach.FirstName + " " + t.Coach.LastName,
-                   t.Coach.Email,
-                   AmountOwed = t.Registration.TotalAmount,
-                   Balance = t.Registration.TotalAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0)
-               })
-               .OrderBy(t => t.Balance)
+            return db.TeamMemberPayments
+                .Where(p => queryListIds.Contains(p.EventureListId))
+                    .Select(p => new
+                    {
+                        TeamName = p.Team.Name,
+                        AmountPaid = p.Amount,
+                        Captain = p.Team.Coach.FirstName + " " + p.Team.Coach.LastName,
+                        AmountOwed = p.Team.Registration.TotalAmount,
+                        p.Team.Coach.Email,
+                        Balance = p.Team.Registration.TotalAmount - p.Amount
+                    })
+                //.OrderByDescending(p => p.Team.Registration.TotalAmount - p.Amount)
                .ToList();
+
+            //return db.Teams
+            //   .Where(t => queryListIds.Contains(t.Registration.EventureListId))   //&& ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0 > 0)
+            //   .Select(t => new
+            //   {
+            //       TeamName = t.Name,
+            //       AmountPaid = (decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0,
+            //       Captain = t.Coach.FirstName + " " + t.Coach.LastName,
+            //       t.Coach.Email,
+            //       AmountOwed = t.Registration.TotalAmount,
+            //       Balance = t.Registration.TotalAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0)
+            //   })
+            //   .OrderBy(t => t.Balance)
+            //   .ToList();
+
+
+
+
+
         }
 
         public object GetTeamRosterInfoByEventureId(Int32 Id)
