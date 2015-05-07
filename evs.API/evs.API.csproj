@@ -292,6 +292,7 @@
   <ItemGroup>
     <Content Include="Content\EmailTemplates\order-confirmation.min.html" />
     <Content Include="Content\EmailTemplates\reset-password.min.html" />
+    <Content Include="Content\Images\evs-logo.png" />
     <Content Include="Scripts\breeze.debug.js" />
     <Content Include="Scripts\breeze.min.js" />
     <Content Include="Scripts\q.js" />
@@ -333,7 +334,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Content\Images\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\evs.DAL\evs.DAL.csproj">

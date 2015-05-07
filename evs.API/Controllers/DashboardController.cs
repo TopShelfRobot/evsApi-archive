@@ -112,17 +112,17 @@ namespace evs.API.Controllers
             var x = new List<DtoEventuresByYear>();
 
             var eps = new List<EventPartial>();
-            eps.Add(new EventPartial(1, "2015 Runathon"));
-            eps.Add(new EventPartial(2, "2015 Pure Tap 5K"));
-            eps.Add(new EventPartial(3, "2015 Great Pumpkin 5K"));
-            eps.Add(new EventPartial(4, "2015 Urban Bourban"));
+            eps.Add(new EventPartial(5, "2015 Fall Runathon Series"));
+            eps.Add(new EventPartial(9, "2015 Urban Bourbon Half Marathon"));
+            eps.Add(new EventPartial(7, "2015 Norton Sports Health Great Pumpkin 10K"));
+            eps.Add(new EventPartial(6, "2015 Louisville Pure Tap 5K"));
             x.Add(new DtoEventuresByYear(2015, eps));
 
             var eps1 = new List<EventPartial>();
-            eps1.Add(new EventPartial(1, "2014 Runathon"));
-            eps1.Add(new EventPartial(2, "2014 Pure Tap 5K"));
-            eps1.Add(new EventPartial(3, "2014 Great Pumpkin 5K"));
-            eps1.Add(new EventPartial(4, "2014 Urban Bourban"));
+            eps1.Add(new EventPartial(1, "2014 Fall Runathon Series"));
+            eps1.Add(new EventPartial(2, "2014 Louisville pure tap 5K"));
+            eps1.Add(new EventPartial(3, "2014 Norton Sports Health Great Pumpkin 10k"));
+            eps1.Add(new EventPartial(4, "2014 Urban Bourbon Half Marathon"));
             x.Add(new DtoEventuresByYear(2014, eps1));
 
             //var eps1 = new List<EventPartial>();
@@ -376,6 +376,36 @@ namespace evs.API.Controllers
             var queryLists = _contextProvider.Context
                                         .EventureLists
                                         .Where(el => el.EventureId == id)
+                                        .Select(l => l.Id);
+
+            var last7Date = DateTime.Now.AddDays(-7).Date;
+            var reg7Count = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId)).Count(r => r.DateCreated > last7Date && r.EventureOrder.Status == "Complete");
+
+            var last30Date = DateTime.Now.AddDays(-30).Date;
+            var reg30Count = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId)).Count(r => r.DateCreated > last30Date && r.EventureOrder.Status == "Complete");
+
+            var last1Date = DateTime.Now.AddDays(-1).Date;
+            var reg1Count = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId)).Count(r => r.DateCreated > last1Date && r.EventureOrder.Status == "Complete");
+
+            var totalCount = _contextProvider.Context.Registrations.Count(r => queryLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete");
+
+
+            var reg7Amount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.DateCreated > last7Date && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
+            var reg30Amount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.DateCreated > last30Date && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
+            var reg1Amount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.DateCreated > last1Date && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
+            var totalAmount = _contextProvider.Context.Registrations.Where(r => queryLists.Contains(r.EventureListId) && r.EventureOrder.Status == "Complete").Sum(r => (decimal?)r.ListAmount);
+
+
+            return new DtoTrends(reg30Count, reg7Count, reg1Count, totalCount, reg30Amount, reg7Amount, reg1Amount, totalAmount);
+        }
+
+        [HttpGet]
+        public DtoTrends GetYearTrendsByOwnerId(Int32 id)
+        {
+            //refactor with GetTrendsByEventId (one above) very not dry
+            var queryLists = _contextProvider.Context
+                                        .EventureLists
+                                        .Where(el => el.Eventure.OwnerId == id && el.DateEventureList.Year == 2015)
                                         .Select(l => l.Id);
 
             var last7Date = DateTime.Now.AddDays(-7).Date;

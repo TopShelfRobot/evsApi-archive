@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using evs.DAL;
+using Newtonsoft.Json;
 
 namespace evs.API.Controllers
 {
@@ -69,6 +70,27 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
+        public IEnumerable<Participant> GetParticipantsByHouseGuid(string id)
+        {
+            //return db.Participants.Where(p => p.OwnerId == id);
+            //var houseId = db.Participants.Where(p => p.ParticipantGuid.ToString() == id).Select(p => p.Id).FirstOrDefault; 
+            //var houseId = from p in db.Participants
+            //              where p.ParticipantGuid.ToString() == id
+            //              select p.Id;
+
+            //var parts = db.Participants.Where(p => houseId.Contains(p.Id));
+            //return parts;
+
+            string query = "select * from Participant " +
+                           " where houseId in (select id from Participant " +
+                           " where ParticipantGuid = '" + id.ToString() + "') ";
+                         
+            var parts = db.Participants.SqlQuery(query).ToList();
+
+            return parts;
+        }
+
+        [HttpGet]
         public IEnumerable<Participant> GetRegisteredParticipantsByEventureListId(Int32 id)
         {
             //var queryEventureListIdsByEventureListId = db.EventureLists.Where(l => l.Id == id).Select(l => l.Id);
@@ -103,6 +125,59 @@ namespace evs.API.Controllers
 
             var queryOwnerEventures = db.Eventures.Where(e => e.OwnerId == id).Select(e => e.Id);
             var queryOwnersLists = db.EventureLists.Where(el => queryOwnerEventures.Contains(el.EventureId)).Select(l => l.Id);
+
+            //need to check order.Status == 'Complete'   //mjb 
+            var query = from r in db.Registrations
+                        where queryOwnersLists.Contains(r.EventureListId)
+                        group r by r.DateCreated.Month
+                            into reggroup
+                            select new
+                            {
+                                regmonth = reggroup.Key,
+                                regcount = reggroup.Sum(s => s.Quantity),
+                                revsum = reggroup.Sum(s => s.TotalAmount)
+                            };
+            int month = 1;
+            foreach (var g in query)
+            {
+                if (g.regmonth != month)  //enter a zero for that month
+                {
+                    do
+                    {
+                        //myList.Add(month, 0);
+                        graph.Add(new DtoGraph(month, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month).Substring(0, 3), 0, 0));
+                        month++;
+
+                    } while (month != g.regmonth);
+                }
+                //myList.Add(g.regmonth, g.Count());
+                graph.Add(new DtoGraph(g.regmonth, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(g.regmonth).Substring(0, 3), g.regcount, g.revsum));
+                month++;
+            }
+            //must catch any months with 0 at end of 
+            if (month < 12)
+            {
+                do
+                {
+                    //Console.Write(month + "|0---");
+                    //myList.Add(month, 0);
+                    graph.Add(new DtoGraph(month, CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month).Substring(0, 3), 0, 0));
+                    month++;
+
+                } while (month < 13);
+            }
+
+            return graph;
+        }
+
+        [HttpGet]
+        public object GetOwnerGraphByYear(Int32 id)
+        {
+            //refactor this with 2 ownergraphs above  very NOT DRY  //TODO:  refactor dry
+            var graph = new List<DtoGraph>();
+
+            var queryOwnerEventures = db.Eventures.Where(e => e.OwnerId == id).Select(e => e.Id);
+            var queryOwnersLists = db.EventureLists.Where(el => queryOwnerEventures.Contains(el.EventureId)  && el.DateEventureList.Year == 2015).Select(l => l.Id);
 
             //need to check order.Status == 'Complete'   //mjb 
             var query = from r in db.Registrations
@@ -277,10 +352,20 @@ namespace evs.API.Controllers
         public object GetRegistrationsByPartId(Int32 id)
         {
             //need to check order.Status == 'Complete'   //mjb 
-            return db.Registrations.Where(r => r.ParticipantId == id)
+            return db.Registrations.Where(r => r.ParticipantId == id && r.EventureOrder.Status == "Complete")
                 .Select(r => new { r.EventureList.DisplayName, r.TotalAmount, r.Quantity, r.DateCreated, r.Id, r.EventureOrderId, r.StockAnswerSetId })
                 .ToList();
         }
+
+        [HttpGet]
+        public object GetRegistrationsByPartGuid(String id)
+        {
+            //need to check order.Status == 'Complete'   //mjb 
+            return db.Registrations.Where(r => r.Participant.ParticipantGuid.ToString() == id)
+                .Select(r => new { r.EventureList.DisplayName, r.TotalAmount, r.Quantity, r.DateCreated, r.Id, r.EventureOrderId, r.StockAnswerSetId })
+                .ToList();
+        }
+
 
         [HttpGet]
         public object GetRevenuePerEvent(Int32 id)
@@ -327,9 +412,9 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public object GetTeamRegistrationsByHouseId(Int32 id)
+        public object GetTeamRegistrationsByHouseGuid(string id)
         {
-            return db.Teams.Where(t => t.Registration.EventureOrder.HouseId == id
+            return db.Teams.Where(t => t.Registration.EventureOrder.House.ParticipantGuid.ToString() == id
                                     && t.Registration.EventureOrder.Status == "Complete"
                                     && t.Active == true)
                 .Select(t => new
@@ -372,9 +457,9 @@ namespace evs.API.Controllers
         }
 
         [HttpGet]
-        public object GetTeamRegistrationsByCoachId(Int32 id)
+        public object GetTeamRegistrationsByCoachGuid(String id)
         {
-            return db.Teams.Where(t => t.CoachId == id
+            return db.Teams.Where(t => t.Coach.ParticipantGuid.ToString() == id
                                     && t.Registration.EventureOrder.Status == "Complete"
                                     && t.Active == true)
                 .Select(t => new
@@ -392,26 +477,26 @@ namespace evs.API.Controllers
                 .ToList();
         }
 
-        [HttpGet]
-        public object GetTeamRegistrationsByCoachGuid(Guid id)
-        {
-            return db.Teams.Where(t => t.Coach.ParticipantGuid == id
-                                    && t.Registration.EventureOrder.Status == "Complete"
-                                    && t.Active == true)
-                .Select(t => new
-                {
-                    t.Name,
-                    t.Id,
-                    ListName = t.Registration.EventureList.DisplayName,
-                    CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
-                    Amount = (decimal?)t.TeamMemberPayments.Where(p => p.Active == true).Sum(p => p.Amount) ?? 0,
-                    Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
-                    t.Division,
-                    t.TimeFinish,
-                    EventName = t.Registration.EventureList.Eventure.Name
-                })
-                .ToList();
-        }
+        //[HttpGet]     
+        //public object GetTeamRegistrationsByCoachGuid(Guid id)
+        //{
+        //    return db.Teams.Where(t => t.Coach.ParticipantGuid == id
+        //                            && t.Registration.EventureOrder.Status == "Complete"
+        //                            && t.Active == true)
+        //        .Select(t => new
+        //        {
+        //            t.Name,
+        //            t.Id,
+        //            ListName = t.Registration.EventureList.DisplayName,
+        //            CoachName = t.Coach.FirstName + " " + t.Coach.LastName,
+        //            Amount = (decimal?)t.TeamMemberPayments.Where(p => p.Active == true).Sum(p => p.Amount) ?? 0,
+        //            Balance = t.Registration.ListAmount - ((decimal?)t.TeamMemberPayments.Sum(p => p.Amount) ?? 0),
+        //            t.Division,
+        //            t.TimeFinish,
+        //            EventName = t.Registration.EventureList.Eventure.Name
+        //        })
+        //        .ToList();
+        //}
 
 
 
@@ -607,18 +692,67 @@ namespace evs.API.Controllers
                 .ToList();
         }
 
+        [HttpGet]
+        public object GetCapacityByEventureId(Int32 id)
+        {
+            string query = "select count(*) 'regs' , (select sum(capacity) " +
+                        "                             from EventureList " +
+                        "                             where EventureId = " + id.ToString() + ") 'capacity'  " +
+                        "from Registration r " +
+                        "inner join EventureList l " +
+                        "on r.EventureListId = l.Id " +
+                        "inner join EventureOrder o " +
+                        "on r.EventureOrderId = o.Id " +
+                        "where o.status = 'Complete' and l.EventureId = " + id.ToString();
+                            
+            
+            //"and year(l.DateEventureList) = " + id.ToString() +
+            //                "group by gender ";
+
+            return db.Database.SqlQuery<DtoGenderKeyValue>(query).ToList();
+        }
+
 
         [HttpGet]
         public object GetGenderInfoByYear(Int32 id)
         {
             string query = "select p.Gender, count(*) as amount " +
                             "from EventureOrder o inner join Registration r on o.Id = r.EventureOrderId inner join Participant p " +
-                            "on r.ParticipantId = p.Id inner join EventureList l on r.EventureListId = l.Id where status = 'Complete' " +
+                            "on r.ParticipantId = p.Id inner join EventureList l on r.EventureListId = l.Id where o.status = 'Complete' " +
                             "and year(l.DateEventureList) = " + id.ToString() +
                             "group by gender ";
 
             return db.Database.SqlQuery<DtoGenderKeyValue>(query).ToList();
         }
+
+        [HttpGet]
+        public object GetGenderInfoByEventureId(Int32 id)
+        {
+            string query = "select p.Gender, count(*) as amount " +
+                            "from EventureOrder o inner join Registration r on o.Id = r.EventureOrderId inner join Participant p " +
+                            "on r.ParticipantId = p.Id inner join EventureList l on r.EventureListId = l.Id where o.status = 'Complete' " +
+                //"and year(l.DateEventureList) = " + id.ToString() +
+                            " and r.EventureListId in (select Id from EventureList where EventureId = " + id.ToString() + ")" +
+                            "group by gender ";
+
+            return db.Database.SqlQuery<DtoGenderKeyValue>(query).ToList();
+        }
+
+        // public object GetGenderByEventureId(Int32 Id)
+        //{
+        //    var queryListIds = from l in db.EventureLists
+        //                       where l.EventureId == Id
+        //                       select l.Id;
+
+        //    return db.Registration
+        //        .Where(r => queryListIds.Contains(r.EventureListId) )
+        //        .Select(r => new
+        //        {
+        //          r.Particpant.
+        //        })
+                
+        //        .ToList();
+        //}
 
         [HttpGet]
         public object GetAgeInfoByYear(Int32 id)
@@ -653,7 +787,7 @@ namespace evs.API.Controllers
         [HttpGet]
         public object GetZipHeatMapByYear(Int32 id)     
         {
-            string query = "select top 50 p.zip, count(*) as amount " +
+            string query = "select top 25 p.zip, count(*) as amount " +
                             "from EventureOrder o inner join Registration r on o.Id = r.EventureOrderId inner join Participant p " +
                             "on r.ParticipantId = p.Id inner join EventureList l on r.EventureListId = l.Id where status = 'Complete' " +
                             "and year(l.DateEventureList) = " + id.ToString() +
@@ -680,11 +814,24 @@ namespace evs.API.Controllers
                             "order by DateEventureList desc ";
 
 
-            return db.Database.SqlQuery<DtoCapacityRegInfo>(query).ToList();
+            return  db.Database.SqlQuery<DtoCapacityRegInfo>(query).ToList();
         }
 
+         [HttpGet]
+         public object GetRevenueByListByEventureId(Int32 id)
+         {
+             string query = "select l.name as [list], sum(r.listamount) as amount " +
+                            "from registration r inner join EventureList l " +
+                            "on r.EventureListId = l.Id " +
+                            "where l.EventureId = " + id.ToString() +
+                            "group by l.name  " +
+                            "order by sum(r.listamount) desc ";
+
+             return db.Database.SqlQuery<DtoListRevKeyValue>(query).ToList();
+         }
 
 
+   
         public class DtoVolunteerData
         {
             public Int32 Id { get; set; }
@@ -692,6 +839,12 @@ namespace evs.API.Controllers
             public Int32 Shifts { get; set; }
             public Int32 Capacity { get; set; }
             public Int32 MaxCapacity { get; set; }
+        }
+
+        public class DtoListRevKeyValue
+        {
+            public String List { get; set; }
+            public Decimal Amount { get; set; }
         }
 
         public class DtoGenderKeyValue

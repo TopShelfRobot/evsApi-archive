@@ -30,6 +30,7 @@ namespace evs.API.Controllers
             string message = string.Empty;
             Int32 couponId = 0;
             decimal amount = 0;
+            Int32 LinkId = 0;   //this is the weird thing that can be owner, event or list
 
             dynamic vm = jsonObject;
             var registrations = new List<Registration>();
@@ -77,7 +78,7 @@ namespace evs.API.Controllers
                 {
                     bool isValidForThisReg = true;
                     string couponType = coupons.FirstOrDefault().CouponType;
-
+                    
                     //check type and verify valid for owner/event/list  
                     switch (couponType)
                     {
@@ -90,6 +91,7 @@ namespace evs.API.Controllers
                             if (ownerId == coupons.FirstOrDefault().CouponTypeLinkId)
                             {
                                 isValidForThisReg = true;
+                                LinkId = ownerId;
                                 //isOwnerCoupon = true;
                             }
                             else
@@ -106,7 +108,10 @@ namespace evs.API.Controllers
                                                 .Select(l => l.EventureId).SingleOrDefault();
 
                             if (eventureId == coupons.FirstOrDefault().CouponTypeLinkId)
+                            {
                                 isValidForThisReg = true;
+                                LinkId = eventureId;
+                            }
                             else
                             {
                                 message = "Coupon is invalid (E1)";
@@ -120,6 +125,10 @@ namespace evs.API.Controllers
                             {
                                 message = "Coupon is invalid (L1)";
                                 isValidForThisReg = false;
+                            }
+                            else
+                            {
+                                LinkId = reg.EventureListId;
                             }
                             break;
 
@@ -189,7 +198,7 @@ namespace evs.API.Controllers
                 }
             }
 
-            var coupon = new DtoCoupon(amount, message, couponId);
+            var coupon = new DtoCoupon(amount, message, couponId, LinkId);
             var js = new JavaScriptSerializer();
             string jsonData = js.Serialize(coupon);
 
@@ -203,16 +212,18 @@ namespace evs.API.Controllers
             public decimal Amount { get; set; }
             public string Message { get; set; }
             public Int32 CouponId { get; set; }
+            public Int32 LinkId { get; set; }
 
-            public DtoCoupon(decimal amount, string message, Int32 couponId)
+            public DtoCoupon(decimal amount, string message, Int32 couponId, Int32 linkId)
             {
                 Amount = amount;
                 Message = message;
                 CouponId = couponId;
+                LinkId = linkId;
             }
         }
 
-       public IEnumerable<Coupon> GetCoupons()
+        public IEnumerable<Coupon> GetCoupons()
         {
             return db.Coupons.ToArray();
         }

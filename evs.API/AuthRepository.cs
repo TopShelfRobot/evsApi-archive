@@ -191,23 +191,41 @@ namespace evs.API
             return result;
         }
 
-        public List<string> GetAllRoles()
+        //public List<string> GetAllRoles()
+        //{
+        //    var rolesList = new List<string>();
+
+        //    var x = _ctx.Roles
+        //                 .Select(r => new RoleDTO
+        //                 {
+        //                     //RoleId = r.Id,
+        //                     Name = r.Name
+        //                 });
+
+        //    foreach (var y in x)
+        //    {
+        //        rolesList.Add(y.Name.ToString());
+        //    }
+
+        //    return rolesList;
+        //}
+
+
+        public List<IdentityRole> GetAllRoles()
         {
-            var rolesList = new List<string>();
+            //var rolesList = new List<string>();
 
-            var x = _ctx.Roles
-                         .Select(r => new RoleDTO
-                         {
-                             //RoleId = r.Id,
-                             Name = r.Name
-                         });
+            return _ctx.Roles.ToList();
 
-            foreach (var y in x)
-            {
-                rolesList.Add(y.Name.ToString());
-            }
+            //return _AppRoleManager.
+                         
 
-            return rolesList;
+            //foreach (var y in x)
+            //{
+            //    rolesList.Add(y.Name.ToString());
+            //}
+
+            //return rolesList;
         }
 
         public List<string> GetRolesByUserId(string userId)

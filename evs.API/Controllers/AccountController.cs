@@ -617,7 +617,7 @@ namespace evs.API.Controllers
         [AllowAnonymous]
         [Route("GetAllRoles")]
         //public IEnumerable<RoleDTO> GetAllRoles()
-        public List<string> GetAllRoles()
+        public List<IdentityRole> GetAllRoles()
         {
             return _repo.GetAllRoles();
         }
