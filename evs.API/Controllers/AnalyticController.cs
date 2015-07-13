@@ -259,7 +259,7 @@ namespace evs.API.Controllers
         [Route("GetCouponsByEventureId/{eventureId}")]
         public object GetCouponsByEventureId( Int32 eventureId)
         {
-            string query = " select p.Email,  p.FirstName, p.LastName, c.Code, o.Id as 'OrderId' ,l.Name as 'ListName', s.Amount as 'CouponAmount', s.DateCreated as 'DateCouponRedeemed'" +
+            string query = " select p.Email,  p.FirstName, p.LastName, c.Code, o.Id as 'OrderId' ,e.Name as 'ListName', s.Amount as 'CouponAmount', s.DateCreated as 'DateCouponRedeemed'" +
                 " from surcharge s " +
                 " inner join coupon c " +
                 " on s.CouponId = c.Id " +
@@ -267,12 +267,12 @@ namespace evs.API.Controllers
                 " on s.EventureOrderId = o.Id " +
                 " left join Participant p " +
                 " on  o.HouseId = p.Id " +
-                " left join EventureList l " +
-                " on s.EventureListId = l.Id " +
+                " left join Eventure e " +
+                " on s.EventureListId = e.Id " +   //weird join bad design mb071315
                 " and c.CouponType = 'event' " +
                 " where ChargeType = 'coupon' " +
                 " and o.status ='Complete' " +
-                " and EventureListId in (select ID from eventurelist where eventureId = " + eventureId.ToString() + ")" +
+                " and e.id = " + eventureId.ToString() +
                 " order by s.DateCreated";
 
             return db.Database.SqlQuery<DtoCouponInfo>(query).ToList();
