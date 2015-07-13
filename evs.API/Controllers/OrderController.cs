@@ -62,12 +62,18 @@ namespace evs.API.Controllers
 
             //transactionStatus = _studentService.CreateStudent(stundentBo);
 
+
+
+
+
+
+
+
             int place = 0;
 
             try
             {
-
-                //quick val  check required?
+               //quick val  check required?
 
                 //deserial obj
                 var order = BuildOrder(orderBundle);
@@ -155,7 +161,7 @@ namespace evs.API.Controllers
                 };
 
                 place = 5;
-                
+
                 var stripeCharge = stripeChargeService.Create(stripeChargeOption);
 
                 place = 6;
@@ -177,6 +183,8 @@ namespace evs.API.Controllers
                     order.Voided = false;
                     order.Status = "Complete";
                     order.OrderStatus = OrderStatus.Completed;
+                    order.PaymentType = PaymentType.credit;
+                    order.OrderTypeId = OrderType.online;
                     //mjb fix order.PaymentType = "credit";
                     //db.Orders.Add(order);
                     //db.SaveChanges();
@@ -219,7 +227,7 @@ namespace evs.API.Controllers
                     logE.DateCreated = System.DateTime.Now.ToLocalTime();
                     db.EventureLogs.Add(logE);
                     db.SaveChanges();
-                    
+
                     var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
                     badResp.Content = new StringContent(stripeCharge.FailureMessage, Encoding.UTF8, "text/plain");
                     return badResp;
@@ -271,6 +279,162 @@ namespace evs.API.Controllers
             //}
         }
 
+        //this is a last second quick fix.  please forgive me
+        [Route("PostMan")]
+        [HttpPost]
+        public HttpResponseMessage CreateManualOrder(JObject orderBundle)
+        {
+            try
+            {
+                var order = BuildOrder(orderBundle);   //deserial obj
+                order.OrderTypeId = OrderType.manual;
+                var processCard = false;
+
+                //validate  //capacity and such
+                Owner owner = db.Owners.Where(o => o.Id == 1).SingleOrDefault();
+                if (owner == null)
+                {
+                    throw new Exception("Owner Setup is Not Configured Correctly");
+                }
+                var part = db.Participants.Where(p => p.Id == order.HouseId).FirstOrDefault();
+                if (part == null)
+                {
+                    throw new Exception("Could not locate participant");
+                }
+                
+                switch ((string)orderBundle["paymentType"])
+                {
+                    case "credit":
+                        order.PaymentType = PaymentType.credit;
+                        processCard = true;
+                        break;
+                    case "check":
+                        order.PaymentType = PaymentType.check;
+                        break;
+                    case "cash":
+                        order.PaymentType = PaymentType.cash;
+                        break;
+                    case "giftCertificate":
+                        order.PaymentType = PaymentType.giftCertificate;
+                        break;
+                    default:
+                        //Console.WriteLine("Default case");
+                        break;
+                }
+                
+                //calulate
+                order.CardProcessorFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.CardProcessorFeePercentPerCharge / 100, 0) + owner.CardProcessorFeeFlatPerChargeInCents);
+                order.LocalFeeInCents = Convert.ToInt32(Math.Round(Convert.ToInt32(order.Amount * 100) * owner.LocalFeePercentOfCharge / 100, 0) + owner.LocalFeeFlatPerChargeInCents);
+                order.LocalApplicationFee = order.LocalFeeInCents - order.CardProcessorFeeInCents;
+
+                if (order.LocalApplicationFee < 0)
+                    order.LocalApplicationFee = 0;
+                
+                StripeCharge stripeCharge = new StripeCharge();
+                if (processCard)
+                    stripeCharge = createStripeCharge(owner.AccessToken, order.Amount, owner.Name, order.LocalApplicationFee, part.FirstName + " " + part.LastName, part.Email, order.Token);
+                
+                if (string.IsNullOrEmpty(stripeCharge.FailureCode) || !processCard )
+                {
+                    if (processCard)
+                    { 
+                        order.AuthorizationCode = stripeCharge.Id;
+                        order.CardNumber = stripeCharge.StripeCard.Last4;
+                        order.CardCvcCheck = stripeCharge.StripeCard.CvcCheck;
+                        order.CardExpires = stripeCharge.StripeCard.ExpirationMonth + "/" + stripeCharge.StripeCard.ExpirationYear;
+                        order.CardFingerprint = stripeCharge.StripeCard.Fingerprint;
+                        order.CardName = stripeCharge.StripeCard.Name;
+                        order.CardOrigin = stripeCharge.StripeCard.Country;
+                        //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
+                    }
+                    order.Voided = false;
+                    order.Status = "Complete";
+                    order.OrderStatus = OrderStatus.Completed;   //this will replace status
+                    OrderService _orderService = new OrderService();
+                    var x = _orderService.CreateOrder(order);
+                    
+                    HttpResponseMessage result;
+
+                    if (ConfigurationManager.AppSettings["CustomName"] == "bourbonchase")
+                        //result = new MailController().SendBourbonLotteryConfirm(order.Id);
+                        result = new MailController().SendConfirmMail(order.Id);   //change back to bourbon chase??
+                    else
+                        result = new MailController().SendConfirmMail(order.Id);
+                    
+                    var resp = Request.CreateResponse(HttpStatusCode.OK);
+                    //resp.Content = new StringContent();
+                    resp.Content = new StringContent(order.Id.ToString(), Encoding.UTF8, "text/plain");
+                    return resp;
+                }
+                else
+                {
+                    var logE = new EventureLog();
+                    logE.Message = "Stripe Exception: " + stripeCharge.FailureMessage +  " -- bundle: " + orderBundle;
+                    logE.Caller = "Order_ERROR_stripe";
+                    logE.Status = "Warning";
+                    logE.LogDate = System.DateTime.Now.ToLocalTime();
+                    logE.DateCreated = System.DateTime.Now.ToLocalTime();
+                    db.EventureLogs.Add(logE);
+                    db.SaveChanges();
+
+                    var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
+                    badResp.Content = new StringContent(stripeCharge.FailureMessage, Encoding.UTF8, "text/plain");
+                    return badResp;
+                }
+            }
+            catch (Exception ex)
+            {
+                var logE = new EventureLog();
+                logE.Message = "Order exception: " + ex.Message +  " -- bundle: " + orderBundle;
+                logE.Caller = "Order_ERROR";
+                logE.Status = "ERROR";
+                logE.LogDate = System.DateTime.Now.ToLocalTime();
+                logE.DateCreated = System.DateTime.Now.ToLocalTime();
+                db.EventureLogs.Add(logE);
+                db.SaveChanges();
+
+                string message = ex.Message;
+                string returnMessage = string.Empty;
+
+                if (message.Substring(0, 4) == "Your")
+                    returnMessage = ex.Message;
+                else
+                    returnMessage = "There was problem processing your order.  Please Try again.";
+
+                var badResp = Request.CreateResponse(HttpStatusCode.BadRequest);
+                //resp.Content = new StringContent();
+                badResp.Content = new StringContent(returnMessage, Encoding.UTF8, "text/plain");
+                return badResp;
+            }
+
+        }
+
+        private StripeCharge createStripeCharge(string accessToken, decimal orderAmount, string ownerName, Int32 appFee, string customerDesc, string customerEmail, string customerToken)
+        {
+            var customerOptions = new StripeCustomerCreateOptions
+            {
+                Email = customerEmail, //Email,
+                Description = customerDesc,
+                TokenId = customerToken,
+            };
+
+            var stripeCustomerService = new StripeCustomerService(accessToken);   //owner.AccessToken
+            var customer = stripeCustomerService.Create(customerOptions);
+            var stripeChargeService = new StripeChargeService(accessToken); //The token returned from the above method
+
+            var stripeChargeOption = new StripeChargeCreateOptions()
+            {
+                Amount = Convert.ToInt32(orderAmount * 100),
+                Currency = "usd",
+                CustomerId = customer.Id,
+                Description = ownerName,
+                ApplicationFee = appFee
+            };
+
+            return stripeChargeService.Create(stripeChargeOption);
+        }
+
+
         [Route("PostZero")]
         [HttpPost]
         public HttpResponseMessage CreateZeroAmountOrder(JObject orderBundle)
@@ -317,6 +481,7 @@ namespace evs.API.Controllers
                 //mjb fixorder.CardType = stripeCharge.StripeCard.Type;
                 order.Voided = false;
                 order.Status = "Complete";
+                order.PaymentType = PaymentType.zeroBalance;
                 //mjb fix order.PaymentType = "credit";
                 //db.Orders.Add(order);
                 //db.SaveChanges();
@@ -334,7 +499,7 @@ namespace evs.API.Controllers
                 //if (ConfigurationManager.AppSettings["CustomName"] == "bourbonchase")
                 //    result = new MailController().SendBourbonLotteryConfirm(order.Id);
                 //else
-                    result = new MailController().SendConfirmMail(order.Id);
+                result = new MailController().SendConfirmMail(order.Id);
                 //HttpResponseMessage result = new MailController().SendTestEmail();
 
                 var resp = Request.CreateResponse(HttpStatusCode.OK);
@@ -359,8 +524,7 @@ namespace evs.API.Controllers
                 return badResp;
             }
         }
-
-
+        
         private EventureOrder BuildOrder(JObject orderBundle)
         {
             //orderAmount: cart.getTotalPrice(),
@@ -396,10 +560,10 @@ namespace evs.API.Controllers
                         //EventureOrderId = order.Id,
                         EventureOrder = order,
                         DateCreated = DateTime.Now,
-                        CouponId = surchargeBundle.couponId                     
+                        CouponId = surchargeBundle.couponId
                     };
 
-                    string  chargeType = surchargeBundle.chargeType ?? "";
+                    string chargeType = surchargeBundle.chargeType ?? "";
                     switch (chargeType)
                     {
                         case "coupon":
@@ -408,7 +572,7 @@ namespace evs.API.Controllers
                         case "cartRule":
                             surcharge.SurchargeType = SurchargeType.Discount;
                             break;
-                         case "onlineFee":
+                        case "onlineFee":
                             surcharge.SurchargeType = SurchargeType.OnlineFee;
                             break;
                         default:
@@ -429,13 +593,13 @@ namespace evs.API.Controllers
                         EventureListId = addonBundle.listId,
                         ChargeType = addonBundle.chargeType,
                         Description = addonBundle.addonName,
-                        ParticipantId = (Int32)orderBundle["orderHouseId"],  
+                        ParticipantId = (Int32)orderBundle["orderHouseId"],
                         EventureOrder = order,
                         DateCreated = DateTime.Now,
                         AddonId = addonBundle.addonId,
                         Quantity = addonBundle.quantity,
                         SurchargeType = SurchargeType.Addon
-    
+
                     };
                     //totalFees = 33; //totalFees + Convert.ToDecimal(surchargeBundle.amount);
                     order.Surcharges.Add(surcharge);
@@ -485,10 +649,26 @@ namespace evs.API.Controllers
             }
             return order;
         }
+
     }
 
 
 
+
+    //if (transactionStatus.Status == false)
+    //{
+    //    var badResponse = Request.CreateResponse(HttpStatusCode.BadRequest, JsonConvert.SerializeObject(studentViewModel));
+    //    return badResponse;
+    //}
+    //else
+    //{
+    //    transactionStatus.ErrorType = ErrorTypeEnum.Success.ToString();
+    //    transactionStatus.ReturnMessage.Add("Record successfully inserted to database");
+
+    //    var badResponse = Request.CreateResponse(HttpStatusCode.Created, transactionStatus);
+
+    //    return badResponse;
+    //}
 
 
 

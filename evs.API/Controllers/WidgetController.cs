@@ -505,13 +505,13 @@ namespace evs.API.Controllers
         public object GetCouponUseByCouponId(Int32 id)
         {
             var surcharge = from s in db.Surcharges
-                            join l in db.EventureLists
-                            on s.EventureListId equals l.Id
+                            join e in db.Eventures
+                            on s.EventureListId equals e.Id     //this line looks wrong but is correct most of the time  stupid join
                             join p in db.Participants
                             on s.ParticipantId equals p.Id
                             where s.ChargeType == "coupon"
                             && s.CouponId == id
-                            select new { s.Amount, s.Description, l.Name, s.EventureOrderId, p.FirstName, p.LastName, s.CouponId };
+                            select new { s.Amount, s.Description, e.Name, s.EventureOrderId, p.FirstName, p.LastName, s.CouponId };
 
             return surcharge;
         }
