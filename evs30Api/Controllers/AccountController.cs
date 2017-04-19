@@ -21,7 +21,7 @@ namespace evs30Api.Controllers
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
-        //private evsContext db = new evsContext();
+        private evsContext db = new evsContext();
 
         // GET: /Account/Login
         [AllowAnonymous]
@@ -470,9 +470,9 @@ namespace evs30Api.Controllers
 
 
         [HttpGet]
-        public IEnumerable<AspNetUser> ParticipantsByHouseId(int houseId)
+        public IEnumerable<Participant> ParticipantsByHouseId(int houseId) // AspNetUser
         {
-            return _db.Participants
+            return db.Participants
                         .Where(p => p.HouseId == houseId) //.Where(p => p.Hous)eId = 1);
                         .OrderBy(p => (p.HouseId == p.Id) ? -1 : 1);   //this should cause the one that is houseID to top
         }
