@@ -30,3 +30,15 @@ D:\source\evs30Api\evs.Model\bin\Microsoft.AspNet.Identity.Core.xml
 D:\source\evs30Api\evs.Model\obj\Debug\evs.Model.dll
 D:\source\evs30Api\evs.Model\obj\Debug\evs.Model.pdb
 D:\source\evs30Api\evs.Model\obj\Debug\evs.Model.csprojResolveAssemblyReference.cache
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\bin\evs.Model.dll.config
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\bin\evs.Model.dll
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\bin\evs.Model.pdb
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\bin\EntityFramework.dll
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\bin\EntityFramework.SqlServer.dll
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\bin\Microsoft.AspNet.Identity.Core.dll
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\bin\EntityFramework.xml
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\bin\EntityFramework.SqlServer.xml
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\bin\Microsoft.AspNet.Identity.Core.xml
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\obj\Debug\evs.Model.csprojResolveAssemblyReference.cache
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\obj\Debug\evs.Model.dll
+C:\Users\aarontropy\Source\Repos\evsApi\evs.Model\obj\Debug\evs.Model.pdb

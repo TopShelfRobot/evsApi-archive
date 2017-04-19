@@ -543,7 +543,7 @@ namespace evs30Api.Controllers
             if (isValidCoupon)
             {
                 couponDto.Message = "valid";
-                if (coupons.FirstOrDefault().DiscountType == 0)  //$ off
+                if (coupons.FirstOrDefault().AmountType == 0)  //$ off
                 {
                     couponDto.Amount = coupons.FirstOrDefault().Amount * -1;   //this could be off if there are two 
                     couponDto.CouponId = coupons.FirstOrDefault().Id;
@@ -688,7 +688,7 @@ namespace evs30Api.Controllers
                     && (l.Active)
                     && (EntityFunctions.TruncateTime(l.DateBeginReg) <= EntityFunctions.TruncateTime(DateTime.Now))
                     && (EntityFunctions.TruncateTime(l.DateEndReg) >= EntityFunctions.TruncateTime(DateTime.Now))
-                    && l.Capacity > l.Registration.Count()
+                    && l.Capacity > l.Registrations.Count()
                     );
         }
 

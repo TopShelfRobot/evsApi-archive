@@ -168,7 +168,7 @@ namespace evs30Api.Controllers
                     if (isValidForThisReg)
                     {
                         //message = "valid";
-                        if (coupons.FirstOrDefault().DiscountType == 0) //$ off
+                        if (coupons.FirstOrDefault().AmountType == 0) //$ off
                         {
                             //for $off coupons we just need to return value so we break from foreach reg loop
                             amount = coupons.FirstOrDefault().Amount * -1;

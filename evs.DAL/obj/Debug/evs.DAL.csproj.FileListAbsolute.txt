@@ -43,3 +43,6 @@ D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.reg_order_status.resourc
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.team_eventureListId.resources
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.part_guid.resources
 D:\source\evs30Api\evs.DAL\obj\Debug\evs.DAL.Migrations.dbGenOption.resources
+C:\Users\aarontropy\Source\Repos\evsApi\evs.DAL\obj\Debug\evs.DAL.csprojResolveAssemblyReference.cache
+C:\Users\aarontropy\Source\Repos\evsApi\evs.DAL\obj\Debug\evs.DAL.dll
+C:\Users\aarontropy\Source\Repos\evsApi\evs.DAL\obj\Debug\evs.DAL.pdb
